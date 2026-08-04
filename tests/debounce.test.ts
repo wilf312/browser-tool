@@ -56,4 +56,31 @@ describe('debounce', () => {
     debounce(fn, 300).flush();
     expect(fn).not.toHaveBeenCalled();
   });
+
+  it('does nothing when flushed again after the call went through', () => {
+    const fn = vi.fn();
+    const debounced = debounce(fn, 300);
+    debounced('a');
+    vi.advanceTimersByTime(300);
+    debounced.flush();
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits 300ms unless told otherwise', () => {
+    const fn = vi.fn();
+    debounce(fn)('a');
+
+    vi.advanceTimersByTime(299);
+    expect(fn).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(1);
+    expect(fn).toHaveBeenCalledExactlyOnceWith('a');
+  });
+
+  it('passes every argument through', () => {
+    const fn = vi.fn();
+    debounce(fn, 300)('a', 2, { c: true });
+    vi.advanceTimersByTime(300);
+    expect(fn).toHaveBeenCalledExactlyOnceWith('a', 2, { c: true });
+  });
 });

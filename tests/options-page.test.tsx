@@ -86,6 +86,24 @@ describe('redirect rules', () => {
     expect(storedRules()[0].from).toBe('a.atlassian.net');
   });
 
+  it('edits one row without disturbing the others', async () => {
+    await mount([
+      { id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true },
+      { id: '2', from: 'c.atlassian.net', to: 'd.atlassian.net', enabled: true },
+    ]);
+
+    fireEvent.change(within(rows()[1]).getByLabelText('from'), {
+      target: { value: 'e.atlassian.net' },
+    });
+    fireEvent.click(within(rows()[1]).getByLabelText('有効'));
+    await settleSave();
+
+    expect(storedRules()).toEqual([
+      { id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true },
+      { id: '2', from: 'e.atlassian.net', to: 'd.atlassian.net', enabled: false },
+    ]);
+  });
+
   it('keeps the caret in the input being typed into', async () => {
     await mount([{ id: '1', from: '', to: '', enabled: true }]);
 
@@ -136,6 +154,30 @@ describe('redirect rules', () => {
     await settleSave();
 
     expect(screen.getAllByRole('status')[0].textContent).toBe('保存しました');
+  });
+
+  it('reports a failed save instead of pretending it worked', async () => {
+    await mount([{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }]);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = new Error('QUOTA_BYTES_PER_ITEM quota exceeded');
+    chrome.sync.set.mockRejectedValueOnce(error);
+
+    fireEvent.click(screen.getByLabelText('有効'));
+    await settleSave();
+
+    expect(screen.getAllByRole('status')[0].textContent).toBe('保存に失敗しました');
+    expect(logged.mock.calls[0]).toContain(error);
+  });
+
+  it('keeps the edit on screen when the save failed', async () => {
+    await mount([{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }]);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    chrome.sync.set.mockRejectedValueOnce(new Error('offline'));
+
+    fireEvent.change(screen.getByLabelText('to'), { target: { value: 'z.atlassian.net' } });
+    await settleSave();
+
+    expect(screen.getByLabelText<HTMLInputElement>('to').value).toBe('z.atlassian.net');
   });
 
   it('flushes a pending save when the page is hidden', async () => {
@@ -213,6 +255,36 @@ describe('meet auto join settings', () => {
     });
 
     expect(chrome.store[MEET_SETTINGS_KEY]).toEqual({ enabled: true, intervalMinutes: 5 });
+  });
+
+  it('reports a failed save instead of pretending it worked', async () => {
+    await mount([]);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = new Error('MAX_WRITE_OPERATIONS_PER_MINUTE quota exceeded');
+    chrome.sync.set.mockRejectedValueOnce(error);
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('自動入室を有効にする'));
+    });
+
+    expect(screen.getAllByRole('status')[1].textContent).toBe('保存に失敗しました');
+    expect(logged.mock.calls[0]).toContain(error);
+    // The checkbox still shows what the user asked for, not what got stored.
+    expect(screen.getByLabelText<HTMLInputElement>('自動入室を有効にする').checked).toBe(true);
+  });
+
+  it('clears the status message again once it has been read', async () => {
+    await mount([]);
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('自動入室を有効にする'));
+    });
+    expect(screen.getAllByRole('status')[1].textContent).toBe('保存しました');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
+    expect(screen.getAllByRole('status')[1].textContent).toBe('');
   });
 
   it('picks up settings changed in another context', async () => {
