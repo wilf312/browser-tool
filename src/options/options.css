@@ -44,6 +44,11 @@ h2 {
   font-size: 14px;
 }
 
+h3 {
+  margin: 16px 0 8px;
+  font-size: 13px;
+}
+
 section + section {
   margin-top: 24px;
   padding-top: 20px;
@@ -177,4 +182,51 @@ button:hover {
 .status {
   color: var(--muted);
   font-size: 12px;
+}
+
+.feature-picker {
+  margin: 0;
+  padding: 8px 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.feature-picker legend {
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.feature-detail {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.error {
+  margin: 12px 0 0;
+  color: #c0392b;
+  font-size: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .error {
+    color: #ff8a80;
+  }
 }
