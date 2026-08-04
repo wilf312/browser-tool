@@ -25,7 +25,10 @@ export function createRule({
 export function sanitizeRules(raw: unknown): RedirectRule[] {
   if (!Array.isArray(raw)) return [];
   return raw
-    .filter((rule): rule is Record<string, unknown> => rule !== null && typeof rule === 'object' && !Array.isArray(rule))
+    .filter(
+      (rule): rule is Record<string, unknown> =>
+        rule !== null && typeof rule === 'object' && !Array.isArray(rule),
+    )
     .map((rule) => ({
       id: typeof rule.id === 'string' && rule.id ? rule.id : newId(),
       from: typeof rule.from === 'string' ? rule.from : '',

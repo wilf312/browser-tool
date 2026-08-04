@@ -25,7 +25,13 @@ body {
   min-width: 560px;
   background: var(--bg);
   color: var(--fg);
-  font: 13px/1.6 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font:
+    13px/1.6 system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Hiragino Sans',
+    'Noto Sans JP',
+    sans-serif;
 }
 
 h1 {
@@ -101,7 +107,7 @@ td.empty {
   text-align: center;
 }
 
-input[type="text"] {
+input[type='text'] {
   box-sizing: border-box;
   width: 100%;
   padding: 5px 7px;
@@ -112,12 +118,12 @@ input[type="text"] {
   font: inherit;
 }
 
-input[type="text"]:focus-visible {
+input[type='text']:focus-visible {
   border-color: var(--accent);
   outline: 1px solid var(--accent);
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   width: 15px;
   height: 15px;
   margin: 0;

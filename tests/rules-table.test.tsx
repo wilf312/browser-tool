@@ -15,7 +15,13 @@ let onAdd: Mock<() => void>;
 
 function setup(rules: RedirectRule[] = sample, focusId: string | null = null) {
   return render(
-    <RulesTable rules={rules} focusId={focusId} onChange={onChange} onDelete={onDelete} onAdd={onAdd} />,
+    <RulesTable
+      rules={rules}
+      focusId={focusId}
+      onChange={onChange}
+      onDelete={onDelete}
+      onAdd={onAdd}
+    />,
   );
 }
 

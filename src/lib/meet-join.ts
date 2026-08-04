@@ -42,10 +42,14 @@ function isClickable(element: Element): boolean {
  * @param root where to look; defaults to the page.
  * @returns the button to click, or null while it is not on the page yet.
  */
-export function findJoinButton(root: ParentNode | null | undefined = globalThis.document): HTMLElement | null {
+export function findJoinButton(
+  root: ParentNode | null | undefined = globalThis.document,
+): HTMLElement | null {
   if (!root || typeof root.querySelectorAll !== 'function') return null;
 
-  const candidates = Array.from(root.querySelectorAll('button, [role="button"]')).filter(isClickable);
+  const candidates = Array.from(root.querySelectorAll('button, [role="button"]')).filter(
+    isClickable,
+  );
 
   for (const wanted of JOIN_LABELS) {
     const match = candidates.find((element) => label(element).includes(wanted));

@@ -41,8 +41,10 @@ export function MeetAutoJoinSection() {
     <section>
       <h2>Meet 自動入室</h2>
       <p className="lead">
-        Google Meet の待機画面を開いておくと、次の開始時刻になったときに「参加」ボタンを自動でクリックします。
-        <br />例) 10:07 に待機画面を開く → <code>10:15</code> に入室
+        Google Meet
+        の待機画面を開いておくと、次の開始時刻になったときに「参加」ボタンを自動でクリックします。
+        <br />
+        例) 10:07 に待機画面を開く → <code>10:15</code> に入室
       </p>
 
       <div className="field">

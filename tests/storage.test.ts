@@ -51,7 +51,10 @@ describe('sanitizeRules', () => {
   });
 
   it('coerces enabled to a boolean', () => {
-    expect(sanitizeRules([{ enabled: 0 }, { enabled: 'yes' }]).map((r) => r.enabled)).toEqual([false, true]);
+    expect(sanitizeRules([{ enabled: 0 }, { enabled: 'yes' }]).map((r) => r.enabled)).toEqual([
+      false,
+      true,
+    ]);
   });
 
   it('returns an empty array for anything that is not an array', () => {
@@ -87,10 +90,17 @@ describe('loadRules', () => {
 describe('saveRules', () => {
   it('writes the sanitized rules to chrome.storage.sync', async () => {
     const chrome = installFakeChrome();
-    await saveRules([{ from: 'a.atlassian.net', to: 'b.atlassian.net' }, 'junk'] as unknown as RedirectRule[]);
+    await saveRules([
+      { from: 'a.atlassian.net', to: 'b.atlassian.net' },
+      'junk',
+    ] as unknown as RedirectRule[]);
     const saved = chrome.store[STORAGE_KEY] as RedirectRule[];
     expect(saved).toHaveLength(1);
-    expect(saved[0]).toMatchObject({ from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true });
+    expect(saved[0]).toMatchObject({
+      from: 'a.atlassian.net',
+      to: 'b.atlassian.net',
+      enabled: true,
+    });
   });
 
   it('does nothing when the extension apis are missing', async () => {

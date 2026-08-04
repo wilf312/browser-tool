@@ -28,7 +28,9 @@ export interface FakeChrome {
   };
   dnr: {
     getDynamicRules: Mock<() => Promise<Array<{ id: number }> | undefined>>;
-    updateDynamicRules: Mock<(options: { removeRuleIds: number[]; addRules: unknown[] }) => Promise<void>>;
+    updateDynamicRules: Mock<
+      (options: { removeRuleIds: number[]; addRules: unknown[] }) => Promise<void>
+    >;
   };
   /** What the service worker registered for the browser lifecycle events. */
   runtime: {
@@ -41,7 +43,10 @@ export interface FakeChrome {
   emitRuntime(event: 'installed' | 'startup'): void;
 }
 
-export function installFakeChrome({ storage = {}, dynamicRules = [] }: FakeChromeOptions = {}): FakeChrome {
+export function installFakeChrome({
+  storage = {},
+  dynamicRules = [],
+}: FakeChromeOptions = {}): FakeChrome {
   const store: Record<string, unknown> = { ...storage };
   const listeners: ChangeListener[] = [];
   const runtime = { installed: [] as RuntimeListener[], startup: [] as RuntimeListener[] };

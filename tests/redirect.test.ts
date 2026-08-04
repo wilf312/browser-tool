@@ -33,13 +33,15 @@ describe('resolveRedirect', () => {
   const rules = [{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }];
 
   it('redirects to the export destination keeping the pathname', () => {
-    expect(resolveRedirect('https://a.atlassian.net/browse/XAPP-134', rules))
-      .toBe('https://b.atlassian.net/browse/XAPP-134');
+    expect(resolveRedirect('https://a.atlassian.net/browse/XAPP-134', rules)).toBe(
+      'https://b.atlassian.net/browse/XAPP-134',
+    );
   });
 
   it('keeps the query string and the hash', () => {
-    expect(resolveRedirect('https://a.atlassian.net/issues/?jql=project%3DXAPP#top', rules))
-      .toBe('https://b.atlassian.net/issues/?jql=project%3DXAPP#top');
+    expect(resolveRedirect('https://a.atlassian.net/issues/?jql=project%3DXAPP#top', rules)).toBe(
+      'https://b.atlassian.net/issues/?jql=project%3DXAPP#top',
+    );
   });
 
   it('keeps the root path', () => {
@@ -47,13 +49,15 @@ describe('resolveRedirect', () => {
   });
 
   it('keeps the scheme', () => {
-    expect(resolveRedirect('http://a.atlassian.net/browse/X-1', rules))
-      .toBe('http://b.atlassian.net/browse/X-1');
+    expect(resolveRedirect('http://a.atlassian.net/browse/X-1', rules)).toBe(
+      'http://b.atlassian.net/browse/X-1',
+    );
   });
 
   it('matches the host case-insensitively', () => {
-    expect(resolveRedirect('https://A.Atlassian.NET/browse/X-1', rules))
-      .toBe('https://b.atlassian.net/browse/X-1');
+    expect(resolveRedirect('https://A.Atlassian.NET/browse/X-1', rules)).toBe(
+      'https://b.atlassian.net/browse/X-1',
+    );
   });
 
   it('does not match a host that merely ends with the from host', () => {
@@ -87,9 +91,12 @@ describe('resolveRedirect', () => {
   });
 
   it('accepts rules written with a scheme or a trailing slash', () => {
-    const messy = [{ id: '1', from: 'https://a.atlassian.net/', to: 'https://b.atlassian.net', enabled: true }];
-    expect(resolveRedirect('https://a.atlassian.net/browse/X-1', messy))
-      .toBe('https://b.atlassian.net/browse/X-1');
+    const messy = [
+      { id: '1', from: 'https://a.atlassian.net/', to: 'https://b.atlassian.net', enabled: true },
+    ];
+    expect(resolveRedirect('https://a.atlassian.net/browse/X-1', messy)).toBe(
+      'https://b.atlassian.net/browse/X-1',
+    );
   });
 
   it('uses the first matching enabled rule', () => {
@@ -98,8 +105,9 @@ describe('resolveRedirect', () => {
       { id: '2', from: 'a.atlassian.net', to: 'c.atlassian.net', enabled: true },
       { id: '3', from: 'a.atlassian.net', to: 'd.atlassian.net', enabled: true },
     ];
-    expect(resolveRedirect('https://a.atlassian.net/browse/X-1', many))
-      .toBe('https://c.atlassian.net/browse/X-1');
+    expect(resolveRedirect('https://a.atlassian.net/browse/X-1', many)).toBe(
+      'https://c.atlassian.net/browse/X-1',
+    );
   });
 
   it('returns null for a url it cannot parse', () => {
@@ -141,8 +149,14 @@ describe('buildDnrRules', () => {
       { id: 'e', from: 'g.atlassian.net', to: 'h.atlassian.net', enabled: true },
     ]);
     expect(built.map((r) => r.id)).toEqual([1, 2]);
-    expect(built.map((r) => r.condition.urlFilter)).toEqual(['||c.atlassian.net/', '||g.atlassian.net/']);
-    expect(built.map((r) => r.action.redirect?.transform?.host)).toEqual(['d.atlassian.net', 'h.atlassian.net']);
+    expect(built.map((r) => r.condition.urlFilter)).toEqual([
+      '||c.atlassian.net/',
+      '||g.atlassian.net/',
+    ]);
+    expect(built.map((r) => r.action.redirect?.transform?.host)).toEqual([
+      'd.atlassian.net',
+      'h.atlassian.net',
+    ]);
   });
 
   it('returns an empty array for no rules', () => {
