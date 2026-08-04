@@ -23,6 +23,13 @@ export default defineConfig(({ mode }) => ({
     // chrome://extensions. A release ships neither the maps nor the sources
     // they inline, so it drops them.
     sourcemap: mode !== 'release',
+    // Vite would emit `<link rel="modulepreload" crossorigin>` for the chunks
+    // shared between the settings page and the service worker. Chrome fetches
+    // those `chrome-extension://` preloads in a different world than the module
+    // graph, so they never match the real request: the page logs "cross-world
+    // extension resource mismatch" and downloads the chunk twice. The extension
+    // loads from local disk, where the head start buys nothing anyway.
+    modulePreload: false,
     rollupOptions: {
       input: {
         options: resolve(import.meta.dirname, 'options.html'),
