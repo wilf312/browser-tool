@@ -89,6 +89,8 @@ npm run lint       # oxlint
 npm run lint:fix   # oxlint --fix（自動修正できるものだけ直す）
 npm run typecheck  # tsc --noEmit
 npm test           # 一度だけ実行
+npm run test:unit      # ユニットテスト（*.unit.test.ts）だけ
+npm run test:scenario  # シナリオテスト（*.scenario.test.ts）だけ
 npm run test:watch
 npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レポート）
 ```
@@ -113,6 +115,17 @@ npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レ
 
 TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM は jsdom）と
 [Testing Library](https://testing-library.com/) を使用します。
+
+テストファイルは種類を名前で区別します。
+
+- **ユニットテスト** `tests/<対象>.unit.test.ts(x)`: モジュール 1 つ（純粋関数・
+  ラッパ・単体のコンポーネント）を、依存を差し替えた状態で確かめます
+- **シナリオテスト** `tests/<対象>.scenario.test.ts(x)`: service worker の起動、
+  content script の自動入室、設定画面の操作といった、複数のモジュールをまたぐ
+  一連の流れを通します
+
+`vitest.config.ts` の `include` はこの 2 つだけを拾うので、どちらでもない名前の
+ファイルは実行されません。
 
 カバレッジは `src/**` が対象です（型定義のみの `src/lib/types.ts` は除外）。行・関数
 カバレッジは 100%、残る未到達の分岐は呼び出し側で防いでいる防御的なガード
@@ -150,7 +163,9 @@ src/
     MeetAutoJoinSection.tsx   Meet 自動入室の設定
     useStatus.ts           「保存しました」の表示と自動クリア
     options.css
-tests/                     各モジュールのテスト + 設定画面 / content script の結合テスト
+tests/
+  *.unit.test.ts(x)        各モジュールのユニットテスト
+  *.scenario.test.ts(x)    service worker / content script / 設定画面のシナリオテスト
 ```
 
 ### ビルドの構成
@@ -158,4 +173,4 @@ tests/                     各モジュールのテスト + 設定画面 / conte
 - **設定画面と service worker** (`vite.config.ts`): ES モジュールとして `dist/` に出力します。`manifest.json` が service worker のパスを名指しするため、`background.js` だけファイル名を固定しています
 - **content script** (`vite.content.config.ts`): manifest v3 の content script は ES モジュールとして注入できないため、単一の IIFE として別に出力します。動的 `import()` も `web_accessible_resources` も不要になりました
 - React は content script にも同梱されるので、Meet のページには 60 KB ほど（gzip）が追加で読み込まれます。パネルの UI をこれ以上増やさないなら、`MeetPanel.tsx` だけ素の DOM に戻す選択肢もあります
-- `manifest.json` は `public/` にあり、Vite がそのまま `dist/` にコピーします。参照しているパスとビルド成果物の対応は `tests/manifest.test.ts` で確認しています
+- `manifest.json` は `public/` にあり、Vite がそのまま `dist/` にコピーします。参照しているパスとビルド成果物の対応は `tests/manifest.unit.test.ts` で確認しています

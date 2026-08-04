@@ -5,7 +5,10 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    include: ['tests/**/*.test.{ts,tsx}'],
+    // Test files carry the kind in their name: `*.unit.test.*` covers a single
+    // module, `*.scenario.test.*` drives a whole flow. Anything else is not
+    // picked up, so the convention cannot silently rot.
+    include: ['tests/**/*.{unit,scenario}.test.{ts,tsx}'],
     setupFiles: ['tests/setup.ts'],
     restoreMocks: true,
     coverage: {
