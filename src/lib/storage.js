@@ -1,5 +1,7 @@
 /** Persistence for the redirect rules, backed by `chrome.storage.sync`. */
 
+import { readSync, writeSync, onSyncValueChanged } from './sync-storage.js';
+
 export const STORAGE_KEY = 'redirectRules';
 
 let idCounter = 0;
@@ -27,32 +29,17 @@ export function sanitizeRules(raw) {
     }));
 }
 
-function syncArea() {
-  return globalThis.chrome?.storage?.sync ?? null;
-}
-
 /** Read the rules. Resolves to `[]` when nothing is stored or outside the extension. */
 export async function loadRules() {
-  const area = syncArea();
-  if (!area) return [];
-  const stored = await area.get(STORAGE_KEY);
-  return sanitizeRules(stored?.[STORAGE_KEY]);
+  return sanitizeRules(await readSync(STORAGE_KEY));
 }
 
 /** Persist the rules. */
 export async function saveRules(rules) {
-  const area = syncArea();
-  if (!area) return;
-  await area.set({ [STORAGE_KEY]: sanitizeRules(rules) });
+  await writeSync(STORAGE_KEY, sanitizeRules(rules));
 }
 
 /** Subscribe to rule changes made in another context (popup, options, other device). */
 export function onRulesChanged(callback) {
-  const onChanged = globalThis.chrome?.storage?.onChanged;
-  if (!onChanged) return;
-  onChanged.addListener((changes, areaName) => {
-    if (areaName !== 'sync') return;
-    if (!changes || !(STORAGE_KEY in changes)) return;
-    callback(sanitizeRules(changes[STORAGE_KEY].newValue));
-  });
+  onSyncValueChanged(STORAGE_KEY, (newValue) => callback(sanitizeRules(newValue)));
 }

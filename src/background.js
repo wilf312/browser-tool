@@ -10,7 +10,7 @@ async function refresh() {
   try {
     await syncDynamicRules(await loadRules());
   } catch (error) {
-    console.error('[jira-domain-redirect] failed to sync redirect rules', error);
+    console.error('[browser-tool] failed to sync redirect rules', error);
   }
 }
 
@@ -19,7 +19,7 @@ chrome.runtime.onStartup.addListener(refresh);
 
 onRulesChanged((rules) => {
   syncDynamicRules(rules).catch((error) => {
-    console.error('[jira-domain-redirect] failed to sync redirect rules', error);
+    console.error('[browser-tool] failed to sync redirect rules', error);
   });
 });
 

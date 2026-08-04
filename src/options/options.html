@@ -2,39 +2,72 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <title>Jira Domain Redirect</title>
+    <title>Browser Tool</title>
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
     <main>
-      <h1>Jira ドメインリダイレクト</h1>
-      <p class="lead">
-        廃止されたドメインへのアクセスを、パス以降をそのままにして移行先へリダイレクトします。<br />
-        例) <code>https://a.atlassian.net/browse/XAPP-134</code> →
-        <code>https://b.atlassian.net/browse/XAPP-134</code>
-      </p>
+      <h1>Browser Tool</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <th scope="col" class="col-enabled">有効</th>
-            <th scope="col">from</th>
-            <th scope="col">to</th>
-            <th scope="col" class="col-delete">削除</th>
-          </tr>
-        </thead>
-        <tbody id="rules"></tbody>
-      </table>
+      <section>
+        <h2>Jira ドメインリダイレクト</h2>
+        <p class="lead">
+          廃止されたドメインへのアクセスを、パス以降をそのままにして移行先へリダイレクトします。<br />
+          例) <code>https://a.atlassian.net/browse/XAPP-134</code> →
+          <code>https://b.atlassian.net/browse/XAPP-134</code>
+        </p>
 
-      <div class="actions">
-        <button type="button" id="add">＋ 追加</button>
-        <span id="status" class="status" role="status" aria-live="polite"></span>
-      </div>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" class="col-enabled">有効</th>
+              <th scope="col">from</th>
+              <th scope="col">to</th>
+              <th scope="col" class="col-delete">削除</th>
+            </tr>
+          </thead>
+          <tbody id="rules"></tbody>
+        </table>
 
-      <p class="note">
-        変更は自動で保存されます。ホスト名のみを入力してください（<code>https://</code> やパスは省略できます）。
-        対象は <code>*.atlassian.net</code> のドメインです。
-      </p>
+        <div class="actions">
+          <button type="button" id="add">＋ 追加</button>
+          <span id="status" class="status" role="status" aria-live="polite"></span>
+        </div>
+
+        <p class="note">
+          変更は自動で保存されます。ホスト名のみを入力してください（<code>https://</code> やパスは省略できます）。
+          対象は <code>*.atlassian.net</code> のドメインです。
+        </p>
+      </section>
+
+      <section>
+        <h2>Meet 自動入室</h2>
+        <p class="lead">
+          Google Meet の待機画面を開いておくと、次の開始時刻になったときに「参加」ボタンを自動でクリックします。<br />
+          例) 10:07 に待機画面を開く → <code>10:15</code> に入室
+        </p>
+
+        <div class="field">
+          <label><input type="checkbox" id="meet-enabled" /> 自動入室を有効にする</label>
+        </div>
+
+        <div class="field">
+          <label for="meet-interval">開始時刻の間隔</label>
+          <select id="meet-interval">
+            <option value="5">5 分</option>
+            <option value="10">10 分</option>
+            <option value="15">15 分</option>
+            <option value="30">30 分</option>
+            <option value="60">60 分</option>
+          </select>
+          <span id="meet-status" class="status" role="status" aria-live="polite"></span>
+        </div>
+
+        <p class="note">
+          待機画面の右下に入室予定時刻とカウントダウンが表示され、そこからキャンセルできます。
+          カメラとマイクの状態は待機画面の設定がそのまま使われます。
+        </p>
+      </section>
     </main>
     <script type="module" src="options.js"></script>
   </body>
