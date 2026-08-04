@@ -1,5 +1,8 @@
 # Nanatsudougu（七つ道具）
 
+<img width="1280" height="800" alt="sc" src="https://github.com/user-attachments/assets/2a90c2e7-cbec-4275-846c-bc96439534a0" />
+
+
 日々のブラウザ作業を少し楽にする Chrome 拡張です。仕事に必要な小さい道具をまとめた「七つ道具」で、
 今のところ 2 つの機能があります。
 
