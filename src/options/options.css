@@ -1,0 +1,147 @@
+:root {
+  color-scheme: light dark;
+  --border: #d5d9e0;
+  --muted: #5a6472;
+  --bg: #ffffff;
+  --fg: #16191d;
+  --row-hover: #f5f7fa;
+  --accent: #0b5cd5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border: #3a4149;
+    --muted: #9aa4b2;
+    --bg: #1c1f23;
+    --fg: #e8eaed;
+    --row-hover: #24282d;
+    --accent: #6ea8ff;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  min-width: 560px;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.6 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.lead,
+.note {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.note {
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th,
+td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background: var(--row-hover);
+}
+
+.col-enabled {
+  width: 44px;
+  text-align: center;
+}
+
+.col-delete {
+  width: 64px;
+  text-align: center;
+}
+
+td.empty {
+  padding: 20px 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+}
+
+input[type="text"]:focus-visible {
+  border-color: var(--accent);
+  outline: 1px solid var(--accent);
+}
+
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+button {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.rule-delete {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 12px;
+}

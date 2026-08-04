@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jira Domain Redirect</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Jira ドメインリダイレクト</h1>
+      <p class="lead">
+        廃止されたドメインへのアクセスを、パス以降をそのままにして移行先へリダイレクトします。<br />
+        例) <code>https://a.atlassian.net/browse/XAPP-134</code> →
+        <code>https://b.atlassian.net/browse/XAPP-134</code>
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" class="col-enabled">有効</th>
+            <th scope="col">from</th>
+            <th scope="col">to</th>
+            <th scope="col" class="col-delete">削除</th>
+          </tr>
+        </thead>
+        <tbody id="rules"></tbody>
+      </table>
+
+      <div class="actions">
+        <button type="button" id="add">＋ 追加</button>
+        <span id="status" class="status" role="status" aria-live="polite"></span>
+      </div>
+
+      <p class="note">
+        変更は自動で保存されます。ホスト名のみを入力してください（<code>https://</code> やパスは省略できます）。
+        対象は <code>*.atlassian.net</code> のドメインです。
+      </p>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

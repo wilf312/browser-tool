@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Jira Domain Redirect",
+  "version": "1.0.0",
+  "description": "廃止された atlassian.net のドメインへのアクセスを、パスを保ったまま移行先ドメインへリダイレクトします。",
+  "permissions": ["declarativeNetRequest", "storage"],
+  "host_permissions": ["*://*.atlassian.net/*"],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "options_page": "src/options/options.html",
+  "action": {
+    "default_popup": "src/options/options.html",
+    "default_title": "Jira Domain Redirect"
+  }
+}
