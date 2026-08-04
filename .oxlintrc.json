@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react", "import", "vitest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "ignorePatterns": ["dist", "coverage", "node_modules"],
+  "rules": {
+    // jsx: "react-jsx" なので React を import する必要はない
+    "react/react-in-jsx-scope": "off",
+    // options.css / content の副作用 import は意図的なもの
+    "import/no-unassigned-import": "off",
+    // vi.fn() の型は呼び出し側から推論できているので必須にはしない
+    "vitest/require-mock-type-parameters": "off"
+  }
+}
