@@ -11,7 +11,11 @@ function snapshot(state: AutoJoinState = 'waiting', remainingMs = 8 * 60 * 1000)
   return { state, joinAt: JOIN_AT, remainingMs };
 }
 
-describe('describe', () => {
+function text(selector: string): string | null {
+  return document.querySelector(selector)?.textContent ?? null;
+}
+
+describe('describeSnapshot', () => {
   it('announces the scheduled join while waiting', () => {
     expect(describeSnapshot(snapshot('waiting'))).toBe('10:15 に自動で参加します');
   });
@@ -24,10 +28,6 @@ describe('describe', () => {
 });
 
 describe('<MeetPanel />', () => {
-  function text(selector: string): string | null {
-    return document.querySelector(selector)?.textContent ?? null;
-  }
-
   it('shows the title, the message and the countdown while waiting', () => {
     render(<MeetPanel snapshot={snapshot()} onCancel={() => {}} />);
 

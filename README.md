@@ -82,11 +82,29 @@ https://b.atlassian.net/browse/XAPP-134
 npm install
 npm run build      # dist/ を生成（型チェック込み）
 npm run dev        # ソースの変更を dist/ に反映し続ける
+npm run check      # 静的チェック（lint + typecheck）
+npm run lint       # oxlint
+npm run lint:fix   # oxlint --fix（自動修正できるものだけ直す）
 npm run typecheck  # tsc --noEmit
 npm test           # 一度だけ実行
 npm run test:watch
 npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レポート）
 ```
+
+### 静的チェック
+
+- **[oxlint](https://oxc.rs/docs/guide/usage/linter.html)**: 設定は `.oxlintrc.json` です。`correctness` / `suspicious` / `perf`
+  をエラーとして扱い、TypeScript・React・import・unicorn・vitest のプラグインを有効にしています。
+  スタイル寄りで誤検知の多い `pedantic` は入れていません。プロジェクトの構成と衝突する
+  3 つのルールだけ個別に off にしています（理由は設定ファイルのコメントに書いてあります）
+- **tsc**: `tsconfig.json`（`src` と `tests`）と `tsconfig.node.json`（ビルド設定ファイル）の
+  2 つを `--noEmit` で通します。`npm run build` の先頭でも同じチェックが走ります
+
+### CI
+
+`.github/workflows/ci.yml` が push（`main`）と pull request で lint → typecheck → test → build を
+実行します。Node のバージョンは [mise](https://mise.jdx.dev/) が `mise.toml` の指定
+（現在は 24.15.0）を読んで揃えるので、CI とローカルで同じバージョンになります。
 
 TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM は jsdom）と
 [Testing Library](https://testing-library.com/) を使用します。
