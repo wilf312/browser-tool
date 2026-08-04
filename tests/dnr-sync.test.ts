@@ -48,6 +48,17 @@ describe('syncDynamicRules', () => {
     });
   });
 
+  it('copes with a browser that reports no dynamic rules at all', async () => {
+    const chrome = installFakeChrome();
+    chrome.dnr.getDynamicRules.mockResolvedValue(undefined);
+
+    await syncDynamicRules([{ id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }]);
+
+    const [options] = chrome.dnr.updateDynamicRules.mock.calls[0];
+    expect(options.removeRuleIds).toEqual([]);
+    expect(options.addRules).toHaveLength(1);
+  });
+
   it('does nothing when the declarativeNetRequest api is missing', async () => {
     await expect(syncDynamicRules([])).resolves.toBeUndefined();
   });

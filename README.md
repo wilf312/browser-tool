@@ -85,10 +85,15 @@ npm run dev        # ソースの変更を dist/ に反映し続ける
 npm run typecheck  # tsc --noEmit
 npm test           # 一度だけ実行
 npm run test:watch
+npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レポート）
 ```
 
 TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM は jsdom）と
 [Testing Library](https://testing-library.com/) を使用します。
+
+カバレッジは `src/**` が対象です（型定義のみの `src/lib/types.ts` は除外）。行・関数
+カバレッジは 100%、残る未到達の分岐は呼び出し側で防いでいる防御的なガード
+（`if (!rule)`、`textContent ?? ''` など）だけです。
 
 ```
 public/manifest.json       そのまま dist/ にコピーされる

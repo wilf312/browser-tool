@@ -110,6 +110,39 @@ describe('createAutoJoin', () => {
     expect(auto.getSnapshot().joinAt).toEqual(at(10, 30));
   });
 
+  it('runs on the real clock with no options at all', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(at(10, 7));
+    try {
+      const auto = createAutoJoin();
+
+      expect(auto.getSnapshot()).toMatchObject({ state: 'waiting', joinAt: at(10, 15) });
+      // No findButton and no onUpdate: ticking past the slot must not throw.
+      vi.setSystemTime(at(10, 15));
+      expect(auto.tick().state).toBe('waiting');
+      vi.setSystemTime(at(10, 30));
+      expect(auto.tick().state).toBe('missed');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('hands out a fresh joinAt so a caller cannot move the schedule', () => {
+    const time = clock(at(10, 7));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null });
+
+    auto.getSnapshot().joinAt.setHours(23);
+    expect(auto.getSnapshot().joinAt).toEqual(at(10, 15));
+  });
+
+  it('never reports a negative remaining time', () => {
+    const time = clock(at(10, 14));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null });
+
+    time.set(at(10, 20));
+    expect(auto.getSnapshot().remainingMs).toBe(0);
+  });
+
   it('reports every tick to onUpdate', () => {
     const time = clock(at(10, 7));
     const onUpdate = vi.fn();

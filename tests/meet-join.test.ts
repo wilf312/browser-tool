@@ -46,9 +46,20 @@ describe('findJoinButton', () => {
       <button disabled>今すぐ参加</button>
       <button aria-disabled="true">今すぐ参加</button>
       <button hidden>今すぐ参加</button>
+      <button aria-hidden="true">今すぐ参加</button>
       <div aria-hidden="true"><button>今すぐ参加</button></div>
     `;
     expect(findJoinButton(document)).toBeNull();
+  });
+
+  it('looks past an unclickable button to a usable one', () => {
+    document.body.innerHTML = '<button disabled>今すぐ参加</button><button>今すぐ参加</button>';
+    expect(findJoinButton(document)).toBe(document.querySelectorAll('button')[1]);
+  });
+
+  it('matches an exact label on the aria-label as well as on the text', () => {
+    document.body.innerHTML = '<div role="button" aria-label="Join"></div>';
+    expect(findJoinButton(document)?.getAttribute('aria-label')).toBe('Join');
   });
 
   it('returns null while the waiting screen is still loading', () => {
@@ -56,7 +67,14 @@ describe('findJoinButton', () => {
     expect(findJoinButton(document)).toBeNull();
   });
 
+  it('searches the whole page when no root is given', () => {
+    document.body.innerHTML = '<button>今すぐ参加</button>';
+    expect(findJoinButton()?.textContent).toBe('今すぐ参加');
+  });
+
   it('returns null without a usable root', () => {
     expect(findJoinButton(null)).toBeNull();
+    // e.g. a detached shadow root that cannot be queried
+    expect(findJoinButton({} as ParentNode)).toBeNull();
   });
 });

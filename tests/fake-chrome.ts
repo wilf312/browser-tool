@@ -17,6 +17,8 @@ export interface FakeChromeOptions {
   dynamicRules?: Array<{ id: number }>;
 }
 
+export type RuntimeListener = () => unknown;
+
 export interface FakeChrome {
   store: Record<string, unknown>;
   listeners: ChangeListener[];
@@ -25,20 +27,29 @@ export interface FakeChrome {
     set: Mock<(items: Record<string, unknown>) => Promise<void>>;
   };
   dnr: {
-    getDynamicRules: Mock<() => Promise<Array<{ id: number }>>>;
+    getDynamicRules: Mock<() => Promise<Array<{ id: number }> | undefined>>;
     updateDynamicRules: Mock<(options: { removeRuleIds: number[]; addRules: unknown[] }) => Promise<void>>;
+  };
+  /** What the service worker registered for the browser lifecycle events. */
+  runtime: {
+    installed: RuntimeListener[];
+    startup: RuntimeListener[];
   };
   /** Pretend another context (another tab, the popup, another device) wrote a key. */
   emitChange(key: string, newValue: unknown, areaName?: string): void;
+  /** Pretend the browser installed the extension / started up. */
+  emitRuntime(event: 'installed' | 'startup'): void;
 }
 
 export function installFakeChrome({ storage = {}, dynamicRules = [] }: FakeChromeOptions = {}): FakeChrome {
   const store: Record<string, unknown> = { ...storage };
   const listeners: ChangeListener[] = [];
+  const runtime = { installed: [] as RuntimeListener[], startup: [] as RuntimeListener[] };
 
   const fake: FakeChrome = {
     store,
     listeners,
+    runtime,
     sync: {
       get: vi.fn(async (key: string) => (key in store ? { [key]: store[key] } : {})),
       set: vi.fn(async (items: Record<string, unknown>) => {
@@ -52,6 +63,9 @@ export function installFakeChrome({ storage = {}, dynamicRules = [] }: FakeChrom
     emitChange(key, newValue, areaName = 'sync') {
       for (const listener of listeners) listener({ [key]: { newValue } }, areaName);
     },
+    emitRuntime(event) {
+      for (const listener of runtime[event]) listener();
+    },
   };
 
   globalThis.chrome = {
@@ -60,6 +74,10 @@ export function installFakeChrome({ storage = {}, dynamicRules = [] }: FakeChrom
       onChanged: { addListener: (listener: ChangeListener) => listeners.push(listener) },
     },
     declarativeNetRequest: fake.dnr,
+    runtime: {
+      onInstalled: { addListener: (listener: RuntimeListener) => runtime.installed.push(listener) },
+      onStartup: { addListener: (listener: RuntimeListener) => runtime.startup.push(listener) },
+    },
   } as unknown as typeof chrome;
 
   return fake;

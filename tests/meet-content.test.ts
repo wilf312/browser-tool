@@ -165,6 +165,23 @@ describe('meet content script', () => {
     expect(joinButton?.click).not.toHaveBeenCalled();
   });
 
+  it('re-targets the countdown when the interval is changed', async () => {
+    await run();
+    expect(panelText('.message')).toBe('10:15 に自動で参加します');
+
+    settingsListener?.({ enabled: true, intervalMinutes: 30 });
+    expect(panelText('.message')).toBe('10:30 に自動で参加します');
+  });
+
+  it('leaves a running countdown alone when only the toggle is re-sent', async () => {
+    await run();
+    await tick(at(10, 10));
+    expect(panelText('.countdown')).toBe('残り 05:00');
+
+    settingsListener?.({ enabled: true, intervalMinutes: 15 });
+    expect(panelText('.countdown')).toBe('残り 05:00');
+  });
+
   it('picks up a countdown when the feature is switched on', async () => {
     await run({ enabled: false, intervalMinutes: 15 });
     expect(panel()).toBeNull();
