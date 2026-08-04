@@ -22,11 +22,25 @@ describe('manifest.json', () => {
     expect(manifest.background.type).toBe('module');
   });
 
+  it('injects the Meet auto join on meet.google.com', () => {
+    const [contentScript] = manifest.content_scripts;
+    expect(contentScript.matches).toContain('https://meet.google.com/*');
+    expect(contentScript.js).toEqual(['src/content/meet-loader.js']);
+  });
+
+  it('exposes the modules the content script imports at runtime', () => {
+    // The loader pulls in `src/content/meet-auto-join.js`, which imports `src/lib/*`.
+    const [entry] = manifest.web_accessible_resources;
+    expect(entry.resources).toEqual(expect.arrayContaining(['src/content/*.js', 'src/lib/*.js']));
+    expect(entry.matches).toContain('https://meet.google.com/*');
+  });
+
   it('points every referenced file at something that exists', () => {
     const referenced = [
       manifest.background.service_worker,
       manifest.options_page,
       manifest.action.default_popup,
+      ...manifest.content_scripts.flatMap((script) => script.js),
     ];
     for (const path of referenced) {
       expect(path, `${path} is referenced by the manifest`).toBeTruthy();

@@ -1,7 +1,7 @@
 {
   "name": "browser-tool",
-  "version": "1.0.0",
-  "description": "Chrome extension that redirects retired Atlassian (Jira) domains to their export destination, keeping the pathname",
+  "version": "1.1.0",
+  "description": "Chrome extension that redirects retired Atlassian (Jira) domains keeping the pathname, and joins a Google Meet call at the next scheduled start time",
   "private": true,
   "type": "module",
   "scripts": {

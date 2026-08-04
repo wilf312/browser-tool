@@ -1,17 +1,30 @@
 {
   "manifest_version": 3,
-  "name": "Jira Domain Redirect",
-  "version": "1.0.0",
-  "description": "廃止された atlassian.net のドメインへのアクセスを、パスを保ったまま移行先ドメインへリダイレクトします。",
+  "name": "Browser Tool",
+  "version": "1.1.0",
+  "description": "廃止された atlassian.net のドメインをパスを保ったままリダイレクトし、Google Meet の開始時刻に自動で入室します。",
   "permissions": ["declarativeNetRequest", "storage"],
   "host_permissions": ["*://*.atlassian.net/*"],
   "background": {
     "service_worker": "src/background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://meet.google.com/*"],
+      "js": ["src/content/meet-loader.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/content/*.js", "src/lib/*.js"],
+      "matches": ["https://meet.google.com/*"]
+    }
+  ],
   "options_page": "src/options/options.html",
   "action": {
     "default_popup": "src/options/options.html",
-    "default_title": "Jira Domain Redirect"
+    "default_title": "Browser Tool"
   }
 }
