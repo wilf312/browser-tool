@@ -32,7 +32,10 @@ describe('sanitizeMeetSettings', () => {
   });
 
   it('fills in the fields that are not stored yet', () => {
-    expect(sanitizeMeetSettings({ intervalMinutes: 30 })).toEqual({ enabled: false, intervalMinutes: 30 });
+    expect(sanitizeMeetSettings({ intervalMinutes: 30 })).toEqual({
+      enabled: false,
+      intervalMinutes: 30,
+    });
     expect(sanitizeMeetSettings({ enabled: true })).toEqual({ enabled: true, intervalMinutes: 15 });
     expect(sanitizeMeetSettings({})).toEqual({ ...DEFAULT_MEET_SETTINGS });
   });

@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   check:
-    name: lint / typecheck / test
+    name: format / lint / typecheck / test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,9 @@ jobs:
           restore-keys: npm-${{ runner.os }}-
 
       - run: npm ci
+
+      - name: Format (oxfmt)
+        run: npm run format:check
 
       - name: Lint (oxlint)
         run: npm run lint

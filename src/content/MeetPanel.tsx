@@ -75,7 +75,9 @@ export function MeetPanel({ snapshot, onCancel }: MeetPanelProps) {
       <div className="panel">
         <div className="title">Meet 自動入室</div>
         <div className="message">{describe(snapshot)}</div>
-        <div className="countdown">{waiting ? `残り ${formatCountdown(snapshot.remainingMs)}` : ''}</div>
+        <div className="countdown">
+          {waiting ? `残り ${formatCountdown(snapshot.remainingMs)}` : ''}
+        </div>
         <button type="button" className="cancel" hidden={!waiting} onClick={onCancel}>
           キャンセル
         </button>

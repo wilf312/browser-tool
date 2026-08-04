@@ -130,7 +130,9 @@ describe('createPanel', () => {
     panel.mount();
     panel.update(snapshot());
 
-    expect(() => panel.host.shadowRoot?.querySelector<HTMLElement>('.cancel')?.click()).not.toThrow();
+    expect(() =>
+      panel.host.shadowRoot?.querySelector<HTMLElement>('.cancel')?.click(),
+    ).not.toThrow();
   });
 
   it('takes the host off the page and tears the React tree down when destroyed', () => {

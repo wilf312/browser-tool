@@ -1,27 +1,33 @@
 {
   "name": "browser-tool",
   "version": "1.1.0",
-  "description": "Chrome extension that redirects retired Atlassian (Jira) domains keeping the pathname, and joins a Google Meet call at the next scheduled start time",
   "private": true,
+  "description": "Chrome extension that redirects retired Atlassian (Jira) domains keeping the pathname, and joins a Google Meet call at the next scheduled start time",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:41729/git/wilf312/browser-tool"
+  },
   "type": "module",
   "scripts": {
     "build": "npm run typecheck && vite build && vite build --config vite.content.config.ts",
     "dev": "vite build --watch",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
-    "check": "npm run lint && npm run typecheck",
+    "check": "npm run format:check && npm run lint && npm run typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
-  "repository": {
-    "type": "git",
-    "url": "http://local_proxy@127.0.0.1:41729/git/wilf312/browser-tool"
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.3",
@@ -32,13 +38,10 @@
     "@vitejs/plugin-react": "^6.0.5",
     "@vitest/coverage-v8": "^4.1.10",
     "jsdom": "^30.0.1",
+    "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
     "typescript": "^7.0.2",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
-  },
-  "dependencies": {
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
   }
 }

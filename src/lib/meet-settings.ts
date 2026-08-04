@@ -19,7 +19,8 @@ export function sanitizeMeetSettings(raw: unknown): MeetSettings {
   }
   const settings = raw as Partial<MeetSettings>;
   return {
-    enabled: settings.enabled === undefined ? DEFAULT_MEET_SETTINGS.enabled : Boolean(settings.enabled),
+    enabled:
+      settings.enabled === undefined ? DEFAULT_MEET_SETTINGS.enabled : Boolean(settings.enabled),
     intervalMinutes: normalizeIntervalMinutes(
       settings.intervalMinutes === undefined
         ? DEFAULT_MEET_SETTINGS.intervalMinutes

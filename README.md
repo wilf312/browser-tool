@@ -30,9 +30,9 @@ https://b.atlassian.net/browse/XAPP-134
 
 パス名だけでなく、クエリ文字列とハッシュもそのまま引き継ぎます。
 
-| 有効 | from | to | 削除 |
-| --- | --- | --- | --- |
-| ☑ | `a.atlassian.net` | `b.atlassian.net` | 削除 |
+| 有効 | from              | to                | 削除 |
+| ---- | ----------------- | ----------------- | ---- |
+| ☑    | `a.atlassian.net` | `b.atlassian.net` | 削除 |
 
 - **有効**: チェックボックスでルールごとに有効／無効を切り替えます
 - **from / to**: ホスト名を入力します（`https://` やパスを付けても自動で取り除かれます）
@@ -82,7 +82,9 @@ https://b.atlassian.net/browse/XAPP-134
 npm install
 npm run build      # dist/ を生成（型チェック込み）
 npm run dev        # ソースの変更を dist/ に反映し続ける
-npm run check      # 静的チェック（lint + typecheck）
+npm run check      # 静的チェック（format:check + lint + typecheck）
+npm run format     # oxfmt（ファイルを整形して書き戻す）
+npm run format:check  # oxfmt --check（整形済みかどうかだけ確認する）
 npm run lint       # oxlint
 npm run lint:fix   # oxlint --fix（自動修正できるものだけ直す）
 npm run typecheck  # tsc --noEmit
@@ -93,6 +95,9 @@ npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レ
 
 ### 静的チェック
 
+- **[oxfmt](https://oxc.rs/docs/guide/usage/formatter.html)**: 設定は `.oxfmtrc.json` です。ほぼ既定値のままで、
+  文字列だけ既存のコードに合わせてシングルクォート（`singleQuote`）にしています。
+  対象は `src` / `tests` の TS・TSX に加えて CSS・Markdown・JSON です
 - **[oxlint](https://oxc.rs/docs/guide/usage/linter.html)**: 設定は `.oxlintrc.json` です。`correctness` / `suspicious` / `perf`
   をエラーとして扱い、TypeScript・React・import・unicorn・vitest のプラグインを有効にしています。
   スタイル寄りで誤検知の多い `pedantic` は入れていません。プロジェクトの構成と衝突する
@@ -102,7 +107,7 @@ npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レ
 
 ### CI
 
-`.github/workflows/ci.yml` が push（`main`）と pull request で lint → typecheck → test → build を
+`.github/workflows/ci.yml` が push（`main`）と pull request で format → lint → typecheck → test → build を
 実行します。Node のバージョンは [mise](https://mise.jdx.dev/) が `mise.toml` の指定
 （現在は 24.15.0）を読んで揃えるので、CI とローカルで同じバージョンになります。
 

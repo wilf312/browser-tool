@@ -14,7 +14,9 @@ describe('syncDynamicRules', () => {
   it('replaces the existing dynamic rules with the ones built from the stored rules', async () => {
     const chrome = installFakeChrome({ dynamicRules: [{ id: 7 }, { id: 9 }] });
 
-    await syncDynamicRules([{ id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }]);
+    await syncDynamicRules([
+      { id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true },
+    ]);
 
     expect(chrome.dnr.updateDynamicRules).toHaveBeenCalledTimes(1);
     const [arg] = chrome.dnr.updateDynamicRules.mock.calls[0];
@@ -29,7 +31,9 @@ describe('syncDynamicRules', () => {
   it('clears the dynamic rules when every rule is disabled', async () => {
     const chrome = installFakeChrome({ dynamicRules: [{ id: 1 }] });
 
-    await syncDynamicRules([{ id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: false }]);
+    await syncDynamicRules([
+      { id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: false },
+    ]);
 
     expect(chrome.dnr.updateDynamicRules).toHaveBeenCalledWith({
       removeRuleIds: [1],
@@ -52,7 +56,9 @@ describe('syncDynamicRules', () => {
     const chrome = installFakeChrome();
     chrome.dnr.getDynamicRules.mockResolvedValue(undefined);
 
-    await syncDynamicRules([{ id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }]);
+    await syncDynamicRules([
+      { id: 'x', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true },
+    ]);
 
     const [options] = chrome.dnr.updateDynamicRules.mock.calls[0];
     expect(options.removeRuleIds).toEqual([]);

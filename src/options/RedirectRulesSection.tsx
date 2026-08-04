@@ -82,7 +82,8 @@ export function RedirectRulesSection() {
       <h2>Jira ドメインリダイレクト</h2>
       <p className="lead">
         廃止されたドメインへのアクセスを、パス以降をそのままにして移行先へリダイレクトします。
-        <br />例) <code>https://a.atlassian.net/browse/XAPP-134</code> →{' '}
+        <br />
+        例) <code>https://a.atlassian.net/browse/XAPP-134</code> →{' '}
         <code>https://b.atlassian.net/browse/XAPP-134</code>
       </p>
 
