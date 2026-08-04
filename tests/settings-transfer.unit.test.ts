@@ -100,6 +100,17 @@ describe('parseBundle', () => {
     expect(result.bundle.features).toEqual(both);
   });
 
+  it('still reads a file written under the old browser-tool name', () => {
+    const text = `{"format":"browser-tool-settings","version":1,"features":{"meetAutoJoin":{"enabled":true,"intervalMinutes":15}}}`;
+
+    const result = parseBundle(text);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.bundle.format).toBe(EXPORT_FORMAT);
+    expect(result.bundle.features.meetAutoJoin).toEqual({ enabled: true, intervalMinutes: 15 });
+  });
+
   it('refuses text that is not JSON', () => {
     expect(parseBundle('{ nope')).toEqual({
       ok: false,
@@ -117,7 +128,7 @@ describe('parseBundle', () => {
   ])('refuses %s', (_label, text) => {
     expect(parseBundle(text)).toEqual({
       ok: false,
-      error: 'browser-tool の設定ファイルではありません',
+      error: 'Nanatsudougu の設定ファイルではありません',
     });
   });
 
@@ -220,11 +231,11 @@ describe('formatExportedAt', () => {
 describe('exportFilename', () => {
   it('carries the local date and time so files sort by when they were made', () => {
     expect(exportFilename(new Date(2026, 7, 4, 9, 5))).toBe(
-      'browser-tool-settings-20260804-0905.json',
+      'nanatsudougu-settings-20260804-0905.json',
     );
   });
 
   it('uses the current time when none is given', () => {
-    expect(exportFilename()).toMatch(/^browser-tool-settings-\d{8}-\d{4}\.json$/);
+    expect(exportFilename()).toMatch(/^nanatsudougu-settings-\d{8}-\d{4}\.json$/);
   });
 });

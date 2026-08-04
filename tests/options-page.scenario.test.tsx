@@ -389,7 +389,7 @@ describe('settings import / export', () => {
       version: 1,
       features: { redirectRules: [storedRule], meetAutoJoin: storedMeet },
     });
-    expect(downloads[0].filename).toMatch(/^browser-tool-settings-\d{8}-\d{4}\.json$/);
+    expect(downloads[0].filename).toMatch(/^nanatsudougu-settings-\d{8}-\d{4}\.json$/);
   });
 
   it('leaves an unticked feature out of the file', async () => {
@@ -519,7 +519,7 @@ describe('settings import / export', () => {
     await chooseFile(settingsFile({ meetAutoJoin: storedMeet }));
     await chooseFile('[]');
 
-    expect(screen.getByRole('alert').textContent).toBe('browser-tool の設定ファイルではありません');
+    expect(screen.getByRole('alert').textContent).toBe('Nanatsudougu の設定ファイルではありません');
     expect(screen.queryByRole('group', { name: '取り込む機能' })).toBeNull();
   });
 

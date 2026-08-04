@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Browser Tool",
+  "name": "Nanatsudougu",
   "version": "1.1.0",
   "description": "廃止された atlassian.net のドメインをパスを保ったままリダイレクトし、Google Meet の開始時刻に自動で入室します。",
   "permissions": ["declarativeNetRequest", "storage"],
@@ -19,6 +19,6 @@
   "options_page": "options.html",
   "action": {
     "default_popup": "options.html",
-    "default_title": "Browser Tool"
+    "default_title": "Nanatsudougu"
   }
 }

@@ -1,6 +1,7 @@
-# browser-tool
+# Nanatsudougu（七つ道具）
 
-日々のブラウザ作業を少し楽にする Chrome 拡張です。今のところ 2 つの機能があります。
+日々のブラウザ作業を少し楽にする Chrome 拡張です。仕事に必要な小さい道具をまとめた「七つ道具」で、
+今のところ 2 つの機能があります。
 
 1. **Jira ドメインリダイレクト** — 廃止された Jira (atlassian.net) のドメインへのアクセスを、パス以降をそのまま残したまま移行先のドメインへリダイレクトします
 2. **Meet 自動入室** — Google Meet の待機画面で、次の開始時刻になったら「参加」ボタンを自動でクリックします
@@ -89,7 +90,7 @@ https://b.atlassian.net/browse/XAPP-134
   書き出す機能  ☑ Jira ドメインリダイレクト  ルール 2 件（有効 1 件）
                 ☑ Meet 自動入室              自動入室 ON / 15 分間隔
                                                   ↓
-                              browser-tool-settings-20260804-1210.json
+                              nanatsudougu-settings-20260804-1210.json
 
 [インポート]
   取り込む機能  ☑ Jira ドメインリダイレクト  ルール 2 件（有効 1 件）
@@ -112,7 +113,7 @@ https://b.atlassian.net/browse/XAPP-134
 
 ```json
 {
-  "format": "browser-tool-settings",
+  "format": "nanatsudougu-settings",
   "version": 1,
   "exportedAt": "2026-08-04T03:10:00.000Z",
   "features": {
@@ -128,13 +129,16 @@ https://b.atlassian.net/browse/XAPP-134
 読み込みません。手で編集したファイルは、通常の保存と同じ正規化（`sanitizeRules` /
 `sanitizeMeetSettings`）を通してから適用されるので、欠けた項目は既定値で埋まります。
 
+改名前の `browser-tool` で書き出したファイル（`"format": "browser-tool-settings"`）も、
+そのまま読み込めます。書き出すときは常に新しい `nanatsudougu-settings` になります。
+
 ## 公開用のビルド
 
 Chrome Web Store には ZIP をアップロードします。`npm run package` が公開用のビルドと
 ZIP の作成をまとめて行います。
 
 ```bash
-npm run package    # release/browser-tool-<version>.zip を作る
+npm run package    # release/nanatsudougu-<version>.zip を作る
 ```
 
 1. バージョンを上げる（`package.json` と `public/manifest.json` の両方）。

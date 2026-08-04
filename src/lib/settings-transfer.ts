@@ -11,8 +11,11 @@ import { sanitizeRules } from './storage';
 import type { MeetSettings, RedirectRule } from './types';
 
 /** Stamped into the file so an unrelated JSON is rejected instead of half applied. */
-export const EXPORT_FORMAT = 'browser-tool-settings';
+export const EXPORT_FORMAT = 'nanatsudougu-settings';
 export const EXPORT_VERSION = 1;
+
+/** Written by the versions named `browser-tool`. Still read back, never written. */
+const LEGACY_EXPORT_FORMATS = new Set<string>(['browser-tool-settings']);
 
 /** The features that can be exported and imported on their own. */
 export const FEATURE_IDS = ['redirectRules', 'meetAutoJoin'] as const;
@@ -104,13 +107,16 @@ export function parseBundle(text: string): ParseResult {
   }
 
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
-    return { ok: false, error: 'browser-tool の設定ファイルではありません' };
+    return { ok: false, error: 'Nanatsudougu の設定ファイルではありません' };
   }
 
   const candidate = raw as Partial<SettingsBundle>;
+  const format: unknown = candidate.format;
   const version = candidate.version;
-  if (candidate.format !== EXPORT_FORMAT || typeof version !== 'number' || !(version >= 1)) {
-    return { ok: false, error: 'browser-tool の設定ファイルではありません' };
+  const known =
+    typeof format === 'string' && (format === EXPORT_FORMAT || LEGACY_EXPORT_FORMATS.has(format));
+  if (!known || typeof version !== 'number' || !(version >= 1)) {
+    return { ok: false, error: 'Nanatsudougu の設定ファイルではありません' };
   }
   if (version > EXPORT_VERSION) {
     return {
@@ -160,8 +166,8 @@ export function formatExportedAt(exportedAt: string): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-/** `browser-tool-settings-20260804-1210.json` */
+/** `nanatsudougu-settings-20260804-1210.json` */
 export function exportFilename(now: Date = new Date()): string {
   const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
-  return `browser-tool-settings-${stamp}.json`;
+  return `nanatsudougu-settings-${stamp}.json`;
 }

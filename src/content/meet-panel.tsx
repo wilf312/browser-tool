@@ -12,7 +12,7 @@ import { flushSync } from 'react-dom';
 import { MeetPanel } from './MeetPanel';
 import type { AutoJoinSnapshot } from '../lib/types';
 
-export const PANEL_ID = 'browser-tool-meet-auto-join';
+export const PANEL_ID = 'nanatsudougu-meet-auto-join';
 
 export interface Panel {
   host: HTMLElement;

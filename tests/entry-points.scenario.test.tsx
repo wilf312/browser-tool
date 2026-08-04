@@ -49,7 +49,7 @@ describe('settings page entry point', () => {
       await import('../src/options/main');
     });
 
-    expect(root.querySelector('h1')?.textContent).toBe('Browser Tool');
+    expect(root.querySelector('h1')?.textContent).toBe('Nanatsudougu');
   });
 
   it('does nothing when the page has no #root', async () => {
