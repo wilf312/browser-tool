@@ -11,5 +11,5 @@ import { start } from './meet-auto-join';
 try {
   start();
 } catch (error) {
-  console.error('[browser-tool] failed to start the Meet auto join', error);
+  console.error('[nanatsudougu] failed to start the Meet auto join', error);
 }

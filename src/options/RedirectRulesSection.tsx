@@ -23,7 +23,7 @@ export function RedirectRulesSection() {
           await saveRules(next);
           showStatus('保存しました');
         } catch (error) {
-          console.error('[browser-tool] failed to save rules', error);
+          console.error('[nanatsudougu] failed to save rules', error);
           showStatus('保存に失敗しました');
         }
       }, SAVE_DEBOUNCE_MS),

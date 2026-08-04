@@ -5,7 +5,7 @@ import { SettingsTransferSection } from './SettingsTransferSection';
 export function App() {
   return (
     <main>
-      <h1>Browser Tool</h1>
+      <h1>Nanatsudougu</h1>
       <RedirectRulesSection />
       <MeetAutoJoinSection />
       <SettingsTransferSection />

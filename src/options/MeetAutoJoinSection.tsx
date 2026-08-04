@@ -32,7 +32,7 @@ export function MeetAutoJoinSection() {
       await saveMeetSettings(next);
       showStatus('保存しました');
     } catch (error) {
-      console.error('[browser-tool] failed to save the Meet settings', error);
+      console.error('[nanatsudougu] failed to save the Meet settings', error);
       showStatus('保存に失敗しました');
     }
   }

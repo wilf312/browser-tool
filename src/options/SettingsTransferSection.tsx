@@ -71,7 +71,7 @@ export function SettingsTransferSection() {
       downloadText(exportFilename(), serializeBundle(buildBundle(features, exportIds)));
       showExportStatus('エクスポートしました');
     } catch (failure) {
-      console.error('[browser-tool] failed to export the settings', failure);
+      console.error('[nanatsudougu] failed to export the settings', failure);
       showExportStatus('エクスポートに失敗しました');
     }
   }, [exportIds, showExportStatus]);
@@ -100,7 +100,7 @@ export function SettingsTransferSection() {
         setPending(null);
         showImportStatus('インポートしました');
       } catch (failure) {
-        console.error('[browser-tool] failed to import the settings', failure);
+        console.error('[nanatsudougu] failed to import the settings', failure);
         showImportStatus('インポートに失敗しました');
       }
     },

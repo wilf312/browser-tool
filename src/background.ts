@@ -10,7 +10,7 @@ async function refresh(): Promise<void> {
   try {
     await syncDynamicRules(await loadRules());
   } catch (error) {
-    console.error('[browser-tool] failed to sync redirect rules', error);
+    console.error('[nanatsudougu] failed to sync redirect rules', error);
   }
 }
 
@@ -19,7 +19,7 @@ chrome.runtime.onStartup.addListener(refresh);
 
 onRulesChanged((rules) => {
   syncDynamicRules(rules).catch((error: unknown) => {
-    console.error('[browser-tool] failed to sync redirect rules', error);
+    console.error('[nanatsudougu] failed to sync redirect rules', error);
   });
 });
 
