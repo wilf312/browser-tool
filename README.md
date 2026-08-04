@@ -150,7 +150,8 @@ npm run package    # release/nanatsudougu-<version>.zip を作る
 3. `npm run package` を実行する
 4. [デベロッパーダッシュボード](https://chrome.google.com/webstore/devconsole)で対象の
    アイテムを開き、「パッケージ」から `release/` の ZIP をアップロードする
-5. ストアの掲載情報（説明・スクリーンショット・プライバシーの項目）を埋めて審査に提出する
+5. ストアの掲載情報（説明・スクリーンショット・プライバシーの項目）を埋めて審査に提出する。
+   カテゴリと説明文の案は [`docs/store-listing.md`](docs/store-listing.md) にあります
 
 デベロッパーモードは開発中に `dist/` をそのまま読み込むためのものなので、公開版の
 インストールには必要ありません。ストアから入れた拡張は Chrome が自動で更新します。
