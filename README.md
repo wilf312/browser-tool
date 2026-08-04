@@ -7,9 +7,16 @@
 
 ## インストール
 
+Vite でビルドしたものを読み込みます。
+
+```bash
+npm install
+npm run build
+```
+
 1. `chrome://extensions` を開く
 2. 「デベロッパーモード」を ON
-3. 「パッケージ化されていない拡張機能を読み込む」でこのリポジトリのルートを選択
+3. 「パッケージ化されていない拡張機能を読み込む」で `dist/` を選択
 
 設定はツールバーのアイコン（または拡張機能の「オプション」）から開きます。
 
@@ -37,7 +44,7 @@ https://b.atlassian.net/browse/XAPP-134
 ### しくみ
 
 - ルールは `chrome.storage.sync` に保存されます
-- Service worker (`src/background.js`) がルールを [declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest) の動的ルールへ変換します。リクエストが発生する前にブラウザ側でリダイレクトされるため、廃止されたドメインへ実際にアクセスすることはありません
+- Service worker (`src/background.ts`) がルールを [declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest) の動的ルールへ変換します。リクエストが発生する前にブラウザ側でリダイレクトされるため、廃止されたドメインへ実際にアクセスすることはありません
 - 変換されるのは**ホスト名だけ**です（`redirect.transform.host`）。そのためパス・クエリ・ハッシュは自動的に維持されます
 - 対象は `main_frame`（アドレスバーやリンクによるページ遷移）のみです
 
@@ -69,37 +76,58 @@ https://b.atlassian.net/browse/XAPP-134
 
 ## 開発
 
+[Vite](https://vite.dev/) + [React](https://react.dev/) + TypeScript です。
+
 ```bash
 npm install
-npm test         # 一度だけ実行
+npm run build      # dist/ を生成（型チェック込み）
+npm run dev        # ソースの変更を dist/ に反映し続ける
+npm run typecheck  # tsc --noEmit
+npm test           # 一度だけ実行
 npm run test:watch
 ```
 
-TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM は jsdom）を使用します。
+TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM は jsdom）と
+[Testing Library](https://testing-library.com/) を使用します。
 
 ```
-manifest.json
+public/manifest.json       そのまま dist/ にコピーされる
+options.html               設定画面の HTML エントリ
+vite.config.ts             設定画面 + service worker のビルド
+vite.content.config.ts     content script のビルド（IIFE）
 src/
-  background.js            service worker: ルール → declarativeNetRequest 同期
+  background.ts            service worker: ルール → declarativeNetRequest 同期
   lib/
-    redirect.js            リダイレクト解決 / DNR ルール生成（純粋関数）
-    sync-storage.js        chrome.storage.sync の薄いラッパ
-    storage.js             リダイレクトルールの読み書きと正規化
-    dnr-sync.js            動的ルールの入れ替え
-    debounce.js            保存のデバウンス
-    meet-schedule.js       入室時刻の計算と表示フォーマット（純粋関数）
-    meet-join.js           待機画面から「参加」ボタンを探す
-    meet-auto-join.js      自動入室の状態機械（タイマーと DOM を持たない）
-    meet-page.js           対象となる Meet の URL 判定
-    meet-settings.js       Meet 自動入室の設定の読み書き
+    types.ts               ルール・設定・スナップショットの型
+    redirect.ts            リダイレクト解決 / DNR ルール生成（純粋関数）
+    sync-storage.ts        chrome.storage.sync の薄いラッパ
+    storage.ts             リダイレクトルールの読み書きと正規化
+    dnr-sync.ts            動的ルールの入れ替え
+    debounce.ts            保存のデバウンス
+    meet-schedule.ts       入室時刻の計算と表示フォーマット（純粋関数）
+    meet-join.ts           待機画面から「参加」ボタンを探す
+    meet-auto-join.ts      自動入室の状態機械（タイマーと DOM を持たない）
+    meet-page.ts           対象となる Meet の URL 判定
+    meet-settings.ts       Meet 自動入室の設定の読み書き
   content/
-    meet-loader.js         content script: モジュール版を動的 import で起動
-    meet-auto-join.js      設定・URL 監視・パネル・状態機械の配線
-    meet-panel.js          待機画面の右下に出すカウントダウン表示
+    main.ts                content script のエントリ
+    meet-auto-join.ts      設定・URL 監視・パネル・状態機械の配線
+    meet-panel.tsx         shadow root への React ルートの出し入れ
+    MeetPanel.tsx          カウントダウン表示のコンポーネント
   options/
-    options.html/.css/.js  設定画面
-    rules-table.js         ルールテーブルのレンダリングと操作
+    main.tsx               設定画面のエントリ
+    App.tsx                2 つのセクションを並べるだけ
+    RedirectRulesSection.tsx  ルールの読み込み・保存
+    RulesTable.tsx         ルールテーブル（表示のみ）
+    MeetAutoJoinSection.tsx   Meet 自動入室の設定
+    useStatus.ts           「保存しました」の表示と自動クリア
+    options.css
 tests/                     各モジュールのテスト + 設定画面 / content script の結合テスト
 ```
 
-manifest v3 の content script はモジュールを直接読み込めないため、`meet-loader.js`（通常のスクリプト）から `chrome.runtime.getURL()` + 動的 `import()` でモジュール版を起動しています。そのため `src/content/*.js` と `src/lib/*.js` を `web_accessible_resources` に登録しています。
+### ビルドの構成
+
+- **設定画面と service worker** (`vite.config.ts`): ES モジュールとして `dist/` に出力します。`manifest.json` が service worker のパスを名指しするため、`background.js` だけファイル名を固定しています
+- **content script** (`vite.content.config.ts`): manifest v3 の content script は ES モジュールとして注入できないため、単一の IIFE として別に出力します。動的 `import()` も `web_accessible_resources` も不要になりました
+- React は content script にも同梱されるので、Meet のページには 60 KB ほど（gzip）が追加で読み込まれます。パネルの UI をこれ以上増やさないなら、`MeetPanel.tsx` だけ素の DOM に戻す選択肢もあります
+- `manifest.json` は `public/` にあり、Vite がそのまま `dist/` にコピーします。参照しているパスとビルド成果物の対応は `tests/manifest.test.ts` で確認しています
