@@ -20,6 +20,9 @@ npm run build
 
 設定はツールバーのアイコン（または拡張機能の「オプション」）から開きます。
 
+自分の環境で使うだけならこれで十分です。Chrome Web Store で配布する場合は
+[公開用のビルド](#公開用のビルド)を参照してください。
+
 ## Jira ドメインリダイレクト
 
 ```
@@ -74,13 +77,56 @@ https://b.atlassian.net/browse/XAPP-134
 - カメラとマイクの状態は待機画面で設定したものがそのまま使われます。拡張機能側では変更しません
 - Meet は SPA なので URL を監視しています。別の会議へ移動すると、その会議のカウントダウンが改めて始まります
 
+## 公開用のビルド
+
+Chrome Web Store には ZIP をアップロードします。`npm run package` が公開用のビルドと
+ZIP の作成をまとめて行います。
+
+```bash
+npm run package    # release/browser-tool-<version>.zip を作る
+```
+
+1. バージョンを上げる（`package.json` と `public/manifest.json` の両方）。
+   数字がずれていると `npm test` と `npm run package` の両方で落ちます
+2. `npm run check && npm test` を通す
+3. `npm run package` を実行する
+4. [デベロッパーダッシュボード](https://chrome.google.com/webstore/devconsole)で対象の
+   アイテムを開き、「パッケージ」から `release/` の ZIP をアップロードする
+5. ストアの掲載情報（説明・スクリーンショット・プライバシーの項目）を埋めて審査に提出する
+
+デベロッパーモードは開発中に `dist/` をそのまま読み込むためのものなので、公開版の
+インストールには必要ありません。ストアから入れた拡張は Chrome が自動で更新します。
+
+### 開発用ビルドとの違い
+
+`npm run build`（`--mode` なし）と `npm run build:release`（`--mode release`）の違いは
+source map の有無だけです。どちらも同じ `dist/` に、同じ内容の minify 済みコードを出力します。
+
+- **`npm run build`**: `dist/*.map` も出力します。`chrome://extensions` から読み込んで
+  デバッグするときに元のソースを追えます
+- **`npm run build:release`**: source map を出しません。map にはソース全体が inline で
+  入るため、公開する ZIP からは外しています
+
+`scripts/package.mjs` は ZIP を作る前に次を確認して、通らなければ何も作らずに終了します。
+アップロードが弾かれてから気づくと手戻りが大きいものだけを見ています。
+
+- `manifest.json` が ZIP の直下にある（Chrome Web Store はこの形しか受け付けません）
+- `manifest.json` が参照しているファイル（`background.js` / `content/main.js` /
+  `options.html`）がビルド結果に揃っている
+- `manifest.json` と `package.json` のバージョンが一致している
+- `.map` が残っていない（= 公開用ビルドで作られた `dist/` である）
+
+`release/` は `.gitignore` に入れてあります。ZIP はコミットしません。
+
 ## 開発
 
 [Vite](https://vite.dev/) + [React](https://react.dev/) + TypeScript です。
 
 ```bash
 npm install
-npm run build      # dist/ を生成（型チェック込み）
+npm run build      # dist/ を生成（型チェック込み、source map あり）
+npm run build:release  # 公開用に dist/ を生成（source map なし）
+npm run package    # build:release + release/ に ZIP を作る
 npm run dev        # ソースの変更を dist/ に反映し続ける
 npm run check      # 静的チェック（format:check + lint + typecheck）
 npm run format     # oxfmt（ファイルを整形して書き戻す）
@@ -136,6 +182,7 @@ public/manifest.json       そのまま dist/ にコピーされる
 options.html               設定画面の HTML エントリ
 vite.config.ts             設定画面 + service worker のビルド
 vite.content.config.ts     content script のビルド（IIFE）
+scripts/package.mjs        dist/ を公開用の ZIP にまとめる
 src/
   background.ts            service worker: ルール → declarativeNetRequest 同期
   lib/
@@ -174,3 +221,4 @@ tests/
 - **content script** (`vite.content.config.ts`): manifest v3 の content script は ES モジュールとして注入できないため、単一の IIFE として別に出力します。動的 `import()` も `web_accessible_resources` も不要になりました
 - React は content script にも同梱されるので、Meet のページには 60 KB ほど（gzip）が追加で読み込まれます。パネルの UI をこれ以上増やさないなら、`MeetPanel.tsx` だけ素の DOM に戻す選択肢もあります
 - `manifest.json` は `public/` にあり、Vite がそのまま `dist/` にコピーします。参照しているパスとビルド成果物の対応は `tests/manifest.unit.test.ts` で確認しています
+- **モード**: 2 つの設定はどちらも `--mode release` のときだけ source map を落とします。それ以外の違いはないので、公開する ZIP の中身は普段デバッグしているものと同じです（`tests/build-config.unit.test.ts` で確認しています）

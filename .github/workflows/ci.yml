@@ -45,3 +45,7 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # 公開用のビルドと ZIP 化まで通ることを確かめる（成果物は捨てる）
+      - name: Package
+        run: npm run package
