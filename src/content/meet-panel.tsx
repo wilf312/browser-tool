@@ -29,7 +29,9 @@ export interface CreatePanelOptions {
 export function createPanel({ document, onCancel = () => {} }: CreatePanelOptions): Panel {
   const host = document.createElement('div');
   host.id = PANEL_ID;
-  host.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:2147483647;';
+  // Pinned bottom-left: Meet's own chat / participant buttons sit in the
+  // bottom-right corner, and a panel there covers them.
+  host.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:2147483647;';
 
   const shadow = host.attachShadow({ mode: 'open' });
   let root: Root | null = null;
