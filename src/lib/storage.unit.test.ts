@@ -6,9 +6,9 @@ import {
   loadRules,
   saveRules,
   onRulesChanged,
-} from '../src/lib/storage';
-import type { RedirectRule } from '../src/lib/types';
-import { installFakeChrome, uninstallFakeChrome } from './fake-chrome';
+} from './storage';
+import type { RedirectRule } from './types';
+import { installFakeChrome, uninstallFakeChrome } from '../../tests/fake-chrome';
 
 beforeEach(() => {
   uninstallFakeChrome();

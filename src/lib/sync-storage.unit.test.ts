@@ -5,8 +5,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { readSync, writeSync, onSyncValueChanged } from '../src/lib/sync-storage';
-import { installFakeChrome, uninstallFakeChrome, type ChangeListener } from './fake-chrome';
+import { readSync, writeSync, onSyncValueChanged } from './sync-storage';
+import {
+  installFakeChrome,
+  uninstallFakeChrome,
+  type ChangeListener,
+} from '../../tests/fake-chrome';
 
 beforeEach(() => {
   uninstallFakeChrome();

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
-import { start, type Running } from '../src/content/meet-auto-join';
-import { PANEL_ID } from '../src/content/meet-panel';
-import type { MeetSettings } from '../src/lib/types';
+import { start, type Running } from './meet-auto-join';
+import { PANEL_ID } from './meet-panel';
+import type { MeetSettings } from '../lib/types';
 
 const MEETING_URL = 'https://meet.google.com/abc-defg-hij';
 

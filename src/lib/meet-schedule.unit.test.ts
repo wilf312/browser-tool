@@ -5,7 +5,7 @@ import {
   formatCountdown,
   nextSlot,
   normalizeIntervalMinutes,
-} from '../src/lib/meet-schedule';
+} from './meet-schedule';
 
 /** Local time, so the assertions match what the user sees on the clock. */
 function at(hours: number, minutes: number, seconds = 0, ms = 0): Date {

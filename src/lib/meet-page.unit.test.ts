@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isMeetingUrl } from '../src/lib/meet-page';
+import { isMeetingUrl } from './meet-page';
 
 describe('isMeetingUrl', () => {
   it('accepts a meeting code', () => {

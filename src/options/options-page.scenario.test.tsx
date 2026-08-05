@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
 import { fireEvent } from '@testing-library/dom';
-import { App } from '../src/options/App';
-import { STORAGE_KEY } from '../src/lib/storage';
-import { MEET_SETTINGS_KEY } from '../src/lib/meet-settings';
-import { EXPORT_FORMAT, type SettingsBundle } from '../src/lib/settings-transfer';
-import type { MeetSettings, RedirectRule } from '../src/lib/types';
-import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from './fake-chrome';
+import { App } from './App';
+import { STORAGE_KEY } from '../lib/storage';
+import { MEET_SETTINGS_KEY } from '../lib/meet-settings';
+import { EXPORT_FORMAT, type SettingsBundle } from '../lib/settings-transfer';
+import type { MeetSettings, RedirectRule } from '../lib/types';
+import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from '../../tests/fake-chrome';
 
 let chrome: FakeChrome;
 

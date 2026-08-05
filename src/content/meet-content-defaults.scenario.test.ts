@@ -5,10 +5,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { start, type Running } from '../src/content/meet-auto-join';
-import { PANEL_ID } from '../src/content/meet-panel';
-import { MEET_SETTINGS_KEY } from '../src/lib/meet-settings';
-import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from './fake-chrome';
+import { start, type Running } from './meet-auto-join';
+import { PANEL_ID } from './meet-panel';
+import { MEET_SETTINGS_KEY } from '../lib/meet-settings';
+import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from '../../tests/fake-chrome';
 
 const MEETING_URL = 'https://meet.google.com/abc-defg-hij';
 

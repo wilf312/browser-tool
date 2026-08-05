@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createAutoJoin } from '../src/lib/meet-auto-join';
+import { createAutoJoin } from './meet-auto-join';
 
 function at(hours: number, minutes: number, seconds = 0): Date {
   return new Date(2026, 0, 15, hours, minutes, seconds);
