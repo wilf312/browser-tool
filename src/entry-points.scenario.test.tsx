@@ -5,10 +5,10 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act } from '@testing-library/react';
-import { installFakeChrome, uninstallFakeChrome } from './fake-chrome';
+import { installFakeChrome, uninstallFakeChrome } from '../tests/fake-chrome';
 
 const start = vi.hoisted(() => vi.fn());
-vi.mock('../src/content/meet-auto-join', () => ({ start }));
+vi.mock('./content/meet-auto-join', () => ({ start }));
 
 beforeEach(() => {
   vi.resetModules();
@@ -22,7 +22,7 @@ afterEach(() => {
 
 describe('content script entry point', () => {
   it('starts the Meet auto join', async () => {
-    await import('../src/content/main');
+    await import('./content/main');
     expect(start).toHaveBeenCalledTimes(1);
   });
 
@@ -33,7 +33,7 @@ describe('content script entry point', () => {
     });
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await expect(import('../src/content/main')).resolves.toBeDefined();
+    await expect(import('./content/main')).resolves.toBeDefined();
     expect(logged.mock.calls[0]).toContain(error);
   });
 });
@@ -46,7 +46,7 @@ describe('settings page entry point', () => {
     document.body.append(root);
 
     await act(async () => {
-      await import('../src/options/main');
+      await import('./options/main');
     });
 
     expect(root.querySelector('h1')?.textContent).toBe('Nanatsudougu');
@@ -56,7 +56,7 @@ describe('settings page entry point', () => {
     installFakeChrome();
 
     await act(async () => {
-      await expect(import('../src/options/main')).resolves.toBeDefined();
+      await expect(import('./options/main')).resolves.toBeDefined();
     });
     expect(document.body.innerHTML).toBe('');
   });

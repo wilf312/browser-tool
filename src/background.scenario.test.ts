@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { STORAGE_KEY } from '../src/lib/storage';
-import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from './fake-chrome';
+import { STORAGE_KEY } from './lib/storage';
+import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from '../tests/fake-chrome';
 
 const RULES = [{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }];
 
@@ -14,7 +14,7 @@ let chrome: FakeChrome;
 /** Boot the worker and wait for the sync it kicks off on its own. */
 async function boot(): Promise<void> {
   vi.resetModules();
-  await import('../src/background');
+  await import('./background');
   await vi.waitFor(() => expect(chrome.dnr.updateDynamicRules).toHaveBeenCalled());
 }
 
@@ -89,7 +89,7 @@ describe('background service worker', () => {
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     vi.resetModules();
-    await import('../src/background');
+    await import('./background');
 
     await vi.waitFor(() => expect(logged).toHaveBeenCalled());
     expect(logged.mock.calls[0]).toContain(error);

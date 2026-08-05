@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { fireEvent } from '@testing-library/dom';
-import { createPanel, PANEL_ID, type Panel } from '../src/content/meet-panel';
-import { MeetPanel, describe as describeSnapshot } from '../src/content/MeetPanel';
-import type { AutoJoinSnapshot, AutoJoinState } from '../src/lib/types';
+import { createPanel, PANEL_ID, type Panel } from './meet-panel';
+import { MeetPanel, describe as describeSnapshot } from './MeetPanel';
+import type { AutoJoinSnapshot, AutoJoinState } from '../lib/types';
 
 const JOIN_AT = new Date(2026, 0, 15, 10, 15);
 

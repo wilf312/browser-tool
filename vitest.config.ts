@@ -8,14 +8,21 @@ export default defineConfig({
     // Test files carry the kind in their name: `*.unit.test.*` covers a single
     // module, `*.scenario.test.*` drives a whole flow. Anything else is not
     // picked up, so the convention cannot silently rot.
-    include: ['tests/**/*.{unit,scenario}.test.{ts,tsx}'],
+    //
+    // Module tests sit next to the module they cover; `tests/` only holds the
+    // ones whose subject is a repository level file (manifest, build config).
+    include: ['{src,tests}/**/*.{unit,scenario}.test.{ts,tsx}'],
     setupFiles: ['tests/setup.ts'],
     restoreMocks: true,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      // Type-only module: nothing to execute, so it would only skew the report.
-      exclude: ['src/lib/types.ts'],
+      exclude: [
+        // Type-only module: nothing to execute, so it would only skew the report.
+        'src/lib/types.ts',
+        // The colocated tests themselves are not part of the measured surface.
+        'src/**/*.{unit,scenario}.test.{ts,tsx}',
+      ],
       reporter: ['text', 'html'],
     },
   },

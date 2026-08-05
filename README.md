@@ -220,20 +220,31 @@ npm run test:coverage  # カバレッジ付きで実行（coverage/ に HTML レ
 TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM は jsdom）と
 [Testing Library](https://testing-library.com/) を使用します。
 
+テストは対象の実装と同じディレクトリに置きます（colocation）。`src/lib/redirect.ts`
+のテストは `src/lib/redirect.unit.test.ts` です。実装を動かすときに対応するテストが
+同じ場所にあるので、探す手間も、移動のときに置き去りにする心配もありません。
+
 テストファイルは種類を名前で区別します。
 
-- **ユニットテスト** `tests/<対象>.unit.test.ts(x)`: モジュール 1 つ（純粋関数・
+- **ユニットテスト** `<対象>.unit.test.ts(x)`: モジュール 1 つ（純粋関数・
   ラッパ・単体のコンポーネント）を、依存を差し替えた状態で確かめます
-- **シナリオテスト** `tests/<対象>.scenario.test.ts(x)`: service worker の起動、
+- **シナリオテスト** `<対象>.scenario.test.ts(x)`: service worker の起動、
   content script の自動入室、設定画面の操作といった、複数のモジュールをまたぐ
   一連の流れを通します
 
 `vitest.config.ts` の `include` はこの 2 つだけを拾うので、どちらでもない名前の
 ファイルは実行されません。
 
-カバレッジは `src/**` が対象です（型定義のみの `src/lib/types.ts` は除外）。行・関数
-カバレッジは 100%、残る未到達の分岐は呼び出し側で防いでいる防御的なガード
-（`if (!rule)`、`textContent ?? ''` など）だけです。
+`tests/` に残っているのは、対象が `src/` の外にあって隣に置けないものだけです。
+
+- `tests/manifest.unit.test.ts` / `tests/build-config.unit.test.ts`: `public/manifest.json`
+  とビルド設定そのもののテスト
+- `tests/setup.ts` / `tests/fake-chrome.ts`: 全テスト共通のセットアップと
+  `chrome` API のスタブ
+
+カバレッジは `src/**` が対象です（型定義のみの `src/lib/types.ts` と、隣に置いた
+テストファイル自身は除外）。行・関数カバレッジは 100%、残る未到達の分岐は呼び出し側で
+防いでいる防御的なガード（`if (!rule)`、`textContent ?? ''` など）だけです。
 
 ```
 public/manifest.json       そのまま dist/ にコピーされる
@@ -241,8 +252,10 @@ options.html               設定画面の HTML エントリ
 vite.config.ts             設定画面 + service worker のビルド
 vite.content.config.ts     content script のビルド（IIFE）
 scripts/package.mjs        dist/ を公開用の ZIP にまとめる
-src/
+src/                       実装と、その隣に置いたテスト
   background.ts            service worker: ルール → declarativeNetRequest 同期
+  background.scenario.test.ts
+  entry-points.scenario.test.tsx  2 つのエントリが読み込めることの確認
   lib/
     types.ts               ルール・設定・スナップショットの型
     redirect.ts            リダイレクト解決 / DNR ルール生成（純粋関数）
@@ -256,11 +269,15 @@ src/
     meet-page.ts           対象となる Meet の URL 判定
     meet-settings.ts       Meet 自動入室の設定の読み書き
     settings-transfer.ts   設定ファイルの組み立てと読み取り（純粋関数）
+    *.unit.test.ts         上の各モジュールのユニットテスト
   content/
     main.ts                content script のエントリ
     meet-auto-join.ts      設定・URL 監視・パネル・状態機械の配線
     meet-panel.tsx         shadow root への React ルートの出し入れ
     MeetPanel.tsx          カウントダウン表示のコンポーネント
+    meet-panel.unit.test.tsx
+    meet-content.scenario.test.ts          自動入室の一連の流れ
+    meet-content-defaults.scenario.test.ts 設定が空のときの既定動作
   options/
     main.tsx               設定画面のエントリ
     App.tsx                3 つのセクションを並べるだけ
@@ -271,9 +288,13 @@ src/
     download.ts            生成したファイルをブラウザのダウンロードに渡す
     useStatus.ts           「保存しました」の表示と自動クリア
     options.css
-tests/
-  *.unit.test.ts(x)        各モジュールのユニットテスト
-  *.scenario.test.ts(x)    service worker / content script / 設定画面のシナリオテスト
+    RulesTable.unit.test.tsx / download.unit.test.ts / useStatus.unit.test.ts
+    options-page.scenario.test.tsx  設定画面の操作
+tests/                     隣に置けないテストと共通のヘルパ
+  manifest.unit.test.ts    public/manifest.json の内容
+  build-config.unit.test.ts  vite の 2 つのビルド設定
+  setup.ts                 各テスト後のクリーンアップ
+  fake-chrome.ts           chrome 拡張 API のスタブ
 ```
 
 ### ビルドの構成

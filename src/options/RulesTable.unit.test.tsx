@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { fireEvent } from '@testing-library/dom';
-import { RulesTable } from '../src/options/RulesTable';
-import type { RedirectRule } from '../src/lib/types';
+import { RulesTable } from './RulesTable';
+import type { RedirectRule } from '../lib/types';
 
 const sample: RedirectRule[] = [
   { id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true },

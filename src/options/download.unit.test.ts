@@ -1,7 +1,7 @@
 /** jsdom has no object URLs and no downloader, so both are stood in for here. */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { downloadText } from '../src/options/download';
+import { downloadText } from './download';
 
 let createObjectURL: ReturnType<typeof vi.fn>;
 let revokeObjectURL: ReturnType<typeof vi.fn>;

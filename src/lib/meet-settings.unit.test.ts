@@ -6,9 +6,9 @@ import {
   onMeetSettingsChanged,
   sanitizeMeetSettings,
   saveMeetSettings,
-} from '../src/lib/meet-settings';
-import type { MeetSettings } from '../src/lib/types';
-import { installFakeChrome, uninstallFakeChrome } from './fake-chrome';
+} from './meet-settings';
+import type { MeetSettings } from './types';
+import { installFakeChrome, uninstallFakeChrome } from '../../tests/fake-chrome';
 
 beforeEach(() => {
   uninstallFakeChrome();

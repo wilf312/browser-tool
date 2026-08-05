@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { findJoinButton } from '../src/lib/meet-join';
+import { findJoinButton } from './meet-join';
 
 beforeEach(() => {
   document.body.innerHTML = '';

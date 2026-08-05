@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { syncDynamicRules } from '../src/lib/dnr-sync';
-import { installFakeChrome, uninstallFakeChrome } from './fake-chrome';
+import { syncDynamicRules } from './dnr-sync';
+import { installFakeChrome, uninstallFakeChrome } from '../../tests/fake-chrome';
 
 beforeEach(() => {
   uninstallFakeChrome();

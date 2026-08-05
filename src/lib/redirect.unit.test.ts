@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeHost, resolveRedirect, buildDnrRules } from '../src/lib/redirect';
+import { normalizeHost, resolveRedirect, buildDnrRules } from './redirect';
 
 describe('normalizeHost', () => {
   it('trims and lowercases', () => {

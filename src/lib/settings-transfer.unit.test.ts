@@ -14,7 +14,7 @@ import {
   sanitizeFeatures,
   serializeBundle,
   type SettingsFeatures,
-} from '../src/lib/settings-transfer';
+} from './settings-transfer';
 
 const rules = [
   { id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true },

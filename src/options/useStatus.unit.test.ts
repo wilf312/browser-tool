@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { useStatus } from '../src/options/useStatus';
+import { useStatus } from './useStatus';
 
 beforeEach(() => {
   vi.useFakeTimers();
