@@ -5,8 +5,13 @@
  * happen, counts down to it, and offers a way out. It is rendered into a shadow
  * root, so the styles travel with the component instead of coming from a
  * stylesheet Meet could reach.
+ *
+ * Once the countdown has settled the box is only a report, so the whole of it
+ * becomes the way to close it — waiting out the dismiss timer for a message you
+ * have already read is the annoying part.
  */
 
+import type { KeyboardEvent } from 'react';
 import { formatClock, formatCountdown } from '../lib/meet-schedule';
 import type { AutoJoinSnapshot } from '../lib/types';
 
@@ -28,8 +33,10 @@ export const PANEL_STYLE = `
     text-transform: uppercase;
     color: #9aa0a6;
   }
+  .panel.dismissible { cursor: pointer; }
   .message { font-weight: 600; }
-  .countdown {
+  .countdown,
+  .hint {
     margin-top: 2px;
     font-variant-numeric: tabular-nums;
     color: #9aa0a6;
@@ -64,20 +71,39 @@ export function describe({ state, joinAt }: AutoJoinSnapshot): string {
 export interface MeetPanelProps {
   snapshot: AutoJoinSnapshot;
   onCancel: () => void;
+  onDismiss: () => void;
 }
 
-export function MeetPanel({ snapshot, onCancel }: MeetPanelProps) {
+export function MeetPanel({ snapshot, onCancel, onDismiss }: MeetPanelProps) {
   const waiting = snapshot.state === 'waiting';
+  // While the countdown runs the box has its own button, and a stray click on
+  // it must not take the countdown away. Only the settled outcome closes.
+  const dismissible = !waiting;
+
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    onDismiss();
+  }
 
   return (
     <>
       <style>{PANEL_STYLE}</style>
-      <div className="panel">
+      <div
+        className={dismissible ? 'panel dismissible' : 'panel'}
+        role={dismissible ? 'button' : undefined}
+        tabIndex={dismissible ? 0 : undefined}
+        title={dismissible ? 'クリックで閉じる' : undefined}
+        onClick={dismissible ? () => onDismiss() : undefined}
+        onKeyDown={dismissible ? handleKeyDown : undefined}
+      >
         <div className="title">Meet 自動入室</div>
         <div className="message">{describe(snapshot)}</div>
-        <div className="countdown">
-          {waiting ? `残り ${formatCountdown(snapshot.remainingMs)}` : ''}
-        </div>
+        {waiting ? (
+          <div className="countdown">残り {formatCountdown(snapshot.remainingMs)}</div>
+        ) : (
+          <div className="hint">クリックで閉じる</div>
+        )}
         <button type="button" className="cancel" hidden={!waiting} onClick={onCancel}>
           キャンセル
         </button>

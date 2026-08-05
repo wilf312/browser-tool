@@ -87,7 +87,7 @@ describe('meet content script', () => {
 
     expect(joinButton?.click).toHaveBeenCalledTimes(1);
     expect(panelText('.message')).toBe('参加しました');
-    expect(panelText('.countdown')).toBe('');
+    expect(panelText('.countdown')).toBeNull();
   });
 
   it('removes the panel a moment after joining', async () => {
@@ -107,6 +107,31 @@ describe('meet content script', () => {
 
     await tick(at(10, 15));
     expect(joinButton?.click).not.toHaveBeenCalled();
+  });
+
+  it('takes the cancelled panel down as soon as it is clicked', async () => {
+    await run();
+
+    cancelButton()?.click();
+    expect(panelText('.message')).toBe('自動入室をキャンセルしました');
+
+    panel()?.shadowRoot?.querySelector<HTMLElement>('.panel')?.click();
+    expect(panel()).toBeNull();
+
+    // The dismiss timer that was already running must not trip over the
+    // session the click took away.
+    await vi.advanceTimersByTimeAsync(6000);
+    expect(panel()).toBeNull();
+  });
+
+  it('leaves the countdown alone when the panel is clicked while waiting', async () => {
+    await run();
+
+    panel()?.shadowRoot?.querySelector<HTMLElement>('.panel')?.click();
+
+    expect(panel()).toBeTruthy();
+    await tick(at(10, 15));
+    expect(joinButton?.click).toHaveBeenCalledTimes(1);
   });
 
   it('hides the cancel button once the countdown is over', async () => {

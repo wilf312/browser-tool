@@ -24,9 +24,15 @@ export interface Panel {
 export interface CreatePanelOptions {
   document: Document;
   onCancel?: () => void;
+  /** The user clicked the settled panel away instead of waiting for it to go. */
+  onDismiss?: () => void;
 }
 
-export function createPanel({ document, onCancel = () => {} }: CreatePanelOptions): Panel {
+export function createPanel({
+  document,
+  onCancel = () => {},
+  onDismiss = () => {},
+}: CreatePanelOptions): Panel {
   const host = document.createElement('div');
   host.id = PANEL_ID;
   // Pinned bottom-left: Meet's own chat / participant buttons sit in the
@@ -47,7 +53,7 @@ export function createPanel({ document, onCancel = () => {} }: CreatePanelOption
     update(snapshot) {
       if (!root) return;
       flushSync(() => {
-        root?.render(<MeetPanel snapshot={snapshot} onCancel={onCancel} />);
+        root?.render(<MeetPanel snapshot={snapshot} onCancel={onCancel} onDismiss={onDismiss} />);
       });
     },
 

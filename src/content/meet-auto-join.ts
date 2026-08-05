@@ -16,7 +16,7 @@ import { createPanel, type Panel } from './meet-panel';
 
 const TICK_MS = 1000;
 const URL_POLL_MS = 1000;
-/** How long the outcome stays on screen once the countdown is over. */
+/** How long the outcome stays on screen if the user does not click it away. */
 const DISMISS_MS = 6000;
 
 export interface StartOptions {
@@ -71,7 +71,12 @@ export function start({
   function startSession() {
     let controller: AutoJoinController | undefined;
 
-    const panel = createPanel({ document, onCancel: () => controller?.cancel() });
+    const panel = createPanel({
+      document,
+      onCancel: () => controller?.cancel(),
+      // The outcome is only shown to be read; clicking it away skips the wait.
+      onDismiss: () => stopSession(),
+    });
 
     controller = createAutoJoin({
       now,
