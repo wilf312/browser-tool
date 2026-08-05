@@ -84,6 +84,12 @@ describe('createPanel', () => {
     expect(document.getElementById(PANEL_ID)).toBeNull();
   });
 
+  it('sits in the bottom-left corner, clear of Meet own bottom-right buttons', () => {
+    expect(panel.host.style.left).toBe('16px');
+    expect(panel.host.style.bottom).toBe('16px');
+    expect(panel.host.style.right).toBe('');
+  });
+
   it('keeps the panel out of the page styles by rendering into the shadow root', () => {
     panel.mount();
     panel.update(snapshot());
