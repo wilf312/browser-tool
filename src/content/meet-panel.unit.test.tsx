@@ -29,7 +29,7 @@ describe('describeSnapshot', () => {
 
 describe('<MeetPanel />', () => {
   it('shows the title, the message and the countdown while waiting', () => {
-    render(<MeetPanel snapshot={snapshot()} onCancel={() => {}} />);
+    render(<MeetPanel snapshot={snapshot()} onCancel={() => {}} onDismiss={() => {}} />);
 
     expect(text('.title')).toBe('Meet 自動入室');
     expect(text('.message')).toBe('10:15 に自動で参加します');
@@ -38,7 +38,7 @@ describe('<MeetPanel />', () => {
 
   it('offers a way out while waiting', () => {
     const onCancel = vi.fn();
-    render(<MeetPanel snapshot={snapshot()} onCancel={onCancel} />);
+    render(<MeetPanel snapshot={snapshot()} onCancel={onCancel} onDismiss={() => {}} />);
 
     const cancel = screen.getByRole('button', { name: 'キャンセル' });
     expect((cancel as HTMLButtonElement).hidden).toBe(false);
@@ -48,15 +48,61 @@ describe('<MeetPanel />', () => {
   });
 
   it('drops the countdown and the cancel button once it has settled', () => {
-    render(<MeetPanel snapshot={snapshot('joined', 0)} onCancel={() => {}} />);
+    render(<MeetPanel snapshot={snapshot('joined', 0)} onCancel={() => {}} onDismiss={() => {}} />);
 
     expect(text('.message')).toBe('参加しました');
-    expect(text('.countdown')).toBe('');
+    expect(document.querySelector('.countdown')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('.cancel')?.hidden).toBe(true);
   });
 
+  it('says the settled panel can be clicked away', () => {
+    render(
+      <MeetPanel snapshot={snapshot('cancelled', 0)} onCancel={() => {}} onDismiss={() => {}} />,
+    );
+
+    expect(text('.hint')).toBe('クリックで閉じる');
+    expect(document.querySelector('.panel')?.classList.contains('dismissible')).toBe(true);
+  });
+
+  it('dismisses when the settled panel is clicked anywhere', () => {
+    const onDismiss = vi.fn();
+    render(
+      <MeetPanel snapshot={snapshot('cancelled', 0)} onCancel={() => {}} onDismiss={onDismiss} />,
+    );
+
+    fireEvent.click(document.querySelector('.title') as HTMLElement);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('dismisses the settled panel from the keyboard', () => {
+    const onDismiss = vi.fn();
+    render(
+      <MeetPanel snapshot={snapshot('joined', 0)} onCancel={() => {}} onDismiss={onDismiss} />,
+    );
+
+    const panel = document.querySelector('.panel') as HTMLElement;
+    expect(panel.tabIndex).toBe(0);
+
+    fireEvent.keyDown(panel, { key: 'Enter' });
+    fireEvent.keyDown(panel, { key: ' ' });
+    fireEvent.keyDown(panel, { key: 'a' });
+    expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the running countdown when the panel itself is clicked', () => {
+    const onDismiss = vi.fn();
+    render(<MeetPanel snapshot={snapshot()} onCancel={() => {}} onDismiss={onDismiss} />);
+
+    const panel = document.querySelector('.panel') as HTMLElement;
+    fireEvent.click(panel);
+    fireEvent.keyDown(panel, { key: 'Enter' });
+
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(panel.classList.contains('dismissible')).toBe(false);
+  });
+
   it('carries its own styles', () => {
-    render(<MeetPanel snapshot={snapshot()} onCancel={() => {}} />);
+    render(<MeetPanel snapshot={snapshot()} onCancel={() => {}} onDismiss={() => {}} />);
     expect(document.querySelector('style')?.textContent).toContain('.panel');
   });
 });
@@ -130,6 +176,26 @@ describe('createPanel', () => {
     cancellable.host.shadowRoot?.querySelector<HTMLElement>('.cancel')?.click();
     expect(onCancel).toHaveBeenCalledTimes(1);
     cancellable.destroy();
+  });
+
+  it('reports a dismiss of the settled panel to the caller', () => {
+    const onDismiss = vi.fn();
+    const dismissible = createPanel({ document, onDismiss });
+    dismissible.mount();
+    dismissible.update(snapshot('cancelled', 0));
+
+    dismissible.host.shadowRoot?.querySelector<HTMLElement>('.panel')?.click();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    dismissible.destroy();
+  });
+
+  it('survives a dismiss when the caller did not ask to hear about it', () => {
+    panel.mount();
+    panel.update(snapshot('cancelled', 0));
+
+    expect(() =>
+      panel.host.shadowRoot?.querySelector<HTMLElement>('.panel')?.click(),
+    ).not.toThrow();
   });
 
   it('survives a cancel when the caller did not ask to hear about it', () => {
