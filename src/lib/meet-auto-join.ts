@@ -16,6 +16,9 @@ import type { AutoJoinSnapshot, AutoJoinState } from './types';
  */
 export const DEFAULT_JOIN_WINDOW_MS = 2 * 60 * 1000;
 
+/** How much later `postpone()` puts the join. One more minute, as often as asked. */
+export const POSTPONE_MS = 60 * 1000;
+
 export interface AutoJoinOptions {
   now?: () => Date;
   intervalMinutes?: number;
@@ -29,6 +32,8 @@ export interface AutoJoinController {
   tick(): AutoJoinSnapshot;
   /** The user does not want to be let in automatically after all. */
   cancel(): AutoJoinSnapshot;
+  /** Not yet — push the join one minute further out. */
+  postpone(): AutoJoinSnapshot;
   getSnapshot(): AutoJoinSnapshot;
 }
 
@@ -40,7 +45,7 @@ export function createAutoJoin({
   onUpdate = () => {},
 }: AutoJoinOptions = {}): AutoJoinController {
   const interval = normalizeIntervalMinutes(intervalMinutes);
-  const joinAt = nextSlot(now(), interval);
+  let joinAt = nextSlot(now(), interval);
   let state: AutoJoinState = 'waiting';
 
   function snapshot(): AutoJoinSnapshot {
@@ -85,6 +90,16 @@ export function createAutoJoin({
     cancel() {
       if (state !== 'waiting') return snapshot();
       return settle('cancelled');
+    },
+
+    postpone() {
+      if (state !== 'waiting') return snapshot();
+      // Measured from now once the slot has gone by, so a postpone during the
+      // grace period still buys a whole minute instead of landing in the past.
+      joinAt = new Date(Math.max(joinAt.getTime(), now().getTime()) + POSTPONE_MS);
+      const current = snapshot();
+      onUpdate(current);
+      return current;
     },
 
     getSnapshot: snapshot,

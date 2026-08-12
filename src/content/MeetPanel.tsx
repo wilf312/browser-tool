@@ -2,7 +2,8 @@
  * The little box in the corner of the Meet waiting screen.
  *
  * It exists so the auto join is never a surprise: it says when the click will
- * happen, counts down to it, and offers a way out. It is rendered into a shadow
+ * happen, counts down to it, and offers a way out — either off altogether, or
+ * one more minute at a time when the wait is the only problem. It is rendered into a shadow
  * root, so the styles travel with the component instead of coming from a
  * stylesheet Meet could reach.
  *
@@ -41,8 +42,13 @@ export const PANEL_STYLE = `
     font-variant-numeric: tabular-nums;
     color: #9aa0a6;
   }
-  .cancel {
+  .actions {
+    display: flex;
+    gap: 8px;
     margin-top: 10px;
+  }
+  .cancel,
+  .postpone {
     padding: 4px 10px;
     border: 1px solid #5f6368;
     border-radius: 999px;
@@ -51,8 +57,11 @@ export const PANEL_STYLE = `
     font: inherit;
     cursor: pointer;
   }
-  .cancel:hover { border-color: #8ab4f8; color: #8ab4f8; }
-  .cancel[hidden] { display: none; }
+  .cancel:hover,
+  .postpone:hover { border-color: #8ab4f8; color: #8ab4f8; }
+  .actions[hidden],
+  .cancel[hidden],
+  .postpone[hidden] { display: none; }
 `;
 
 export function describe({ state, joinAt }: AutoJoinSnapshot): string {
@@ -71,13 +80,14 @@ export function describe({ state, joinAt }: AutoJoinSnapshot): string {
 export interface MeetPanelProps {
   snapshot: AutoJoinSnapshot;
   onCancel: () => void;
+  onPostpone: () => void;
   onDismiss: () => void;
 }
 
-export function MeetPanel({ snapshot, onCancel, onDismiss }: MeetPanelProps) {
+export function MeetPanel({ snapshot, onCancel, onPostpone, onDismiss }: MeetPanelProps) {
   const waiting = snapshot.state === 'waiting';
-  // While the countdown runs the box has its own button, and a stray click on
-  // it must not take the countdown away. Only the settled outcome closes.
+  // While the countdown runs the box has its own buttons, and a stray click on
+  // one must not take the countdown away. Only the settled outcome closes.
   const dismissible = !waiting;
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -104,9 +114,20 @@ export function MeetPanel({ snapshot, onCancel, onDismiss }: MeetPanelProps) {
         ) : (
           <div className="hint">クリックで閉じる</div>
         )}
-        <button type="button" className="cancel" hidden={!waiting} onClick={onCancel}>
-          キャンセル
-        </button>
+        <div className="actions" hidden={!waiting}>
+          <button
+            type="button"
+            className="postpone"
+            hidden={!waiting}
+            title="参加を1分先に延ばす"
+            onClick={onPostpone}
+          >
+            +1分
+          </button>
+          <button type="button" className="cancel" hidden={!waiting} onClick={onCancel}>
+            キャンセル
+          </button>
+        </div>
       </div>
     </>
   );

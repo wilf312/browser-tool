@@ -74,6 +74,7 @@ export function start({
     const panel = createPanel({
       document,
       onCancel: () => controller?.cancel(),
+      onPostpone: () => controller?.postpone(),
       // The outcome is only shown to be read; clicking it away skips the wait.
       onDismiss: () => stopSession(),
     });

@@ -24,6 +24,8 @@ export interface Panel {
 export interface CreatePanelOptions {
   document: Document;
   onCancel?: () => void;
+  /** The user wants one more minute before the join. */
+  onPostpone?: () => void;
   /** The user clicked the settled panel away instead of waiting for it to go. */
   onDismiss?: () => void;
 }
@@ -31,6 +33,7 @@ export interface CreatePanelOptions {
 export function createPanel({
   document,
   onCancel = () => {},
+  onPostpone = () => {},
   onDismiss = () => {},
 }: CreatePanelOptions): Panel {
   const host = document.createElement('div');
@@ -53,7 +56,14 @@ export function createPanel({
     update(snapshot) {
       if (!root) return;
       flushSync(() => {
-        root?.render(<MeetPanel snapshot={snapshot} onCancel={onCancel} onDismiss={onDismiss} />);
+        root?.render(
+          <MeetPanel
+            snapshot={snapshot}
+            onCancel={onCancel}
+            onPostpone={onPostpone}
+            onDismiss={onDismiss}
+          />,
+        );
       });
     },
 
