@@ -26,6 +26,8 @@ export interface CreatePanelOptions {
   onCancel?: () => void;
   /** The user wants one more minute before the join. */
   onPostpone?: () => void;
+  /** The user does not want to wait a whole minute of what is left. */
+  onHasten?: () => void;
   /** The user clicked the settled panel away instead of waiting for it to go. */
   onDismiss?: () => void;
 }
@@ -34,6 +36,7 @@ export function createPanel({
   document,
   onCancel = () => {},
   onPostpone = () => {},
+  onHasten = () => {},
   onDismiss = () => {},
 }: CreatePanelOptions): Panel {
   const host = document.createElement('div');
@@ -61,6 +64,7 @@ export function createPanel({
             snapshot={snapshot}
             onCancel={onCancel}
             onPostpone={onPostpone}
+            onHasten={onHasten}
             onDismiss={onDismiss}
           />,
         );

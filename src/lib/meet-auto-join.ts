@@ -16,8 +16,8 @@ import type { AutoJoinSnapshot, AutoJoinState } from './types';
  */
 export const DEFAULT_JOIN_WINDOW_MS = 2 * 60 * 1000;
 
-/** How much later `postpone()` puts the join. One more minute, as often as asked. */
-export const POSTPONE_MS = 60 * 1000;
+/** How far `postpone()` and `hasten()` move the join. One minute per click, as often as asked. */
+export const NUDGE_MS = 60 * 1000;
 
 export interface AutoJoinOptions {
   now?: () => Date;
@@ -34,6 +34,8 @@ export interface AutoJoinController {
   cancel(): AutoJoinSnapshot;
   /** Not yet — push the join one minute further out. */
   postpone(): AutoJoinSnapshot;
+  /** Sooner — pull the join one minute in, never past the current moment. */
+  hasten(): AutoJoinSnapshot;
   getSnapshot(): AutoJoinSnapshot;
 }
 
@@ -54,6 +56,13 @@ export function createAutoJoin({
       joinAt: new Date(joinAt.getTime()),
       remainingMs: Math.max(0, joinAt.getTime() - now().getTime()),
     };
+  }
+
+  function reschedule(next: Date): AutoJoinSnapshot {
+    joinAt = next;
+    const current = snapshot();
+    onUpdate(current);
+    return current;
   }
 
   function settle(next: AutoJoinState): AutoJoinSnapshot {
@@ -96,10 +105,17 @@ export function createAutoJoin({
       if (state !== 'waiting') return snapshot();
       // Measured from now once the slot has gone by, so a postpone during the
       // grace period still buys a whole minute instead of landing in the past.
-      joinAt = new Date(Math.max(joinAt.getTime(), now().getTime()) + POSTPONE_MS);
-      const current = snapshot();
-      onUpdate(current);
-      return current;
+      return reschedule(new Date(Math.max(joinAt.getTime(), now().getTime()) + NUDGE_MS));
+    },
+
+    hasten() {
+      if (state !== 'waiting') return snapshot();
+      const current = now().getTime();
+      // Nothing left to pull in: the slot has gone by and we are only waiting
+      // for Meet to show the button. Moving joinAt back would just push the
+      // give-up deadline around.
+      if (joinAt.getTime() <= current) return snapshot();
+      return reschedule(new Date(Math.max(current, joinAt.getTime() - NUDGE_MS)));
     },
 
     getSnapshot: snapshot,

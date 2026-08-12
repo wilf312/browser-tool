@@ -75,6 +75,7 @@ export function start({
       document,
       onCancel: () => controller?.cancel(),
       onPostpone: () => controller?.postpone(),
+      onHasten: () => controller?.hasten(),
       // The outcome is only shown to be read; clicking it away skips the wait.
       onDismiss: () => stopSession(),
     });

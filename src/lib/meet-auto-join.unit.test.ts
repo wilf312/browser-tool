@@ -169,6 +169,76 @@ describe('createAutoJoin', () => {
     expect(snapshot.joinAt).toEqual(at(10, 15));
   });
 
+  it('pulls the join one minute in on a hasten', () => {
+    const time = clock(at(10, 7));
+    const button = fakeButton();
+    const auto = createAutoJoin({ now: time.now, findButton: () => button });
+
+    expect(auto.hasten().joinAt).toEqual(at(10, 14));
+
+    time.set(at(10, 14));
+    expect(auto.tick().state).toBe('joined');
+  });
+
+  it('takes a minute off per hasten', () => {
+    const time = clock(at(10, 7));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null });
+
+    auto.hasten();
+    expect(auto.hasten().joinAt).toEqual(at(10, 13));
+  });
+
+  it('never hastens the join into the past', () => {
+    const time = clock(at(10, 14, 30));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null });
+
+    // Only 30 seconds are left, so a minute off means "now", not 10:14.
+    expect(auto.hasten().joinAt).toEqual(at(10, 14, 30));
+    expect(auto.getSnapshot().remainingMs).toBe(0);
+  });
+
+  it('ignores a hasten once the slot has gone by', () => {
+    const time = clock(at(10, 14));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null, joinWindowMs: 60_000 });
+
+    // Waiting for a join button Meet has not rendered: there is no countdown
+    // left to shorten, and the give-up deadline must stay where it is.
+    time.set(at(10, 15, 30));
+    expect(auto.hasten().joinAt).toEqual(at(10, 15));
+
+    time.set(at(10, 16, 1));
+    expect(auto.tick().state).toBe('missed');
+  });
+
+  it('undoes a postpone', () => {
+    const time = clock(at(10, 7));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null });
+
+    auto.postpone();
+    expect(auto.hasten().joinAt).toEqual(at(10, 15));
+  });
+
+  it('reports a hasten to onUpdate', () => {
+    const time = clock(at(10, 7));
+    const onUpdate = vi.fn();
+    const auto = createAutoJoin({ now: time.now, findButton: () => null, onUpdate });
+
+    auto.hasten();
+    expect(onUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ state: 'waiting', joinAt: at(10, 14) }),
+    );
+  });
+
+  it('ignores a hasten once the countdown has settled', () => {
+    const time = clock(at(10, 7));
+    const auto = createAutoJoin({ now: time.now, findButton: () => null });
+
+    auto.cancel();
+    const snapshot = auto.hasten();
+    expect(snapshot.state).toBe('cancelled');
+    expect(snapshot.joinAt).toEqual(at(10, 15));
+  });
+
   it('honours the configured interval', () => {
     const time = clock(at(10, 7));
     const auto = createAutoJoin({ now: time.now, intervalMinutes: 30, findButton: () => null });

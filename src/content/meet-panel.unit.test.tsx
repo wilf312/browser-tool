@@ -34,6 +34,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot()}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={() => {}}
       />,
     );
@@ -50,6 +51,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot()}
         onCancel={onCancel}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={() => {}}
       />,
     );
@@ -68,6 +70,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot()}
         onCancel={() => {}}
         onPostpone={onPostpone}
+        onHasten={() => {}}
         onDismiss={() => {}}
       />,
     );
@@ -79,12 +82,53 @@ describe('<MeetPanel />', () => {
     expect(onPostpone).toHaveBeenCalledTimes(1);
   });
 
+  it('offers a minute back while the countdown still has one', () => {
+    const onHasten = vi.fn();
+    render(
+      <MeetPanel
+        snapshot={snapshot()}
+        onCancel={() => {}}
+        onPostpone={() => {}}
+        onHasten={onHasten}
+        onDismiss={() => {}}
+      />,
+    );
+
+    const hasten = screen.getByRole('button', { name: '-1分' });
+    expect((hasten as HTMLButtonElement).disabled).toBe(false);
+
+    fireEvent.click(hasten);
+    expect(onHasten).toHaveBeenCalledTimes(1);
+  });
+
+  it('greys out -1分 once the countdown has run out', () => {
+    const onHasten = vi.fn();
+    render(
+      <MeetPanel
+        snapshot={snapshot('waiting', 0)}
+        onCancel={() => {}}
+        onPostpone={() => {}}
+        onHasten={onHasten}
+        onDismiss={() => {}}
+      />,
+    );
+
+    const hasten = document.querySelector<HTMLButtonElement>('.hasten') as HTMLButtonElement;
+    expect(hasten.disabled).toBe(true);
+    // +1分 still makes sense: Meet may yet show the button.
+    expect(document.querySelector<HTMLButtonElement>('.postpone')?.disabled).toBe(false);
+
+    fireEvent.click(hasten);
+    expect(onHasten).not.toHaveBeenCalled();
+  });
+
   it('drops the countdown and the cancel button once it has settled', () => {
     render(
       <MeetPanel
         snapshot={snapshot('joined', 0)}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={() => {}}
       />,
     );
@@ -93,6 +137,7 @@ describe('<MeetPanel />', () => {
     expect(document.querySelector('.countdown')).toBeNull();
     expect(document.querySelector<HTMLButtonElement>('.cancel')?.hidden).toBe(true);
     expect(document.querySelector<HTMLButtonElement>('.postpone')?.hidden).toBe(true);
+    expect(document.querySelector<HTMLButtonElement>('.hasten')?.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>('.actions')?.hidden).toBe(true);
   });
 
@@ -102,6 +147,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot('cancelled', 0)}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={() => {}}
       />,
     );
@@ -117,6 +163,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot('cancelled', 0)}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={onDismiss}
       />,
     );
@@ -132,6 +179,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot('joined', 0)}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={onDismiss}
       />,
     );
@@ -152,6 +200,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot()}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={onDismiss}
       />,
     );
@@ -170,6 +219,7 @@ describe('<MeetPanel />', () => {
         snapshot={snapshot()}
         onCancel={() => {}}
         onPostpone={() => {}}
+        onHasten={() => {}}
         onDismiss={() => {}}
       />,
     );
@@ -277,6 +327,26 @@ describe('createPanel', () => {
     postponable.host.shadowRoot?.querySelector<HTMLElement>('.postpone')?.click();
     expect(onPostpone).toHaveBeenCalledTimes(1);
     postponable.destroy();
+  });
+
+  it('reports a hasten to the caller', () => {
+    const onHasten = vi.fn();
+    const hastenable = createPanel({ document, onHasten });
+    hastenable.mount();
+    hastenable.update(snapshot());
+
+    hastenable.host.shadowRoot?.querySelector<HTMLElement>('.hasten')?.click();
+    expect(onHasten).toHaveBeenCalledTimes(1);
+    hastenable.destroy();
+  });
+
+  it('survives a hasten when the caller did not ask to hear about it', () => {
+    panel.mount();
+    panel.update(snapshot());
+
+    expect(() =>
+      panel.host.shadowRoot?.querySelector<HTMLElement>('.hasten')?.click(),
+    ).not.toThrow();
   });
 
   it('survives a postpone when the caller did not ask to hear about it', () => {

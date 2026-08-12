@@ -2,10 +2,10 @@
  * The little box in the corner of the Meet waiting screen.
  *
  * It exists so the auto join is never a surprise: it says when the click will
- * happen, counts down to it, and offers a way out — either off altogether, or
- * one more minute at a time when the wait is the only problem. It is rendered into a shadow
- * root, so the styles travel with the component instead of coming from a
- * stylesheet Meet could reach.
+ * happen, counts down to it, and offers a way out — off altogether, or a minute
+ * later or earlier at a time when only the timing is wrong. It is rendered into
+ * a shadow root, so the styles travel with the component instead of coming from
+ * a stylesheet Meet could reach.
  *
  * Once the countdown has settled the box is only a report, so the whole of it
  * becomes the way to close it — waiting out the dismiss timer for a message you
@@ -48,7 +48,8 @@ export const PANEL_STYLE = `
     margin-top: 10px;
   }
   .cancel,
-  .postpone {
+  .postpone,
+  .hasten {
     padding: 4px 10px;
     border: 1px solid #5f6368;
     border-radius: 999px;
@@ -58,10 +59,13 @@ export const PANEL_STYLE = `
     cursor: pointer;
   }
   .cancel:hover,
-  .postpone:hover { border-color: #8ab4f8; color: #8ab4f8; }
+  .postpone:hover,
+  .hasten:not(:disabled):hover { border-color: #8ab4f8; color: #8ab4f8; }
+  .hasten:disabled { opacity: .4; cursor: default; }
   .actions[hidden],
   .cancel[hidden],
-  .postpone[hidden] { display: none; }
+  .postpone[hidden],
+  .hasten[hidden] { display: none; }
 `;
 
 export function describe({ state, joinAt }: AutoJoinSnapshot): string {
@@ -81,11 +85,15 @@ export interface MeetPanelProps {
   snapshot: AutoJoinSnapshot;
   onCancel: () => void;
   onPostpone: () => void;
+  onHasten: () => void;
   onDismiss: () => void;
 }
 
-export function MeetPanel({ snapshot, onCancel, onPostpone, onDismiss }: MeetPanelProps) {
+export function MeetPanel({ snapshot, onCancel, onPostpone, onHasten, onDismiss }: MeetPanelProps) {
   const waiting = snapshot.state === 'waiting';
+  // Past the scheduled time we are only waiting for Meet to show the join
+  // button, and there is no countdown left to shorten.
+  const canHasten = waiting && snapshot.remainingMs > 0;
   // While the countdown runs the box has its own buttons, and a stray click on
   // one must not take the countdown away. Only the settled outcome closes.
   const dismissible = !waiting;
@@ -115,6 +123,16 @@ export function MeetPanel({ snapshot, onCancel, onPostpone, onDismiss }: MeetPan
           <div className="hint">クリックで閉じる</div>
         )}
         <div className="actions" hidden={!waiting}>
+          <button
+            type="button"
+            className="hasten"
+            hidden={!waiting}
+            disabled={!canHasten}
+            title="参加を1分早める"
+            onClick={onHasten}
+          >
+            -1分
+          </button>
           <button
             type="button"
             className="postpone"
