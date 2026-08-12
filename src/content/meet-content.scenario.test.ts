@@ -27,6 +27,14 @@ function cancelButton(): HTMLElement | null {
   return panel()?.shadowRoot?.querySelector<HTMLElement>('.cancel') ?? null;
 }
 
+function postponeButton(): HTMLElement | null {
+  return panel()?.shadowRoot?.querySelector<HTMLElement>('.postpone') ?? null;
+}
+
+function hastenButton(): HTMLButtonElement | null {
+  return panel()?.shadowRoot?.querySelector<HTMLButtonElement>('.hasten') ?? null;
+}
+
 /** Boot the content script with the clock, the URL and the settings under test. */
 async function run(settings: MeetSettings = { enabled: true, intervalMinutes: 15 }) {
   running = start({
@@ -107,6 +115,48 @@ describe('meet content script', () => {
 
     await tick(at(10, 15));
     expect(joinButton?.click).not.toHaveBeenCalled();
+  });
+
+  it('waits another minute when +1分 is clicked', async () => {
+    await run();
+
+    postponeButton()?.click();
+    expect(panelText('.message')).toBe('10:16 に自動で参加します');
+    expect(panelText('.countdown')).toBe('残り 09:00');
+
+    await tick(at(10, 15));
+    expect(joinButton?.click).not.toHaveBeenCalled();
+
+    await tick(at(10, 16));
+    expect(joinButton?.click).toHaveBeenCalledTimes(1);
+  });
+
+  it('joins a minute earlier when -1分 is clicked', async () => {
+    await run();
+
+    hastenButton()?.click();
+    expect(panelText('.message')).toBe('10:14 に自動で参加します');
+    expect(panelText('.countdown')).toBe('残り 07:00');
+
+    await tick(at(10, 14));
+    expect(joinButton?.click).toHaveBeenCalledTimes(1);
+  });
+
+  it('greys out -1分 while it waits for a join button Meet has not shown', async () => {
+    joinButton = null;
+    await run();
+    expect(hastenButton()?.disabled).toBe(false);
+
+    await tick(at(10, 15));
+    expect(hastenButton()?.disabled).toBe(true);
+  });
+
+  it('hides +1分 once the countdown is over', async () => {
+    await run();
+    expect((postponeButton() as HTMLElement).hidden).toBe(false);
+
+    await tick(at(10, 15));
+    expect((postponeButton() as HTMLElement).hidden).toBe(true);
   });
 
   it('takes the cancelled panel down as soon as it is clicked', async () => {
