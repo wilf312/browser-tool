@@ -15,14 +15,14 @@ export const MIN_RELOAD_INTERVAL_SECONDS = 30;
 export const MAX_RELOAD_INTERVAL_SECONDS = 60 * 60;
 
 export const MIN_RELOAD_DURATION_MINUTES = 1;
-export const MAX_RELOAD_DURATION_MINUTES = 24 * 60;
+export const MAX_RELOAD_DURATION_MINUTES = 8 * 60;
 
 /** Allowed values in the dropdowns; any other input falls back to the default. */
-export const RELOAD_INTERVAL_CHOICES = [30, 60, 180, 300, 600, 1800] as const;
-export const RELOAD_DURATION_CHOICES = [5, 15, 30, 60, 180, 480] as const;
+export const RELOAD_INTERVAL_CHOICES = [300, 600, 1800] as const;
+export const RELOAD_DURATION_CHOICES = [60, 120, 180, 240, 300, 360, 420, 480] as const;
 
-export const DEFAULT_RELOAD_INTERVAL_SECONDS = 60;
-export const DEFAULT_RELOAD_DURATION_MINUTES = 30;
+export const DEFAULT_RELOAD_INTERVAL_SECONDS = 300;
+export const DEFAULT_RELOAD_DURATION_MINUTES = 60;
 
 /**
  * How late an alarm may be and still count as the boundary it was meant for.

@@ -15,9 +15,9 @@ afterEach(() => {
 
 describe('sanitizeReloadSettings', () => {
   it('keeps well formed settings', () => {
-    expect(sanitizeReloadSettings({ intervalSeconds: 300, durationMinutes: 60 })).toEqual({
-      intervalSeconds: 300,
-      durationMinutes: 60,
+    expect(sanitizeReloadSettings({ intervalSeconds: 1800, durationMinutes: 480 })).toEqual({
+      intervalSeconds: 1800,
+      durationMinutes: 480,
     });
   });
 
@@ -31,12 +31,12 @@ describe('sanitizeReloadSettings', () => {
 describe('loadReloadSettings', () => {
   it('reads the stored settings', async () => {
     installFakeChrome({
-      storage: { [RELOAD_SETTINGS_KEY]: { intervalSeconds: 30, durationMinutes: 15 } },
+      storage: { [RELOAD_SETTINGS_KEY]: { intervalSeconds: 600, durationMinutes: 240 } },
     });
 
     await expect(loadReloadSettings()).resolves.toEqual({
-      intervalSeconds: 30,
-      durationMinutes: 15,
+      intervalSeconds: 600,
+      durationMinutes: 240,
     });
   });
 
@@ -51,11 +51,11 @@ describe('saveReloadSettings', () => {
   it('writes the normalized settings', async () => {
     const chrome = installFakeChrome();
 
-    await saveReloadSettings({ intervalSeconds: 5, durationMinutes: 60 });
+    await saveReloadSettings({ intervalSeconds: 5, durationMinutes: 180 });
 
     expect(chrome.store[RELOAD_SETTINGS_KEY]).toEqual({
       intervalSeconds: DEFAULT_RELOAD_SETTINGS.intervalSeconds,
-      durationMinutes: 60,
+      durationMinutes: 180,
     });
   });
 });
@@ -66,8 +66,8 @@ describe('onReloadSettingsChanged', () => {
     const seen = vi.fn();
 
     onReloadSettingsChanged(seen);
-    chrome.emitChange(RELOAD_SETTINGS_KEY, { intervalSeconds: 600, durationMinutes: 180 });
+    chrome.emitChange(RELOAD_SETTINGS_KEY, { intervalSeconds: 1800, durationMinutes: 180 });
 
-    expect(seen).toHaveBeenCalledWith({ intervalSeconds: 600, durationMinutes: 180 });
+    expect(seen).toHaveBeenCalledWith({ intervalSeconds: 1800, durationMinutes: 180 });
   });
 });

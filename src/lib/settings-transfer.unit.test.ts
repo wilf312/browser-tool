@@ -186,7 +186,7 @@ describe('sanitizeFeatures', () => {
       enabled: true,
     });
     expect(features.meetAutoJoin).toEqual({ enabled: true, intervalMinutes: 60 });
-    expect(features.reloadTimer).toEqual({ intervalSeconds: 60, durationMinutes: 1440 });
+    expect(features.reloadTimer).toEqual({ intervalSeconds: 300, durationMinutes: 480 });
   });
 
   it.each([
@@ -223,8 +223,11 @@ describe('describeFeature', () => {
   it('spells out the reload timer values', () => {
     expect(describeFeature({ reloadTimer: timer }, 'reloadTimer')).toBe('5 分ごと / 3 時間');
     expect(
-      describeFeature({ reloadTimer: { intervalSeconds: 30, durationMinutes: 15 } }, 'reloadTimer'),
-    ).toBe('30 秒ごと / 15 分');
+      describeFeature(
+        { reloadTimer: { intervalSeconds: 1800, durationMinutes: 480 } },
+        'reloadTimer',
+      ),
+    ).toBe('30 分ごと / 8 時間');
   });
 
   it('describes a missing feature as nothing', () => {

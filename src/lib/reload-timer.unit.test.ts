@@ -35,8 +35,8 @@ function after(seconds: number): Date {
 
 describe('normalizeIntervalSeconds', () => {
   it('keeps sensible values', () => {
-    expect(normalizeIntervalSeconds(30)).toBe(30);
-    expect(normalizeIntervalSeconds('300')).toBe(300);
+    expect(normalizeIntervalSeconds(300)).toBe(300);
+    expect(normalizeIntervalSeconds('1800')).toBe(1800);
   });
 
   it('falls back to the default for anything unusable', () => {
@@ -56,7 +56,7 @@ describe('normalizeIntervalSeconds', () => {
 
 describe('normalizeDurationMinutes', () => {
   it('keeps sensible values', () => {
-    expect(normalizeDurationMinutes(5)).toBe(5);
+    expect(normalizeDurationMinutes(60)).toBe(60);
     expect(normalizeDurationMinutes('180')).toBe(180);
   });
 
@@ -66,8 +66,8 @@ describe('normalizeDurationMinutes', () => {
     }
   });
 
-  it('caps the duration at a day', () => {
-    expect(normalizeDurationMinutes(10_000)).toBe(1440);
+  it('caps the duration at eight hours', () => {
+    expect(normalizeDurationMinutes(10_000)).toBe(480);
   });
 });
 
@@ -75,16 +75,16 @@ describe('createReloadJob', () => {
   it('spans the requested duration from now', () => {
     const created = createReloadJob({
       tabId: 4,
-      intervalSeconds: 30,
-      durationMinutes: 5,
+      intervalSeconds: 600,
+      durationMinutes: 120,
       now: new Date(START),
     });
 
     expect(created).toEqual({
       tabId: 4,
-      intervalSeconds: 30,
+      intervalSeconds: 600,
       startedAt: START,
-      endsAt: START + 5 * 60_000,
+      endsAt: START + 120 * 60_000,
     });
   });
 

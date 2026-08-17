@@ -39,6 +39,11 @@ async function click(name: string) {
   });
 }
 
+/** The labels a dropdown offers, top to bottom. */
+function optionLabels(label: string): string[] {
+  return [...screen.getByLabelText<HTMLSelectElement>(label).options].map((option) => option.text);
+}
+
 /** Let the countdown redraw. */
 async function tick(seconds: number) {
   await act(async () => {
@@ -67,47 +72,61 @@ describe('reload timer', () => {
   it('starts with the defaults', async () => {
     await mount();
 
-    expect(screen.getByLabelText<HTMLSelectElement>('リロード間隔').value).toBe('60');
-    expect(screen.getByLabelText<HTMLSelectElement>('続ける時間').value).toBe('30');
+    expect(screen.getByLabelText<HTMLSelectElement>('リロード間隔').value).toBe('300');
+    expect(screen.getByLabelText<HTMLSelectElement>('続ける時間').value).toBe('60');
   });
 
   it('offers the values that were picked last time', async () => {
-    await mount({}, { [RELOAD_SETTINGS_KEY]: { intervalSeconds: 300, durationMinutes: 180 } });
+    await mount({}, { [RELOAD_SETTINGS_KEY]: { intervalSeconds: 1800, durationMinutes: 480 } });
 
-    expect(screen.getByLabelText<HTMLSelectElement>('リロード間隔').value).toBe('300');
-    expect(screen.getByLabelText<HTMLSelectElement>('続ける時間').value).toBe('180');
+    expect(screen.getByLabelText<HTMLSelectElement>('リロード間隔').value).toBe('1800');
+    expect(screen.getByLabelText<HTMLSelectElement>('続ける時間').value).toBe('480');
+  });
+
+  it('offers only the three intervals and the eight durations', async () => {
+    await mount();
+
+    expect(optionLabels('リロード間隔')).toEqual(['5 分', '10 分', '30 分']);
+    expect(optionLabels('続ける時間')).toEqual([
+      '1 時間',
+      '2 時間',
+      '3 時間',
+      '4 時間',
+      '5 時間',
+      '6 時間',
+      '7 時間',
+      '8 時間',
+    ]);
   });
 
   it('offers a stored value that is not one of the usual choices', async () => {
-    await mount({}, { [RELOAD_SETTINGS_KEY]: { intervalSeconds: 45, durationMinutes: 1440 } });
+    await mount({}, { [RELOAD_SETTINGS_KEY]: { intervalSeconds: 900, durationMinutes: 90 } });
 
     const interval = screen.getByLabelText<HTMLSelectElement>('リロード間隔');
-    expect(interval.value).toBe('45');
+    expect(interval.value).toBe('900');
     expect([...interval.options].map((option) => option.value)).toEqual([
-      '30',
-      '45',
-      '60',
-      '180',
       '300',
       '600',
+      '900',
       '1800',
     ]);
 
     const duration = screen.getByLabelText<HTMLSelectElement>('続ける時間');
-    expect(duration.value).toBe('1440');
-    expect([...duration.options].map((option) => option.value)).toContain('1440');
+    expect(duration.value).toBe('90');
+    expect([...duration.options][0].value).toBe('60');
+    expect([...duration.options][1].value).toBe('90');
   });
 
   it('remembers the values that were picked', async () => {
     await mount();
 
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('リロード間隔'), { target: { value: '30' } });
+      fireEvent.change(screen.getByLabelText('リロード間隔'), { target: { value: '1800' } });
     });
 
     expect(chrome.store[RELOAD_SETTINGS_KEY]).toEqual({
-      intervalSeconds: 30,
-      durationMinutes: 30,
+      intervalSeconds: 1800,
+      durationMinutes: 60,
     });
   });
 
@@ -115,17 +134,17 @@ describe('reload timer', () => {
     await mount();
 
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('リロード間隔'), { target: { value: '30' } });
-      fireEvent.change(screen.getByLabelText('続ける時間'), { target: { value: '5' } });
+      fireEvent.change(screen.getByLabelText('リロード間隔'), { target: { value: '600' } });
+      fireEvent.change(screen.getByLabelText('続ける時間'), { target: { value: '240' } });
     });
     await click('開始');
 
     const job = storedJobs()[7];
-    expect(job).toMatchObject({ tabId: 7, intervalSeconds: 30 });
-    expect(job.endsAt - job.startedAt).toBe(5 * 60_000);
+    expect(job).toMatchObject({ tabId: 7, intervalSeconds: 600 });
+    expect(job.endsAt - job.startedAt).toBe(240 * 60_000);
     expect(chrome.alarmStore.get(reloadAlarmName(7))).toEqual({
-      when: job.startedAt + 30_000,
-      periodInMinutes: 0.5,
+      when: job.startedAt + 600_000,
+      periodInMinutes: 10,
     });
   });
 
@@ -134,14 +153,14 @@ describe('reload timer', () => {
 
     await click('開始');
 
-    expect(progress()).toContain('1 分 ごとにリロードしています');
-    expect(progress()).toContain('終了まで 30:00');
-    expect(progress()).toContain('次まで 01:00');
+    expect(progress()).toContain('5 分 ごとにリロードしています');
+    expect(progress()).toContain('終了まで 1:00:00');
+    expect(progress()).toContain('次まで 05:00');
 
     await tick(20);
 
-    expect(progress()).toContain('終了まで 29:40');
-    expect(progress()).toContain('次まで 00:40');
+    expect(progress()).toContain('終了まで 59:40');
+    expect(progress()).toContain('次まで 04:40');
   });
 
   it('picks a running timer back up when the popup is opened again', async () => {
@@ -216,11 +235,11 @@ describe('reload timer', () => {
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('リロード間隔'), { target: { value: '30' } });
+      fireEvent.change(screen.getByLabelText('リロード間隔'), { target: { value: '1800' } });
     });
 
     // The dropdown still moved, so the timer can be started with what was picked.
-    expect(screen.getByLabelText<HTMLSelectElement>('リロード間隔').value).toBe('30');
+    expect(screen.getByLabelText<HTMLSelectElement>('リロード間隔').value).toBe('1800');
     expect(logged.mock.calls[0]).toContain(error);
   });
 
@@ -228,10 +247,10 @@ describe('reload timer', () => {
     await mount();
 
     await act(async () => {
-      chrome.emitChange(RELOAD_SETTINGS_KEY, { intervalSeconds: 600, durationMinutes: 60 });
+      chrome.emitChange(RELOAD_SETTINGS_KEY, { intervalSeconds: 600, durationMinutes: 480 });
     });
 
-    expect(screen.getByText('10 分ごと / 1 時間')).toBeTruthy();
+    expect(screen.getByText('10 分ごと / 8 時間')).toBeTruthy();
   });
 
   it('says there is no tab to reload when the settings page has a tab of its own', async () => {
