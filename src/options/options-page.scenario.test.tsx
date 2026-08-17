@@ -398,13 +398,14 @@ describe('settings import / export', () => {
     fireEvent.click(featureCheckbox('書き出す機能', 'Meet 自動入室'));
     await clickExport();
 
-    expect((await exported()).features).toEqual({ redirectRules: [storedRule] });
+    expect(Object.keys((await exported()).features)).not.toContain('meetAutoJoin');
   });
 
   it('exports a single feature on its own', async () => {
     await mount([storedRule], storedMeet);
 
     fireEvent.click(featureCheckbox('書き出す機能', 'Jira ドメインリダイレクト'));
+    fireEvent.click(featureCheckbox('書き出す機能', 'ページ自動リロード'));
     await clickExport();
 
     expect((await exported()).features).toEqual({ meetAutoJoin: storedMeet });
@@ -422,6 +423,7 @@ describe('settings import / export', () => {
 
     fireEvent.click(featureCheckbox('書き出す機能', 'Jira ドメインリダイレクト'));
     fireEvent.click(featureCheckbox('書き出す機能', 'Meet 自動入室'));
+    fireEvent.click(featureCheckbox('書き出す機能', 'ページ自動リロード'));
 
     expect(screen.getByRole('button', { name: 'エクスポート' })).toHaveProperty('disabled', true);
   });

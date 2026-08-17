@@ -3,12 +3,13 @@
 <img width="1280" height="800" alt="sc" src="https://github.com/user-attachments/assets/2a90c2e7-cbec-4275-846c-bc96439534a0" />
 
 日々のブラウザ作業を少し楽にする Chrome 拡張です。仕事に必要な小さい道具をまとめた「七つ道具」で、
-今のところ 2 つの機能があります。
+今のところ 3 つの機能があります。
 
 1. **Jira ドメインリダイレクト** — 廃止された Jira (atlassian.net) のドメインへのアクセスを、パス以降をそのまま残したまま移行先のドメインへリダイレクトします
 2. **Meet 自動入室** — Google Meet の待機画面で、次の開始時刻になったら「参加」ボタンを自動でクリックします
+3. **ページ自動リロード** — 開いているタブを、決めた間隔で決めた時間だけリロードし続けます
 
-どちらの設定も JSON ファイルに書き出して、別の端末で読み込めます（[設定のインポート / エクスポート](#設定のインポート--エクスポート)）。
+どの設定も JSON ファイルに書き出して、別の端末で読み込めます（[設定のインポート / エクスポート](#設定のインポート--エクスポート)）。
 
 ## インストール
 
@@ -82,6 +83,43 @@ https://b.atlassian.net/browse/XAPP-134
 - カメラとマイクの状態は待機画面で設定したものがそのまま使われます。拡張機能側では変更しません
 - Meet は SPA なので URL を監視しています。別の会議へ移動すると、その会議のカウントダウンが改めて始まります
 
+## ページ自動リロード
+
+ビルドの結果や試合の経過のように、開いたまま更新を待つページのための機能です。ツールバーの
+アイコンからこの拡張を開くと、そのとき見ていたタブが対象になります。
+
+```
+[ページ自動リロード]
+  対象: https://ci.example.com/job/main
+  リロード間隔 [1 分 ▾]  続ける時間 [30 分 ▾]  [開始]
+                            ↓
+  1 分ごとにリロードしています（終了まで 28:42 ／ 次まで 00:18）  [停止]
+```
+
+- **リロード間隔**: 30 秒 / 1 分 / 3 分 / 5 分 / 10 分 / 30 分
+- **続ける時間**: 5 分 / 15 分 / 30 分 / 1 時間 / 3 時間 / 8 時間。この時間がたてば自分で止まります。
+  止め忘れて何時間もリロードし続ける、ということにはなりません
+- 選んだ値は次に開いたときの初期値として憶えます
+
+止まるのは、**決めた時間がたったとき**・**タブを閉じたとき**・**「停止」を押したとき**の 3 つです。
+設定画面（ポップアップ）を閉じてもタイマーは動き続けます。もう一度開けば残り時間が表示され、
+そこから停止できます。
+
+### しくみ
+
+- タイマーは**タブに紐づきます**。そのタブで別のページへ移動した場合、移動先がリロードされます。
+  URL ではなくタブが対象、と考えてください
+- リロードは [`chrome.alarms`](https://developer.chrome.com/docs/extensions/reference/api/alarms) が起こします。service worker は次のリロードまでの間に
+  停止されますが、アラームが来れば起き直すので、間隔が何分空いても関係ありません。逆に Chrome の
+  アラームは 30 秒より短い間隔では動かないため、最短の間隔は 30 秒です
+- 動いているタイマーは `chrome.storage.session` に置きます。タブ ID はブラウザを再起動すると
+  意味を失うので、再起動で消えるここが正しい置き場所です
+- タブごとに動くので、複数のタブでそれぞれ別のタイマーを走らせられます。設定画面はいま見ている
+  タブのぶんだけを表示します
+- 対象のタブの URL を読むために [`activeTab`](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab) 権限を使っています。ツールバーのアイコンを
+  押したそのタブに対してだけ許可される権限なので、閲覧履歴を読む権限（`tabs`）は必要ありません。
+  `chrome://extensions` から設定画面をタブとして開いた場合は対象のタブがないので、その旨を表示します
+
 ## 設定のインポート / エクスポート
 
 設定画面のいちばん下から、設定を JSON ファイルに書き出したり、書き出したファイルを読み込んだり
@@ -91,12 +129,14 @@ https://b.atlassian.net/browse/XAPP-134
 [エクスポート]
   書き出す機能  ☑ Jira ドメインリダイレクト  ルール 2 件（有効 1 件）
                 ☑ Meet 自動入室              自動入室 ON / 15 分間隔
+                ☑ ページ自動リロード         1 分ごと / 30 分
                                                   ↓
                               nanatsudougu-settings-20260804-1210.json
 
 [インポート]
   取り込む機能  ☑ Jira ドメインリダイレクト  ルール 2 件（有効 1 件）
                 ☐ Meet 自動入室              自動入室 ON / 15 分間隔
+                ☑ ページ自動リロード         1 分ごと / 30 分
                                                   ↓
                         チェックした機能だけが今の設定を置き換える
 ```
@@ -122,14 +162,19 @@ https://b.atlassian.net/browse/XAPP-134
     "redirectRules": [
       { "id": "1", "from": "a.atlassian.net", "to": "b.atlassian.net", "enabled": true }
     ],
-    "meetAutoJoin": { "enabled": true, "intervalMinutes": 15 }
+    "meetAutoJoin": { "enabled": true, "intervalMinutes": 15 },
+    "reloadTimer": { "intervalSeconds": 60, "durationMinutes": 30 }
   }
 }
 ```
 
+ページ自動リロードで書き出されるのは、**次に開始するときの初期値**だけです。動いているタイマーは
+そのブラウザのそのタブのものなので、ファイルには入りません。
+
 `format` が違うファイル、壊れた JSON、この拡張より新しい `version` のファイルは、理由を表示して
 読み込みません。手で編集したファイルは、通常の保存と同じ正規化（`sanitizeRules` /
-`sanitizeMeetSettings`）を通してから適用されるので、欠けた項目は既定値で埋まります。
+`sanitizeMeetSettings` / `sanitizeReloadSettings`）を通してから適用されるので、欠けた項目は
+既定値で埋まります。
 
 改名前の `browser-tool` で書き出したファイル（`"format": "browser-tool-settings"`）も、
 そのまま読み込めます。書き出すときは常に新しい `nanatsudougu-settings` になります。
@@ -253,17 +298,23 @@ vite.config.ts             設定画面 + service worker のビルド
 vite.content.config.ts     content script のビルド（IIFE）
 scripts/package.mjs        dist/ を公開用の ZIP にまとめる
 src/                       実装と、その隣に置いたテスト
-  background.ts            service worker: ルール → declarativeNetRequest 同期
+  background.ts            service worker: ルール → declarativeNetRequest 同期、リロードのアラーム
   background.scenario.test.ts
   entry-points.scenario.test.tsx  2 つのエントリが読み込めることの確認
   lib/
     types.ts               ルール・設定・スナップショットの型
     redirect.ts            リダイレクト解決 / DNR ルール生成（純粋関数）
     sync-storage.ts        chrome.storage.sync の薄いラッパ
+    session-storage.ts     chrome.storage.session の薄いラッパ
     storage.ts             リダイレクトルールの読み書きと正規化
     dnr-sync.ts            動的ルールの入れ替え
     debounce.ts            保存のデバウンス
-    meet-schedule.ts       入室時刻の計算と表示フォーマット（純粋関数）
+    format-time.ts         時刻とカウントダウンの表示フォーマット（純粋関数）
+    active-tab.ts          設定画面が対象にするタブの取得
+    reload-timer.ts        リロードの時刻計算と正規化（純粋関数）
+    reload-jobs.ts         動いているタイマーの保存とアラームの出し入れ
+    reload-settings.ts     リロードタイマーの初期値の読み書き
+    meet-schedule.ts       入室時刻の計算（純粋関数）
     meet-join.ts           待機画面から「参加」ボタンを探す
     meet-auto-join.ts      自動入室の状態機械（タイマーと DOM を持たない）
     meet-page.ts           対象となる Meet の URL 判定
@@ -284,12 +335,14 @@ src/                       実装と、その隣に置いたテスト
     RedirectRulesSection.tsx  ルールの読み込み・保存
     RulesTable.tsx         ルールテーブル（表示のみ）
     MeetAutoJoinSection.tsx   Meet 自動入室の設定
+    ReloadTimerSection.tsx    ページ自動リロードの開始と停止
     SettingsTransferSection.tsx  設定の書き出しと読み込み
     download.ts            生成したファイルをブラウザのダウンロードに渡す
     useStatus.ts           「保存しました」の表示と自動クリア
     options.css
     RulesTable.unit.test.tsx / download.unit.test.ts / useStatus.unit.test.ts
     options-page.scenario.test.tsx  設定画面の操作
+    reload-timer.scenario.test.tsx  ページ自動リロードの開始から停止まで
 tests/                     隣に置けないテストと共通のヘルパ
   manifest.unit.test.ts    public/manifest.json の内容
   build-config.unit.test.ts  vite の 2 つのビルド設定

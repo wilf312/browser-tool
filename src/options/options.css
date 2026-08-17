@@ -184,6 +184,11 @@ button:hover {
   font-size: 12px;
 }
 
+.target {
+  margin: 12px 0 0;
+  overflow-wrap: anywhere;
+}
+
 .feature-picker {
   margin: 0;
   padding: 8px 12px 10px;
