@@ -5,9 +5,16 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { STORAGE_KEY } from './lib/storage';
+import { RELOAD_JOBS_KEY, reloadAlarmName } from './lib/reload-jobs';
 import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from '../tests/fake-chrome';
 
 const RULES = [{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }];
+
+/** A timer that started a minute ago and has an hour left to run. */
+function runningJob() {
+  const startedAt = Date.now() - 60_000;
+  return { tabId: 7, intervalSeconds: 60, startedAt, endsAt: startedAt + 60 * 60_000 };
+}
 
 let chrome: FakeChrome;
 
@@ -102,6 +109,74 @@ describe('background service worker', () => {
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     chrome.emitChange(STORAGE_KEY, RULES);
+
+    await vi.waitFor(() => expect(logged).toHaveBeenCalled());
+    expect(logged.mock.calls[0]).toContain(error);
+  });
+});
+
+describe('reload timers', () => {
+  it('reloads the tab when its alarm fires', async () => {
+    chrome = installFakeChrome({
+      storage: { [STORAGE_KEY]: RULES },
+      session: { [RELOAD_JOBS_KEY]: { 7: runningJob() } },
+    });
+    await boot();
+
+    chrome.emitAlarm(reloadAlarmName(7));
+
+    await vi.waitFor(() => expect(chrome.tabs.reload).toHaveBeenCalledWith(7));
+  });
+
+  it('leaves alarms that are not reload timers alone', async () => {
+    await boot();
+
+    chrome.emitAlarm('something-else');
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(chrome.tabs.reload).not.toHaveBeenCalled();
+  });
+
+  it('stops the timer of a tab the user closed', async () => {
+    chrome = installFakeChrome({
+      storage: { [STORAGE_KEY]: RULES },
+      session: { [RELOAD_JOBS_KEY]: { 7: runningJob() } },
+    });
+    await boot();
+
+    chrome.emitTabRemoved(7);
+
+    await vi.waitFor(() => expect(chrome.sessionStore[RELOAD_JOBS_KEY]).toEqual({}));
+    expect(chrome.alarms.clear).toHaveBeenCalledWith(reloadAlarmName(7));
+  });
+
+  it('logs instead of throwing when the timer of a closed tab cannot be stopped', async () => {
+    chrome = installFakeChrome({
+      storage: { [STORAGE_KEY]: RULES },
+      session: { [RELOAD_JOBS_KEY]: { 7: runningJob() } },
+    });
+    await boot();
+    const error = new Error('alarms are unavailable');
+    chrome.alarms.clear.mockRejectedValue(error);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    chrome.emitTabRemoved(7);
+
+    await vi.waitFor(() => expect(logged).toHaveBeenCalled());
+    expect(logged.mock.calls[0]).toContain(error);
+  });
+
+  it('logs instead of throwing when a reload fails', async () => {
+    chrome = installFakeChrome({
+      storage: { [STORAGE_KEY]: RULES },
+      session: { [RELOAD_JOBS_KEY]: { 7: runningJob() } },
+    });
+    await boot();
+    const error = new Error('session storage is gone');
+    chrome.session.get.mockRejectedValue(error);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    chrome.emitAlarm(reloadAlarmName(7));
 
     await vi.waitFor(() => expect(logged).toHaveBeenCalled());
     expect(logged.mock.calls[0]).toContain(error);

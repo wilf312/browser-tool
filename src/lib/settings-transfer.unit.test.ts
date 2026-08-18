@@ -23,6 +23,8 @@ const rules = [
 
 const meet = { enabled: true, intervalMinutes: 30 };
 
+const timer = { intervalSeconds: 300, durationMinutes: 180 };
+
 const both: SettingsFeatures = { redirectRules: rules, meetAutoJoin: meet };
 
 /** The text of a file holding both features. */
@@ -35,6 +37,7 @@ describe('the features that can be transferred', () => {
     expect(FEATURE_IDS.map((id) => FEATURE_LABELS[id])).toEqual([
       'Jira ドメインリダイレクト',
       'Meet 自動入室',
+      'ページ自動リロード',
     ]);
   });
 });
@@ -42,6 +45,9 @@ describe('the features that can be transferred', () => {
 describe('pickFeatures', () => {
   it('keeps only what was asked for', () => {
     expect(pickFeatures(both, ['meetAutoJoin'])).toEqual({ meetAutoJoin: meet });
+    expect(pickFeatures({ ...both, reloadTimer: timer }, ['reloadTimer'])).toEqual({
+      reloadTimer: timer,
+    });
   });
 
   it('leaves out a feature that is not there even when it is asked for', () => {
@@ -170,6 +176,7 @@ describe('sanitizeFeatures', () => {
     const features = sanitizeFeatures({
       redirectRules: [{ from: 'a.atlassian.net' }, 'nope'],
       meetAutoJoin: { enabled: 'yes', intervalMinutes: 999 },
+      reloadTimer: { intervalSeconds: 1, durationMinutes: 99_999 },
     });
 
     expect(features.redirectRules).toHaveLength(1);
@@ -179,6 +186,7 @@ describe('sanitizeFeatures', () => {
       enabled: true,
     });
     expect(features.meetAutoJoin).toEqual({ enabled: true, intervalMinutes: 60 });
+    expect(features.reloadTimer).toEqual({ intervalSeconds: 300, durationMinutes: 480 });
   });
 
   it.each([
@@ -190,7 +198,9 @@ describe('sanitizeFeatures', () => {
   });
 
   it('drops features stored under the wrong shape', () => {
-    expect(sanitizeFeatures({ redirectRules: {}, meetAutoJoin: [] })).toEqual({});
+    expect(sanitizeFeatures({ redirectRules: {}, meetAutoJoin: [], reloadTimer: 'nope' })).toEqual(
+      {},
+    );
   });
 });
 
@@ -210,9 +220,20 @@ describe('describeFeature', () => {
     ).toBe('自動入室 OFF / 15 分間隔');
   });
 
+  it('spells out the reload timer values', () => {
+    expect(describeFeature({ reloadTimer: timer }, 'reloadTimer')).toBe('5 分ごと / 3 時間');
+    expect(
+      describeFeature(
+        { reloadTimer: { intervalSeconds: 1800, durationMinutes: 480 } },
+        'reloadTimer',
+      ),
+    ).toBe('30 分ごと / 8 時間');
+  });
+
   it('describes a missing feature as nothing', () => {
     expect(describeFeature({}, 'redirectRules')).toBe('');
     expect(describeFeature({}, 'meetAutoJoin')).toBe('');
+    expect(describeFeature({}, 'reloadTimer')).toBe('');
   });
 });
 

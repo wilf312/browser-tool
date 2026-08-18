@@ -13,7 +13,7 @@
  */
 
 import type { KeyboardEvent } from 'react';
-import { formatClock, formatCountdown } from '../lib/meet-schedule';
+import { formatClock, formatCountdown } from '../lib/format-time';
 import type { AutoJoinSnapshot } from '../lib/types';
 
 export const PANEL_STYLE = `

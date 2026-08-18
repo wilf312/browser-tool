@@ -51,6 +51,7 @@ npm run release -- <version>
 ```
 
 スクリプトが行うこと:
+
 1. `.env` の必須項目を検証
 2. `package.json` (npm version --no-git-tag-version) と `public/manifest.json` の version を更新
 3. `npm run package` (typecheck → release ビルド → `release/nanatsudougu-<version>.zip`)
@@ -63,6 +64,7 @@ npm run release -- <version>
 `Pending review` は Chrome Web Store の審査待ちで、審査通過後に自動で一般公開される。
 
 注意点:
+
 - v4 の `upload` サブコマンドに `--auto-publish` は**存在しない**。指定しても無視され、
   ドラフトがアップロードされるだけで公開されない。サブコマンドを省略すること。
 - Claude が `publish` を実行できず権限で弾かれる場合がある。そのときはユーザーに

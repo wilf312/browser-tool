@@ -7,8 +7,10 @@
  */
 
 import { sanitizeMeetSettings } from './meet-settings';
+import { sanitizeReloadSettings } from './reload-settings';
+import { formatDurationLabel, formatIntervalLabel } from './reload-timer';
 import { sanitizeRules } from './storage';
-import type { MeetSettings, RedirectRule } from './types';
+import type { MeetSettings, RedirectRule, ReloadSettings } from './types';
 
 /** Stamped into the file so an unrelated JSON is rejected instead of half applied. */
 export const EXPORT_FORMAT = 'nanatsudougu-settings';
@@ -18,19 +20,22 @@ export const EXPORT_VERSION = 1;
 const LEGACY_EXPORT_FORMATS = new Set<string>(['browser-tool-settings']);
 
 /** The features that can be exported and imported on their own. */
-export const FEATURE_IDS = ['redirectRules', 'meetAutoJoin'] as const;
+export const FEATURE_IDS = ['redirectRules', 'meetAutoJoin', 'reloadTimer'] as const;
 
 export type FeatureId = (typeof FEATURE_IDS)[number];
 
 export const FEATURE_LABELS: Readonly<Record<FeatureId, string>> = Object.freeze({
   redirectRules: 'Jira ドメインリダイレクト',
   meetAutoJoin: 'Meet 自動入室',
+  reloadTimer: 'ページ自動リロード',
 });
 
 /** The settings of each feature. A bundle carries only the ones that were picked. */
 export interface SettingsFeatures {
   redirectRules?: RedirectRule[];
   meetAutoJoin?: MeetSettings;
+  /** The values a timer starts with. The running timers themselves are not carried. */
+  reloadTimer?: ReloadSettings;
 }
 
 /** What a settings file contains. */
@@ -54,6 +59,9 @@ export function pickFeatures(
   }
   if (ids.includes('meetAutoJoin') && features.meetAutoJoin !== undefined) {
     picked.meetAutoJoin = features.meetAutoJoin;
+  }
+  if (ids.includes('reloadTimer') && features.reloadTimer !== undefined) {
+    picked.reloadTimer = features.reloadTimer;
   }
   return picked;
 }
@@ -93,6 +101,10 @@ export function sanitizeFeatures(raw: unknown): SettingsFeatures {
   const meet = features.meetAutoJoin;
   if (meet !== null && typeof meet === 'object' && !Array.isArray(meet)) {
     result.meetAutoJoin = sanitizeMeetSettings(meet);
+  }
+  const reload = features.reloadTimer;
+  if (reload !== null && typeof reload === 'object' && !Array.isArray(reload)) {
+    result.reloadTimer = sanitizeReloadSettings(reload);
   }
   return result;
 }
@@ -150,9 +162,14 @@ export function describeFeature(features: SettingsFeatures, id: FeatureId): stri
     const enabled = rules.filter((rule) => rule.enabled).length;
     return `ルール ${rules.length} 件（有効 ${enabled} 件）`;
   }
-  const settings = features.meetAutoJoin;
-  if (settings === undefined) return '';
-  return `自動入室 ${settings.enabled ? 'ON' : 'OFF'} / ${settings.intervalMinutes} 分間隔`;
+  if (id === 'meetAutoJoin') {
+    const settings = features.meetAutoJoin;
+    if (settings === undefined) return '';
+    return `自動入室 ${settings.enabled ? 'ON' : 'OFF'} / ${settings.intervalMinutes} 分間隔`;
+  }
+  const timer = features.reloadTimer;
+  if (timer === undefined) return '';
+  return `${formatIntervalLabel(timer.intervalSeconds)}ごと / ${formatDurationLabel(timer.durationMinutes)}`;
 }
 
 function pad(value: number): string {

@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Nanatsudougu",
   "version": "1.2.0",
-  "description": "廃止された atlassian.net のドメインをパスを保ったままリダイレクトし、Google Meet の開始時刻に自動で入室します。",
-  "permissions": ["declarativeNetRequest", "storage"],
+  "description": "廃止された atlassian.net のドメインをパスを保ったままリダイレクトし、Google Meet の開始時刻に自動で入室し、開いているタブを決めた時間だけリロードし続けます。",
+  "permissions": ["declarativeNetRequest", "storage", "alarms", "activeTab"],
   "host_permissions": ["*://*.atlassian.net/*"],
   "background": {
     "service_worker": "background.js",

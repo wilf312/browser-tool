@@ -8,6 +8,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { loadMeetSettings, onMeetSettingsChanged, saveMeetSettings } from '../lib/meet-settings';
+import {
+  loadReloadSettings,
+  onReloadSettingsChanged,
+  saveReloadSettings,
+} from '../lib/reload-settings';
 import { loadRules, onRulesChanged, saveRules } from '../lib/storage';
 import {
   buildBundle,
@@ -32,6 +37,7 @@ async function readFeatures(ids: readonly FeatureId[]): Promise<SettingsFeatures
   const features: SettingsFeatures = {};
   if (ids.includes('redirectRules')) features.redirectRules = await loadRules();
   if (ids.includes('meetAutoJoin')) features.meetAutoJoin = await loadMeetSettings();
+  if (ids.includes('reloadTimer')) features.reloadTimer = await loadReloadSettings();
   return features;
 }
 
@@ -39,6 +45,7 @@ async function readFeatures(ids: readonly FeatureId[]): Promise<SettingsFeatures
 async function writeFeatures(features: SettingsFeatures): Promise<void> {
   if (features.redirectRules !== undefined) await saveRules(features.redirectRules);
   if (features.meetAutoJoin !== undefined) await saveMeetSettings(features.meetAutoJoin);
+  if (features.reloadTimer !== undefined) await saveReloadSettings(features.reloadTimer);
 }
 
 /** Tick or untick one feature, keeping the list in the order the features are shown. */
@@ -60,9 +67,15 @@ export function SettingsTransferSection() {
   useEffect(() => {
     loadRules().then((rules) => setStored((current) => ({ ...current, redirectRules: rules })));
     loadMeetSettings().then((meet) => setStored((current) => ({ ...current, meetAutoJoin: meet })));
+    loadReloadSettings().then((timer) =>
+      setStored((current) => ({ ...current, reloadTimer: timer })),
+    );
 
     onRulesChanged((rules) => setStored((current) => ({ ...current, redirectRules: rules })));
     onMeetSettingsChanged((meet) => setStored((current) => ({ ...current, meetAutoJoin: meet })));
+    onReloadSettingsChanged((timer) =>
+      setStored((current) => ({ ...current, reloadTimer: timer })),
+    );
   }, []);
 
   const handleExport = useCallback(async () => {

@@ -55,6 +55,14 @@ describe('manifest.json', () => {
     expect(manifest.host_permissions).toContain('*://*.atlassian.net/*');
   });
 
+  it('requests the permissions the reload timer needs', () => {
+    // The alarm survives the service worker being shut down between two
+    // reloads; activeTab is what lets the popup name the tab it will reload,
+    // without asking for a look at every site.
+    expect(manifest.permissions).toContain('alarms');
+    expect(manifest.permissions).toContain('activeTab');
+  });
+
   it('runs the background script as a module', () => {
     expect(manifest.background.type).toBe('module');
   });
