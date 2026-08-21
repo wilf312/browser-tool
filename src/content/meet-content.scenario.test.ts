@@ -35,6 +35,30 @@ function hastenButton(): HTMLButtonElement | null {
   return panel()?.shadowRoot?.querySelector<HTMLButtonElement>('.hasten') ?? null;
 }
 
+/**
+ * The dialog Meet puts up when nobody has let you in yet, as it behaves on the
+ * page: answering it takes it down.
+ */
+function showKeepWaitingDialog(): { answers: () => number; isUp: () => boolean } {
+  let answers = 0;
+  const dialog = document.createElement('div');
+  dialog.setAttribute('role', 'dialog');
+  dialog.innerHTML = `
+    <h2>まだ通話から退出していません</h2>
+    <p>まだ参加できないようです。このまま待機を続けますか？</p>
+    <button>退出</button>
+    <button>待機</button>
+  `;
+  dialog.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).textContent !== '待機') return;
+    answers += 1;
+    dialog.remove();
+  });
+  document.body.append(dialog);
+
+  return { answers: () => answers, isUp: () => dialog.isConnected };
+}
+
 /** Boot the content script with the clock, the URL and the settings under test. */
 async function run(settings: MeetSettings = { enabled: true, intervalMinutes: 15 }) {
   running = start({
@@ -48,6 +72,7 @@ async function run(settings: MeetSettings = { enabled: true, intervalMinutes: 15
     now: () => time,
     tickMs: 1000,
     urlPollMs: 1000,
+    keepWaitingPollMs: 1000,
     dismissMs: 6000,
   });
   await running.ready;
@@ -285,13 +310,73 @@ describe('meet content script', () => {
     expect(panelText('.message')).toBe('参加ボタンが見つかりませんでした');
   });
 
+  it('answers 待機 when Meet asks whether to keep waiting', async () => {
+    await run();
+    const dialog = showKeepWaitingDialog();
+
+    await tick();
+    expect(dialog.answers()).toBe(1);
+    expect(dialog.isUp()).toBe(false);
+  });
+
+  it('answers the dialog again every time it comes back', async () => {
+    await run();
+
+    const first = showKeepWaitingDialog();
+    await tick();
+    expect(first.isUp()).toBe(false);
+
+    const second = showKeepWaitingDialog();
+    await tick();
+    expect(second.isUp()).toBe(false);
+  });
+
+  it('still answers the dialog once the countdown panel is gone', async () => {
+    await run();
+    await tick(at(10, 15));
+    await vi.advanceTimersByTimeAsync(6000);
+    expect(panel()).toBeNull();
+
+    const dialog = showKeepWaitingDialog();
+    await tick(at(10, 20));
+    expect(dialog.answers()).toBe(1);
+  });
+
+  it('leaves the dialog alone while the feature is off', async () => {
+    await run({ enabled: false, intervalMinutes: 15 });
+    const dialog = showKeepWaitingDialog();
+
+    await tick();
+    expect(dialog.answers()).toBe(0);
+  });
+
+  it('leaves the dialog alone on pages that are not a meeting', async () => {
+    url = 'https://meet.google.com/';
+    await run();
+    const dialog = showKeepWaitingDialog();
+
+    await tick();
+    expect(dialog.answers()).toBe(0);
+  });
+
+  it('stops answering the dialog once the feature is switched off', async () => {
+    await run();
+    settingsListener?.({ enabled: false, intervalMinutes: 15 });
+
+    const dialog = showKeepWaitingDialog();
+    await tick();
+    expect(dialog.answers()).toBe(0);
+  });
+
   it('stops cleanly', async () => {
     await run();
+    const dialog = showKeepWaitingDialog();
     running?.stop();
     running = null;
 
     expect(panel()).toBeNull();
     await tick(at(10, 15));
     expect(joinButton?.click).not.toHaveBeenCalled();
+    expect(dialog.answers()).toBe(0);
   });
 });

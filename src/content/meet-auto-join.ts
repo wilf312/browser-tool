@@ -5,10 +5,16 @@
  * join button once the next slot boundary is reached. Meet is a single page
  * app, so the URL is watched too: moving from the landing page into a meeting
  * (or from one meeting to another) starts a fresh countdown.
+ *
+ * The page is also watched for Meet's 「このまま待機を続けますか？」 dialog, which
+ * drops you out of the lobby when nobody answers it. That watch outlives the
+ * countdown panel: the dialog only shows up minutes after the join was asked
+ * for.
  */
 
 import { createAutoJoin, type AutoJoinController } from '../lib/meet-auto-join';
 import { findJoinButton } from '../lib/meet-join';
+import { findKeepWaitingButton } from '../lib/meet-keep-waiting';
 import { isMeetingUrl } from '../lib/meet-page';
 import { loadMeetSettings, onMeetSettingsChanged } from '../lib/meet-settings';
 import type { MeetSettings } from '../lib/types';
@@ -16,6 +22,8 @@ import { createPanel, type Panel } from './meet-panel';
 
 const TICK_MS = 1000;
 const URL_POLL_MS = 1000;
+/** How often the page is checked for the 「待機を続けますか？」 dialog. */
+const KEEP_WAITING_POLL_MS = 1000;
 /** How long the outcome stays on screen if the user does not click it away. */
 const DISMISS_MS = 6000;
 
@@ -25,9 +33,11 @@ export interface StartOptions {
   loadSettings?: () => Promise<MeetSettings>;
   onSettingsChanged?: (callback: (settings: MeetSettings) => void) => void;
   findButton?: () => { click: () => void } | null | undefined;
+  findKeepWaiting?: () => { click: () => void } | null | undefined;
   now?: () => Date;
   tickMs?: number;
   urlPollMs?: number;
+  keepWaitingPollMs?: number;
   dismissMs?: number;
 }
 
@@ -51,13 +61,16 @@ export function start({
   loadSettings = loadMeetSettings,
   onSettingsChanged = onMeetSettingsChanged,
   findButton = () => findJoinButton(document),
+  findKeepWaiting = () => findKeepWaitingButton(document),
   now = () => new Date(),
   tickMs = TICK_MS,
   urlPollMs = URL_POLL_MS,
+  keepWaitingPollMs = KEEP_WAITING_POLL_MS,
   dismissMs = DISMISS_MS,
 }: StartOptions = {}): Running {
   let settings: MeetSettings | null = null;
   let session: Session | null = null;
+  let keepWaitingTimer: ReturnType<typeof setInterval> | null = null;
   let url = getUrl();
 
   function stopSession() {
@@ -104,10 +117,24 @@ export function start({
     panel.update(controller.getSnapshot());
   }
 
+  function startKeepWaiting() {
+    if (keepWaitingTimer !== null) return;
+    keepWaitingTimer = setInterval(() => findKeepWaiting()?.click(), keepWaitingPollMs);
+  }
+
+  function stopKeepWaiting() {
+    if (keepWaitingTimer === null) return;
+    clearInterval(keepWaitingTimer);
+    keepWaitingTimer = null;
+  }
+
   function sync() {
     const wanted = Boolean(settings?.enabled) && isMeetingUrl(getUrl());
     if (wanted && !session) startSession();
     if (!wanted && session) stopSession();
+    // Not tied to the session: the dialog turns up long after the panel is gone.
+    if (wanted) startKeepWaiting();
+    else stopKeepWaiting();
   }
 
   const urlTimer = setInterval(() => {
@@ -134,6 +161,7 @@ export function start({
     ready,
     stop() {
       clearInterval(urlTimer);
+      stopKeepWaiting();
       stopSession();
     },
     getSession: () => session,
