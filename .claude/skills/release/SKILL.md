@@ -44,6 +44,15 @@ npm run lint && npm test
 
 失敗したらリリースせず報告する。
 
+あわせて、前回リリース以降に `manifest.json` の権限が増えていないか確認する:
+
+```bash
+git diff <前回のreleaseコミット> -- public/manifest.json
+```
+
+権限が増えている場合、Developer Dashboard に用途説明を書かないと publish が弾かれる
+(詳細は「7. よくある失敗と対処」)。先にユーザーへ伝えておくこと。
+
 ## 5. リリース実行
 
 ```bash
@@ -81,3 +90,53 @@ git tag v<version>
 ```
 
 push / tag push はユーザーの了承を得てから行う。
+
+## 7. よくある失敗と対処
+
+### `Invalid grant: The authentication keys are probably invalid or expired`
+
+`.env` の `REFRESH_TOKEN` が失効している。**OAuth 同意画面が「テスト中 / Testing」のままだと
+refresh token は 7 日で失効する**ので、まず恒久対策を行う:
+
+1. https://console.cloud.google.com/apis/credentials/consent で
+   **アプリを公開 / PUBLISH APP** を押して「本番 / In production」にする（外部審査は不要）
+2. そのうえで refresh token を取り直す
+
+`CLIENT_ID` / `CLIENT_SECRET` は失効しないので再作成不要。Google Cloud の認証情報画面で
+Client secret が `Enabled` なら生きている。`.env` の値をそのまま使い回す。
+
+token の取り直しに `npx chrome-webstore-upload-keys` は使えない。対話 CLI なので
+Bash ツール経由でも `!` 実行でも 120 秒でデタッチされ、stdin を受け取れなくなる。
+代わりにローカルにコールバックサーバを立てて OAuth を通す:
+
+- `redirect_uri=http://localhost:<port>`、`scope=https://www.googleapis.com/auth/chromewebstore`、
+  `access_type=offline`、`prompt=consent` で認可 URL を組み立てる
+- `open <url>` でブラウザを開き、ユーザーに承認してもらう
+- 受け取った code を `https://oauth2.googleapis.com/token` に POST して refresh_token を取得し、
+  スクリプト内から `.env` に直接書き込む（トークンは画面に出さない）
+
+バックアップを `.env.bak` に作る場合、**`.gitignore` は `.env` しか無視しないので
+作業後に必ず削除する**こと。
+
+### `Your submission does not meet the requirements to be published in the store.`
+
+アップロードは成功していて、publish だけが弾かれた状態（ZIP はドラフトとして反映済み、
+再アップロード不要）。原因はストア掲載情報の不備で、**多くは `manifest.json` に権限を
+追加したのに用途説明 (justification) を書いていないこと**。
+
+リリース前に権限差分を確認する:
+
+```bash
+git diff <前回のreleaseコミット> -- public/manifest.json
+```
+
+権限が増えていたら、Developer Dashboard の **プライバシーへの取り組み /
+Privacy practices** タブで各権限の用途、単一用途の説明、データ使用の開示を記入し、
+**審査のため送信**する必要がある。
+
+### Developer Dashboard はブラウザ自動操作できない
+
+`chrome.google.com` は Chrome の拡張機能ギャラリー扱いで、拡張によるスクリプト実行が
+ブロックされている (`The extensions gallery cannot be scripted`)。claude-in-chrome では
+スクリーンショットすら取れない。ダッシュボードの入力は**必ずユーザーの手作業**になるので、
+代行を申し出ず、貼り付け用の文面を用意して渡すこと。
