@@ -3,11 +3,12 @@
 <img width="1280" height="800" alt="sc" src="https://github.com/user-attachments/assets/2a90c2e7-cbec-4275-846c-bc96439534a0" />
 
 日々のブラウザ作業を少し楽にする Chrome 拡張です。仕事に必要な小さい道具をまとめた「七つ道具」で、
-今のところ 3 つの機能があります。
+今のところ 4 つの機能があります。
 
 1. **Jira ドメインリダイレクト** — 廃止された Jira (atlassian.net) のドメインへのアクセスを、パス以降をそのまま残したまま移行先のドメインへリダイレクトします
 2. **Meet 自動入室** — Google Meet の待機画面で、次の開始時刻になったら「参加」ボタンを自動でクリックします
 3. **ページ自動リロード** — 開いているタブを、決めた間隔で決めた時間だけリロードし続けます
+4. **GitHub 自動マージ** — Pull Request のページで、CI がすべて green になったら自動でマージします
 
 どの設定も JSON ファイルに書き出して、別の端末で読み込めます（[設定のインポート / エクスポート](#設定のインポート--エクスポート)）。
 
@@ -124,7 +125,36 @@ https://b.atlassian.net/browse/XAPP-134
   押したそのタブに対してだけ許可される権限なので、閲覧履歴を読む権限（`tabs`）は必要ありません。
   `chrome://extensions` から設定画面をタブとして開いた場合は対象のタブがないので、その旨を表示します
 
-## 設定のインポート / エクスポート
+## GitHub 自動マージ
+
+Pull Request のページで、CI のチェックがまだ完了していない（yellow の）間だけ、「Merge pull
+request」ボタンの横に **「CIがgreenになったら自動マージ」** ボタンが現れます。押すと ON になり、
+チェックがすべて green になった時点で、そのボタン自身が「Merge pull request」→（コミットメッセージ
+確認の）「Confirm merge」の 2 回のクリックを代わりに行い、マージまで完了させます。
+
+```
+[Merge pull request ▾]  [CIがgreenになったら自動マージ]
+                                     ↓ 押す
+[Merge pull request ▾]  [CIを監視中…（クリックで解除）]
+                                     ↓ 全チェックが green に
+                          自動で Merge → Confirm merge をクリック
+                                     ↓
+[Merge pull request ▾]  [マージしました]  （数秒で消えます）
+```
+
+- 既定では何もしません。ボタンを押して ON にしたときだけ監視が始まります。もう一度押せば OFF に戻ります
+- チェックが 1 つでも失敗すると監視を止め、マージはしません（「CIが失敗しました」と表示して消えます）
+- ページを離れる、または別の Pull Request に移動すると、監視状態はリセットされます
+
+### しくみ
+
+- 対象は Pull Request 自身のページ（`https://github.com/{owner}/{repo}/pull/{番号}`）だけです
+- チェックの状態は、GitHub のマージボックスが表示する要約文言（`All checks have passed` /
+  `Some checks haven't completed yet` / `Some checks were not successful`）で判定します。GitHub の
+  内部的なクラス名は変わりやすいため、Meet のボタンと同じく、画面に出ている文言で探します
+- マージボタンも同様に、表示ラベル（`Merge pull request` / `Squash and merge` / `Rebase and merge`、
+  確認後は `Confirm merge` など）で探してクリックします
+- 設定は保存しません。ページを開くたびに OFF から始まります
 
 設定画面のいちばん下から、設定を JSON ファイルに書き出したり、書き出したファイルを読み込んだり
 できます。書き出す機能も、取り込む機能も**機能単位で選べます**。

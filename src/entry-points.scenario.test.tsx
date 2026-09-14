@@ -10,9 +10,13 @@ import { installFakeChrome, uninstallFakeChrome } from '../tests/fake-chrome';
 const start = vi.hoisted(() => vi.fn());
 vi.mock('./content/meet-auto-join', () => ({ start }));
 
+const startGithubAutoMerge = vi.hoisted(() => vi.fn());
+vi.mock('./content/github-auto-merge', () => ({ start: startGithubAutoMerge }));
+
 beforeEach(() => {
   vi.resetModules();
   start.mockReset();
+  startGithubAutoMerge.mockReset();
   document.body.innerHTML = '';
 });
 
@@ -29,6 +33,22 @@ describe('content script entry point', () => {
   it('logs instead of throwing when the auto join cannot start', async () => {
     const error = new Error('no document');
     start.mockImplementation(() => {
+      throw error;
+    });
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(import('./content/main')).resolves.toBeDefined();
+    expect(logged.mock.calls[0]).toContain(error);
+  });
+
+  it('starts the GitHub auto merge', async () => {
+    await import('./content/main');
+    expect(startGithubAutoMerge).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs instead of throwing when the auto merge cannot start', async () => {
+    const error = new Error('no document');
+    startGithubAutoMerge.mockImplementation(() => {
       throw error;
     });
     const logged = vi.spyOn(console, 'error').mockImplementation(() => {});

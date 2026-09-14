@@ -7,9 +7,16 @@
  */
 
 import { start } from './meet-auto-join';
+import { start as startGithubAutoMerge } from './github-auto-merge';
 
 try {
   start();
 } catch (error) {
   console.error('[nanatsudougu] failed to start the Meet auto join', error);
+}
+
+try {
+  startGithubAutoMerge();
+} catch (error) {
+  console.error('[nanatsudougu] failed to start the GitHub auto merge', error);
 }
