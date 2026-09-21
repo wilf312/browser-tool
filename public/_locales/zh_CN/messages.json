@@ -1,0 +1,341 @@
+{
+  "app_name": {
+    "message": "Nanatsudougu",
+    "description": "Extension name shown in the browser."
+  },
+  "app_description": {
+    "message": "在保留路径的情况下重定向已停用的 atlassian.net 域名，在 Google Meet 开始时间自动入会，并按设定的时长持续重新加载当前标签页。",
+    "description": "Extension description shown in the browser and the Web Store."
+  },
+
+  "saved": {
+    "message": "已保存",
+    "description": "Status after a setting was written."
+  },
+  "save_failed": {
+    "message": "保存失败",
+    "description": "Status when a setting could not be written."
+  },
+  "cancel": {
+    "message": "取消",
+    "description": "Button that drops what is on screen without applying it."
+  },
+  "delete": {
+    "message": "删除",
+    "description": "Button that removes a row."
+  },
+  "enabled": {
+    "message": "启用",
+    "description": "Table column and checkbox that turns a single rule on."
+  },
+  "add": {
+    "message": "＋ 添加",
+    "description": "Button that adds a new row."
+  },
+  "unit_seconds": {
+    "message": "$1 秒",
+    "description": "A number of seconds, as shown in a dropdown."
+  },
+  "unit_minutes": {
+    "message": "$1 分钟",
+    "description": "A number of minutes, as shown in a dropdown."
+  },
+  "unit_hours": {
+    "message": "$1 小时",
+    "description": "A number of whole hours, as shown in a dropdown."
+  },
+  "unit_hours_minutes": {
+    "message": "$1 小时 $2 分钟",
+    "description": "Hours and minutes, as shown in a dropdown."
+  },
+
+  "feature_redirect_rules": {
+    "message": "Jira 域名重定向",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "feature_meet_auto_join": {
+    "message": "Meet 自动入会",
+    "description": "Feature name, used as its section heading, panel title and export label."
+  },
+  "feature_reload_timer": {
+    "message": "页面自动重新加载",
+    "description": "Feature name, used as its section heading and export label."
+  },
+
+  "redirect_lead": {
+    "message": "把对已停用域名的访问重定向到新域名，路径及之后的部分保持原样。",
+    "description": "Intro of the Jira redirect section."
+  },
+  "redirect_example_prefix": {
+    "message": "例如）",
+    "description": "Text before the first URL in the redirect example."
+  },
+  "redirect_example_arrow": {
+    "message": " → ",
+    "description": "Arrow between the two URLs in the redirect example."
+  },
+  "redirect_note_prefix": {
+    "message": "更改会自动保存。只需填写主机名（",
+    "description": "Start of the note under the rules table, before the https:// code span."
+  },
+  "redirect_note_between": {
+    "message": "，路径可以省略）。适用于 ",
+    "description": "Middle of the note under the rules table, between the two code spans."
+  },
+  "redirect_note_suffix": {
+    "message": " 域名。",
+    "description": "End of the note under the rules table, after the domain code span."
+  },
+  "rules_empty": {
+    "message": "还没有规则。请通过「添加」来登记。",
+    "description": "Placeholder row shown while there are no redirect rules."
+  },
+  "delete_row": {
+    "message": "删除这一行",
+    "description": "Tooltip of the delete button on a rules table row."
+  },
+
+  "meet_lead": {
+    "message": "保持 Google Meet 等待页面打开，到了下一个开始时间会自动点击「加入」按钮。",
+    "description": "Intro of the Meet auto join section."
+  },
+  "meet_example_prefix": {
+    "message": "例如）10:07 打开等待页面 → ",
+    "description": "Text before the join time in the auto join example."
+  },
+  "meet_example_suffix": {
+    "message": " 入会",
+    "description": "Text after the join time in the auto join example."
+  },
+  "meet_enable": {
+    "message": "启用自动入会",
+    "description": "Checkbox that turns the Meet auto join on."
+  },
+  "meet_interval": {
+    "message": "开始时间间隔",
+    "description": "Label of the dropdown that picks the join interval."
+  },
+  "meet_note": {
+    "message": "等待页面左下角会显示入会时间和倒计时，可以在那里取消。摄像头和麦克风沿用等待页面中的设置。当 Meet 询问是否继续等待时，扩展会自动按下「等待」继续等待。",
+    "description": "Note under the Meet auto join controls."
+  },
+
+  "reload_lead": {
+    "message": "按设定的间隔和时长，持续重新加载当前打开的标签页。",
+    "description": "Intro of the reload timer section."
+  },
+  "reload_example_prefix": {
+    "message": "例如）每 ",
+    "description": "Text before the interval in the reload example."
+  },
+  "reload_example_between": {
+    "message": " 一次，持续 ",
+    "description": "Text between the interval and the duration in the reload example."
+  },
+  "reload_example_mid": {
+    "message": " → ",
+    "description": "Text between the duration and the closing sentence in the reload example."
+  },
+  "reload_example_suffix": {
+    "message": " 后自动停止",
+    "description": "Text after the repeated duration in the reload example."
+  },
+  "reload_checking_tab": {
+    "message": "正在确认目标标签页…",
+    "description": "Status while the active tab is being looked up."
+  },
+  "reload_no_tab_note": {
+    "message": "没有找到目标标签页。请先打开要重新加载的页面，再从工具栏的 Nanatsudougu 图标打开此页面。",
+    "description": "Shown when the popup has no tab to act on."
+  },
+  "reload_target_label": {
+    "message": "目标: ",
+    "description": "Label before the tab the timer will reload."
+  },
+  "reload_tab_fallback": {
+    "message": "此标签页",
+    "description": "How the target tab is named when it has no URL or title."
+  },
+  "reload_progress_lead": {
+    "message": "每 $1 重新加载一次（剩余 $2",
+    "description": "Running timer status; $1 is the interval, $2 the remaining time."
+  },
+  "reload_progress_next": {
+    "message": " ／ 距下次 $1",
+    "description": "Appended to the running timer status; $1 is the time to the next reload."
+  },
+  "reload_progress_tail": {
+    "message": "）",
+    "description": "Closing bracket of the running timer status."
+  },
+  "reload_interval_label": {
+    "message": "重新加载间隔",
+    "description": "Label of the reload interval dropdown."
+  },
+  "reload_duration_label": {
+    "message": "持续时间",
+    "description": "Label of the reload duration dropdown."
+  },
+  "reload_start": {
+    "message": "开始",
+    "description": "Button that starts the timer."
+  },
+  "reload_stop": {
+    "message": "停止",
+    "description": "Button that stops the timer."
+  },
+  "reload_started": {
+    "message": "已开始",
+    "description": "Status after the timer started."
+  },
+  "reload_start_failed": {
+    "message": "开始失败",
+    "description": "Status when the timer could not be started."
+  },
+  "reload_stopped": {
+    "message": "已停止",
+    "description": "Status after the timer stopped."
+  },
+  "reload_stop_failed": {
+    "message": "停止失败",
+    "description": "Status when the timer could not be stopped."
+  },
+  "reload_footer_note": {
+    "message": "计时器按标签页运行。关闭此页面后仍会继续，直到设定时长结束、标签页被关闭或按下「停止」。它跟随标签页，因此在该标签页中跳转到别处时，会重新加载跳转后的页面。",
+    "description": "Note at the bottom of the reload timer section."
+  },
+
+  "transfer_section_title": {
+    "message": "设置的导入 / 导出",
+    "description": "Heading of the settings transfer section."
+  },
+  "transfer_lead": {
+    "message": "把设置导出为 JSON 文件，可在其他设备或重装后导入。导出和导入都可以按功能选择。",
+    "description": "Intro of the settings transfer section."
+  },
+  "export_heading": {
+    "message": "导出",
+    "description": "Sub-heading of the export half."
+  },
+  "export_features_legend": {
+    "message": "要导出的功能",
+    "description": "Legend of the picker for the features to write to the file."
+  },
+  "export_button": {
+    "message": "导出",
+    "description": "Button that downloads the settings file."
+  },
+  "export_done": {
+    "message": "已导出",
+    "description": "Status after the settings file was written."
+  },
+  "export_failed": {
+    "message": "导出失败",
+    "description": "Status when the settings file could not be written."
+  },
+  "import_heading": {
+    "message": "导入",
+    "description": "Sub-heading of the import half."
+  },
+  "import_file_label": {
+    "message": "设置文件",
+    "description": "Label of the file picker for the settings to read."
+  },
+  "import_features_legend": {
+    "message": "要导入的功能",
+    "description": "Legend of the picker for the features to read out of the file."
+  },
+  "import_apply": {
+    "message": "应用所选设置",
+    "description": "Button that applies the picked features from the file."
+  },
+  "import_done": {
+    "message": "已导入",
+    "description": "Status after the settings were applied."
+  },
+  "import_failed": {
+    "message": "导入失败",
+    "description": "Status when the settings could not be applied."
+  },
+  "import_exported_at_note": {
+    "message": "这是 $1 导出的文件。",
+    "description": "Says when the file being imported was written; $1 is the timestamp."
+  },
+  "transfer_footer_note": {
+    "message": "应用后，所选功能的设置会替换为当前内容。未选择的功能保持原样。",
+    "description": "Note at the bottom of the settings transfer section."
+  },
+  "transfer_error_json": {
+    "message": "无法作为 JSON 读取",
+    "description": "Import error when the file is not valid JSON."
+  },
+  "transfer_error_not_ours": {
+    "message": "不是 Nanatsudougu 的设置文件",
+    "description": "Import error when the JSON is not a settings bundle."
+  },
+  "transfer_error_newer": {
+    "message": "这是较新格式的设置文件（version $1）。请更新扩展",
+    "description": "Import error when the file comes from a newer format; $1 is its version."
+  },
+  "transfer_error_empty": {
+    "message": "文件里没有可导入的设置",
+    "description": "Import error when the bundle carries no known feature."
+  },
+  "describe_no_rules": {
+    "message": "无规则",
+    "description": "Says a redirect rules feature holds no rule."
+  },
+  "describe_rules": {
+    "message": "规则 $1 条（已启用 $2 条）",
+    "description": "Says how many redirect rules a feature holds; $1 total, $2 enabled."
+  },
+  "describe_meet": {
+    "message": "自动入会 $1 / 每 $2 分钟",
+    "description": "Says the Meet settings; $1 is ON/OFF, $2 the interval in minutes."
+  },
+  "describe_reload": {
+    "message": "每 $1 / $2",
+    "description": "Says the reload settings; $1 is the interval, $2 the duration."
+  },
+
+  "panel_joined": {
+    "message": "已加入",
+    "description": "Panel message after the join button was clicked."
+  },
+  "panel_cancelled": {
+    "message": "已取消自动入会",
+    "description": "Panel message after the user cancelled the join."
+  },
+  "panel_missed": {
+    "message": "未找到加入按钮",
+    "description": "Panel message when the join button never showed up."
+  },
+  "panel_waiting": {
+    "message": "将在 $1 自动加入",
+    "description": "Panel message while waiting; $1 is the join time."
+  },
+  "panel_remaining": {
+    "message": "剩余 $1",
+    "description": "Countdown on the panel; $1 is the time left."
+  },
+  "panel_close_hint": {
+    "message": "点击关闭",
+    "description": "Hint that the settled panel closes when clicked."
+  },
+  "panel_hasten": {
+    "message": "-1 分钟",
+    "description": "Button that moves the join one minute earlier."
+  },
+  "panel_hasten_title": {
+    "message": "提前 1 分钟加入",
+    "description": "Tooltip of the hasten button."
+  },
+  "panel_postpone": {
+    "message": "+1 分钟",
+    "description": "Button that moves the join one minute later."
+  },
+  "panel_postpone_title": {
+    "message": "推迟 1 分钟加入",
+    "description": "Tooltip of the postpone button."
+  }
+}

@@ -1,0 +1,341 @@
+{
+  "app_name": {
+    "message": "Nanatsudougu",
+    "description": "Extension name shown in the browser."
+  },
+  "app_description": {
+    "message": "Redirige los dominios retirados de atlassian.net conservando la ruta, entra automáticamente en Google Meet a la hora de inicio y sigue recargando la pestaña abierta durante el tiempo que definas.",
+    "description": "Extension description shown in the browser and the Web Store."
+  },
+
+  "saved": {
+    "message": "Guardado",
+    "description": "Status after a setting was written."
+  },
+  "save_failed": {
+    "message": "No se pudo guardar",
+    "description": "Status when a setting could not be written."
+  },
+  "cancel": {
+    "message": "Cancelar",
+    "description": "Button that drops what is on screen without applying it."
+  },
+  "delete": {
+    "message": "Eliminar",
+    "description": "Button that removes a row."
+  },
+  "enabled": {
+    "message": "Activa",
+    "description": "Table column and checkbox that turns a single rule on."
+  },
+  "add": {
+    "message": "＋ Añadir",
+    "description": "Button that adds a new row."
+  },
+  "unit_seconds": {
+    "message": "$1 s",
+    "description": "A number of seconds, as shown in a dropdown."
+  },
+  "unit_minutes": {
+    "message": "$1 min",
+    "description": "A number of minutes, as shown in a dropdown."
+  },
+  "unit_hours": {
+    "message": "$1 h",
+    "description": "A number of whole hours, as shown in a dropdown."
+  },
+  "unit_hours_minutes": {
+    "message": "$1 h $2 min",
+    "description": "Hours and minutes, as shown in a dropdown."
+  },
+
+  "feature_redirect_rules": {
+    "message": "Redirección de dominios Jira",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "feature_meet_auto_join": {
+    "message": "Entrada automática en Meet",
+    "description": "Feature name, used as its section heading, panel title and export label."
+  },
+  "feature_reload_timer": {
+    "message": "Recarga automática de páginas",
+    "description": "Feature name, used as its section heading and export label."
+  },
+
+  "redirect_lead": {
+    "message": "Redirige el acceso a dominios retirados al host nuevo, conservando todo lo que sigue a la ruta tal cual.",
+    "description": "Intro of the Jira redirect section."
+  },
+  "redirect_example_prefix": {
+    "message": "Ej.) ",
+    "description": "Text before the first URL in the redirect example."
+  },
+  "redirect_example_arrow": {
+    "message": " → ",
+    "description": "Arrow between the two URLs in the redirect example."
+  },
+  "redirect_note_prefix": {
+    "message": "Los cambios se guardan automáticamente. Introduce solo el nombre del host (",
+    "description": "Start of the note under the rules table, before the https:// code span."
+  },
+  "redirect_note_between": {
+    "message": " y la ruta puede omitirse). Se aplica a dominios ",
+    "description": "Middle of the note under the rules table, between the two code spans."
+  },
+  "redirect_note_suffix": {
+    "message": ".",
+    "description": "End of the note under the rules table, after the domain code span."
+  },
+  "rules_empty": {
+    "message": "No hay reglas. Añade una con «Añadir».",
+    "description": "Placeholder row shown while there are no redirect rules."
+  },
+  "delete_row": {
+    "message": "Eliminar esta fila",
+    "description": "Tooltip of the delete button on a rules table row."
+  },
+
+  "meet_lead": {
+    "message": "Si dejas abierta la pantalla de espera de Google Meet, se pulsa el botón «Unirse» por ti a la próxima hora de inicio.",
+    "description": "Intro of the Meet auto join section."
+  },
+  "meet_example_prefix": {
+    "message": "Ej.) abrir la pantalla de espera a las 10:07 → ",
+    "description": "Text before the join time in the auto join example."
+  },
+  "meet_example_suffix": {
+    "message": " para entrar",
+    "description": "Text after the join time in the auto join example."
+  },
+  "meet_enable": {
+    "message": "Activar la entrada automática",
+    "description": "Checkbox that turns the Meet auto join on."
+  },
+  "meet_interval": {
+    "message": "Intervalo de inicio",
+    "description": "Label of the dropdown that picks the join interval."
+  },
+  "meet_note": {
+    "message": "La hora de entrada y una cuenta atrás aparecen en la esquina inferior izquierda de la pantalla de espera, donde puedes cancelar. Se usan tal cual los ajustes de cámara y micrófono de la pantalla de espera. Cuando Meet pregunta si quieres seguir esperando, la extensión pulsa Seguir esperando por ti.",
+    "description": "Note under the Meet auto join controls."
+  },
+
+  "reload_lead": {
+    "message": "Sigue recargando la pestaña que tienes abierta ahora, con el intervalo y durante el tiempo que definas.",
+    "description": "Intro of the reload timer section."
+  },
+  "reload_example_prefix": {
+    "message": "Ej.) cada ",
+    "description": "Text before the interval in the reload example."
+  },
+  "reload_example_between": {
+    "message": " durante ",
+    "description": "Text between the interval and the duration in the reload example."
+  },
+  "reload_example_mid": {
+    "message": " → ",
+    "description": "Text between the duration and the closing sentence in the reload example."
+  },
+  "reload_example_suffix": {
+    "message": " y luego se detiene automáticamente",
+    "description": "Text after the repeated duration in the reload example."
+  },
+  "reload_checking_tab": {
+    "message": "Comprobando la pestaña de destino…",
+    "description": "Status while the active tab is being looked up."
+  },
+  "reload_no_tab_note": {
+    "message": "No se encontró ninguna pestaña de destino. Abre la página que quieras recargar y luego abre esta pantalla desde el icono de Nanatsudougu en la barra de herramientas.",
+    "description": "Shown when the popup has no tab to act on."
+  },
+  "reload_target_label": {
+    "message": "Destino: ",
+    "description": "Label before the tab the timer will reload."
+  },
+  "reload_tab_fallback": {
+    "message": "esta pestaña",
+    "description": "How the target tab is named when it has no URL or title."
+  },
+  "reload_progress_lead": {
+    "message": "Recargando cada $1 (quedan $2",
+    "description": "Running timer status; $1 is the interval, $2 the remaining time."
+  },
+  "reload_progress_next": {
+    "message": " / siguiente en $1",
+    "description": "Appended to the running timer status; $1 is the time to the next reload."
+  },
+  "reload_progress_tail": {
+    "message": ")",
+    "description": "Closing bracket of the running timer status."
+  },
+  "reload_interval_label": {
+    "message": "Intervalo de recarga",
+    "description": "Label of the reload interval dropdown."
+  },
+  "reload_duration_label": {
+    "message": "Duración",
+    "description": "Label of the reload duration dropdown."
+  },
+  "reload_start": {
+    "message": "Iniciar",
+    "description": "Button that starts the timer."
+  },
+  "reload_stop": {
+    "message": "Detener",
+    "description": "Button that stops the timer."
+  },
+  "reload_started": {
+    "message": "Iniciado",
+    "description": "Status after the timer started."
+  },
+  "reload_start_failed": {
+    "message": "No se pudo iniciar",
+    "description": "Status when the timer could not be started."
+  },
+  "reload_stopped": {
+    "message": "Detenido",
+    "description": "Status after the timer stopped."
+  },
+  "reload_stop_failed": {
+    "message": "No se pudo detener",
+    "description": "Status when the timer could not be stopped."
+  },
+  "reload_footer_note": {
+    "message": "El temporizador funciona por pestaña. Sigue activo al cerrar esta pantalla y termina cuando se cumple la duración, se cierra la pestaña o pulsas Detener. Va con la pestaña, así que si navegas a otra página en esa pestaña, se recarga la nueva página.",
+    "description": "Note at the bottom of the reload timer section."
+  },
+
+  "transfer_section_title": {
+    "message": "Importar / exportar ajustes",
+    "description": "Heading of the settings transfer section."
+  },
+  "transfer_lead": {
+    "message": "Escribe tus ajustes en un archivo JSON y vuelve a cargarlos en otro dispositivo o tras reinstalar. Puedes elegir qué funciones escribir y cuáles leer.",
+    "description": "Intro of the settings transfer section."
+  },
+  "export_heading": {
+    "message": "Exportar",
+    "description": "Sub-heading of the export half."
+  },
+  "export_features_legend": {
+    "message": "Funciones que exportar",
+    "description": "Legend of the picker for the features to write to the file."
+  },
+  "export_button": {
+    "message": "Exportar",
+    "description": "Button that downloads the settings file."
+  },
+  "export_done": {
+    "message": "Exportado",
+    "description": "Status after the settings file was written."
+  },
+  "export_failed": {
+    "message": "Error al exportar",
+    "description": "Status when the settings file could not be written."
+  },
+  "import_heading": {
+    "message": "Importar",
+    "description": "Sub-heading of the import half."
+  },
+  "import_file_label": {
+    "message": "Archivo de ajustes",
+    "description": "Label of the file picker for the settings to read."
+  },
+  "import_features_legend": {
+    "message": "Funciones que importar",
+    "description": "Legend of the picker for the features to read out of the file."
+  },
+  "import_apply": {
+    "message": "Aplicar los ajustes seleccionados",
+    "description": "Button that applies the picked features from the file."
+  },
+  "import_done": {
+    "message": "Importado",
+    "description": "Status after the settings were applied."
+  },
+  "import_failed": {
+    "message": "Error al importar",
+    "description": "Status when the settings could not be applied."
+  },
+  "import_exported_at_note": {
+    "message": "Este archivo se exportó el $1.",
+    "description": "Says when the file being imported was written; $1 is the timestamp."
+  },
+  "transfer_footer_note": {
+    "message": "Al aplicar, los ajustes de las funciones elegidas sustituyen a los actuales. Las que no elijas se quedan como están.",
+    "description": "Note at the bottom of the settings transfer section."
+  },
+  "transfer_error_json": {
+    "message": "No se pudo leer como JSON",
+    "description": "Import error when the file is not valid JSON."
+  },
+  "transfer_error_not_ours": {
+    "message": "No es un archivo de ajustes de Nanatsudougu",
+    "description": "Import error when the JSON is not a settings bundle."
+  },
+  "transfer_error_newer": {
+    "message": "El archivo usa un formato más reciente (versión $1). Actualiza la extensión",
+    "description": "Import error when the file comes from a newer format; $1 is its version."
+  },
+  "transfer_error_empty": {
+    "message": "El archivo no contiene ajustes que se puedan importar",
+    "description": "Import error when the bundle carries no known feature."
+  },
+  "describe_no_rules": {
+    "message": "Sin reglas",
+    "description": "Says a redirect rules feature holds no rule."
+  },
+  "describe_rules": {
+    "message": "$1 regla(s) ($2 activas)",
+    "description": "Says how many redirect rules a feature holds; $1 total, $2 enabled."
+  },
+  "describe_meet": {
+    "message": "Entrada automática $1 / cada $2 min",
+    "description": "Says the Meet settings; $1 is ON/OFF, $2 the interval in minutes."
+  },
+  "describe_reload": {
+    "message": "cada $1 / $2",
+    "description": "Says the reload settings; $1 is the interval, $2 the duration."
+  },
+
+  "panel_joined": {
+    "message": "Te has unido",
+    "description": "Panel message after the join button was clicked."
+  },
+  "panel_cancelled": {
+    "message": "Entrada automática cancelada",
+    "description": "Panel message after the user cancelled the join."
+  },
+  "panel_missed": {
+    "message": "No se encontró el botón de unirse",
+    "description": "Panel message when the join button never showed up."
+  },
+  "panel_waiting": {
+    "message": "Te unirás automáticamente a las $1",
+    "description": "Panel message while waiting; $1 is the join time."
+  },
+  "panel_remaining": {
+    "message": "Quedan $1",
+    "description": "Countdown on the panel; $1 is the time left."
+  },
+  "panel_close_hint": {
+    "message": "Haz clic para cerrar",
+    "description": "Hint that the settled panel closes when clicked."
+  },
+  "panel_hasten": {
+    "message": "-1 min",
+    "description": "Button that moves the join one minute earlier."
+  },
+  "panel_hasten_title": {
+    "message": "Unirse 1 minuto antes",
+    "description": "Tooltip of the hasten button."
+  },
+  "panel_postpone": {
+    "message": "+1 min",
+    "description": "Button that moves the join one minute later."
+  },
+  "panel_postpone_title": {
+    "message": "Unirse 1 minuto después",
+    "description": "Tooltip of the postpone button."
+  }
+}
