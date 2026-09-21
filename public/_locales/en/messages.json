@@ -1,0 +1,341 @@
+{
+  "app_name": {
+    "message": "Nanatsudougu",
+    "description": "Extension name shown in the browser."
+  },
+  "app_description": {
+    "message": "Redirects retired atlassian.net domains while keeping the path, joins Google Meet automatically at the start time, and keeps reloading the open tab for as long as you set.",
+    "description": "Extension description shown in the browser and the Web Store."
+  },
+
+  "saved": {
+    "message": "Saved",
+    "description": "Status after a setting was written."
+  },
+  "save_failed": {
+    "message": "Could not save",
+    "description": "Status when a setting could not be written."
+  },
+  "cancel": {
+    "message": "Cancel",
+    "description": "Button that drops what is on screen without applying it."
+  },
+  "delete": {
+    "message": "Delete",
+    "description": "Button that removes a row."
+  },
+  "enabled": {
+    "message": "On",
+    "description": "Table column and checkbox that turns a single rule on."
+  },
+  "add": {
+    "message": "＋ Add",
+    "description": "Button that adds a new row."
+  },
+  "unit_seconds": {
+    "message": "$1 sec",
+    "description": "A number of seconds, as shown in a dropdown."
+  },
+  "unit_minutes": {
+    "message": "$1 min",
+    "description": "A number of minutes, as shown in a dropdown."
+  },
+  "unit_hours": {
+    "message": "$1 hr",
+    "description": "A number of whole hours, as shown in a dropdown."
+  },
+  "unit_hours_minutes": {
+    "message": "$1 hr $2 min",
+    "description": "Hours and minutes, as shown in a dropdown."
+  },
+
+  "feature_redirect_rules": {
+    "message": "Jira domain redirect",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "feature_meet_auto_join": {
+    "message": "Meet auto join",
+    "description": "Feature name, used as its section heading, panel title and export label."
+  },
+  "feature_reload_timer": {
+    "message": "Page auto reload",
+    "description": "Feature name, used as its section heading and export label."
+  },
+
+  "redirect_lead": {
+    "message": "Redirects visits to retired domains to the new host, keeping everything after the path as it is.",
+    "description": "Intro of the Jira redirect section."
+  },
+  "redirect_example_prefix": {
+    "message": "e.g. ",
+    "description": "Text before the first URL in the redirect example."
+  },
+  "redirect_example_arrow": {
+    "message": " → ",
+    "description": "Arrow between the two URLs in the redirect example."
+  },
+  "redirect_note_prefix": {
+    "message": "Changes are saved automatically. Enter the host name only (",
+    "description": "Start of the note under the rules table, before the https:// code span."
+  },
+  "redirect_note_between": {
+    "message": " and the path may be omitted). Applies to ",
+    "description": "Middle of the note under the rules table, between the two code spans."
+  },
+  "redirect_note_suffix": {
+    "message": " domains.",
+    "description": "End of the note under the rules table, after the domain code span."
+  },
+  "rules_empty": {
+    "message": "No rules yet. Add one with “Add”.",
+    "description": "Placeholder row shown while there are no redirect rules."
+  },
+  "delete_row": {
+    "message": "Delete this row",
+    "description": "Tooltip of the delete button on a rules table row."
+  },
+
+  "meet_lead": {
+    "message": "Keep the Google Meet waiting screen open and the Join button is clicked for you at the next start time.",
+    "description": "Intro of the Meet auto join section."
+  },
+  "meet_example_prefix": {
+    "message": "e.g. open the waiting screen at 10:07 → ",
+    "description": "Text before the join time in the auto join example."
+  },
+  "meet_example_suffix": {
+    "message": " to join",
+    "description": "Text after the join time in the auto join example."
+  },
+  "meet_enable": {
+    "message": "Enable auto join",
+    "description": "Checkbox that turns the Meet auto join on."
+  },
+  "meet_interval": {
+    "message": "Join interval",
+    "description": "Label of the dropdown that picks the join interval."
+  },
+  "meet_note": {
+    "message": "The join time and a countdown appear in the bottom-left of the waiting screen, where you can cancel. The camera and microphone settings from the waiting screen are used as they are. When Meet asks whether to keep waiting, the extension presses Keep waiting for you.",
+    "description": "Note under the Meet auto join controls."
+  },
+
+  "reload_lead": {
+    "message": "Keeps reloading the tab you have open now, at the interval and for the duration you set.",
+    "description": "Intro of the reload timer section."
+  },
+  "reload_example_prefix": {
+    "message": "e.g. every ",
+    "description": "Text before the interval in the reload example."
+  },
+  "reload_example_between": {
+    "message": " for ",
+    "description": "Text between the interval and the duration in the reload example."
+  },
+  "reload_example_mid": {
+    "message": " → ",
+    "description": "Text between the duration and the closing sentence in the reload example."
+  },
+  "reload_example_suffix": {
+    "message": " later it stops automatically",
+    "description": "Text after the repeated duration in the reload example."
+  },
+  "reload_checking_tab": {
+    "message": "Checking the target tab…",
+    "description": "Status while the active tab is being looked up."
+  },
+  "reload_no_tab_note": {
+    "message": "No target tab found. Open the page you want to reload, then open this screen from the Nanatsudougu icon in the toolbar.",
+    "description": "Shown when the popup has no tab to act on."
+  },
+  "reload_target_label": {
+    "message": "Target: ",
+    "description": "Label before the tab the timer will reload."
+  },
+  "reload_tab_fallback": {
+    "message": "this tab",
+    "description": "How the target tab is named when it has no URL or title."
+  },
+  "reload_progress_lead": {
+    "message": "Reloading every $1 ($2 left",
+    "description": "Running timer status; $1 is the interval, $2 the remaining time."
+  },
+  "reload_progress_next": {
+    "message": " / next in $1",
+    "description": "Appended to the running timer status; $1 is the time to the next reload."
+  },
+  "reload_progress_tail": {
+    "message": ")",
+    "description": "Closing bracket of the running timer status."
+  },
+  "reload_interval_label": {
+    "message": "Reload interval",
+    "description": "Label of the reload interval dropdown."
+  },
+  "reload_duration_label": {
+    "message": "Duration",
+    "description": "Label of the reload duration dropdown."
+  },
+  "reload_start": {
+    "message": "Start",
+    "description": "Button that starts the timer."
+  },
+  "reload_stop": {
+    "message": "Stop",
+    "description": "Button that stops the timer."
+  },
+  "reload_started": {
+    "message": "Started",
+    "description": "Status after the timer started."
+  },
+  "reload_start_failed": {
+    "message": "Could not start",
+    "description": "Status when the timer could not be started."
+  },
+  "reload_stopped": {
+    "message": "Stopped",
+    "description": "Status after the timer stopped."
+  },
+  "reload_stop_failed": {
+    "message": "Could not stop",
+    "description": "Status when the timer could not be stopped."
+  },
+  "reload_footer_note": {
+    "message": "The timer runs per tab. It keeps going after you close this screen, and ends when the duration is up, the tab is closed, or you press Stop. It follows the tab, so if you navigate that tab elsewhere, the new page is what gets reloaded.",
+    "description": "Note at the bottom of the reload timer section."
+  },
+
+  "transfer_section_title": {
+    "message": "Import / export settings",
+    "description": "Heading of the settings transfer section."
+  },
+  "transfer_lead": {
+    "message": "Write your settings to a JSON file and read them back on another device or after reinstalling. You can pick which features to write and which to read.",
+    "description": "Intro of the settings transfer section."
+  },
+  "export_heading": {
+    "message": "Export",
+    "description": "Sub-heading of the export half."
+  },
+  "export_features_legend": {
+    "message": "Features to export",
+    "description": "Legend of the picker for the features to write to the file."
+  },
+  "export_button": {
+    "message": "Export",
+    "description": "Button that downloads the settings file."
+  },
+  "export_done": {
+    "message": "Exported",
+    "description": "Status after the settings file was written."
+  },
+  "export_failed": {
+    "message": "Export failed",
+    "description": "Status when the settings file could not be written."
+  },
+  "import_heading": {
+    "message": "Import",
+    "description": "Sub-heading of the import half."
+  },
+  "import_file_label": {
+    "message": "Settings file",
+    "description": "Label of the file picker for the settings to read."
+  },
+  "import_features_legend": {
+    "message": "Features to import",
+    "description": "Legend of the picker for the features to read out of the file."
+  },
+  "import_apply": {
+    "message": "Apply selected settings",
+    "description": "Button that applies the picked features from the file."
+  },
+  "import_done": {
+    "message": "Imported",
+    "description": "Status after the settings were applied."
+  },
+  "import_failed": {
+    "message": "Import failed",
+    "description": "Status when the settings could not be applied."
+  },
+  "import_exported_at_note": {
+    "message": "This file was exported on $1.",
+    "description": "Says when the file being imported was written; $1 is the timestamp."
+  },
+  "transfer_footer_note": {
+    "message": "Applying replaces the settings of the features you picked. The ones you did not pick stay as they are.",
+    "description": "Note at the bottom of the settings transfer section."
+  },
+  "transfer_error_json": {
+    "message": "Could not read it as JSON",
+    "description": "Import error when the file is not valid JSON."
+  },
+  "transfer_error_not_ours": {
+    "message": "This is not a Nanatsudougu settings file",
+    "description": "Import error when the JSON is not a settings bundle."
+  },
+  "transfer_error_newer": {
+    "message": "This file uses a newer format (version $1). Update the extension",
+    "description": "Import error when the file comes from a newer format; $1 is its version."
+  },
+  "transfer_error_empty": {
+    "message": "No importable settings in the file",
+    "description": "Import error when the bundle carries no known feature."
+  },
+  "describe_no_rules": {
+    "message": "No rules",
+    "description": "Says a redirect rules feature holds no rule."
+  },
+  "describe_rules": {
+    "message": "$1 rule(s) ($2 enabled)",
+    "description": "Says how many redirect rules a feature holds; $1 total, $2 enabled."
+  },
+  "describe_meet": {
+    "message": "Auto join $1 / every $2 min",
+    "description": "Says the Meet settings; $1 is ON/OFF, $2 the interval in minutes."
+  },
+  "describe_reload": {
+    "message": "every $1 / $2",
+    "description": "Says the reload settings; $1 is the interval, $2 the duration."
+  },
+
+  "panel_joined": {
+    "message": "Joined",
+    "description": "Panel message after the join button was clicked."
+  },
+  "panel_cancelled": {
+    "message": "Auto join cancelled",
+    "description": "Panel message after the user cancelled the join."
+  },
+  "panel_missed": {
+    "message": "Could not find the join button",
+    "description": "Panel message when the join button never showed up."
+  },
+  "panel_waiting": {
+    "message": "Joining automatically at $1",
+    "description": "Panel message while waiting; $1 is the join time."
+  },
+  "panel_remaining": {
+    "message": "$1 left",
+    "description": "Countdown on the panel; $1 is the time left."
+  },
+  "panel_close_hint": {
+    "message": "Click to close",
+    "description": "Hint that the settled panel closes when clicked."
+  },
+  "panel_hasten": {
+    "message": "-1 min",
+    "description": "Button that moves the join one minute earlier."
+  },
+  "panel_hasten_title": {
+    "message": "Join 1 minute earlier",
+    "description": "Tooltip of the hasten button."
+  },
+  "panel_postpone": {
+    "message": "+1 min",
+    "description": "Button that moves the join one minute later."
+  },
+  "panel_postpone_title": {
+    "message": "Join 1 minute later",
+    "description": "Tooltip of the postpone button."
+  }
+}

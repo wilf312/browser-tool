@@ -122,6 +122,292 @@ https://github.com/wilf312/browser-tool
 - ストアの詳細説明は Markdown も HTML も解釈されません。上の `■` と `・` はプレーンテキストで
   見出しと箇条書きに見せるためのものなので、記号ごとそのまま貼ります
 
+## 英語（en）の掲載情報
+
+`public/_locales/en/messages.json` を追加したので、ダッシュボードの言語「英語」にも同じ内容を
+登録します。カテゴリと「プライバシーへの取り組み」タブは全言語共通なので、日本語のままで構いません。
+
+### 名前（最大 75 文字）
+
+```
+Nanatsudougu
+```
+
+### 概要 / 短い説明（最大 132 文字）
+
+```
+Redirects retired Jira domains with their paths intact and joins Google Meet automatically right at the start time.
+```
+
+### 詳細説明（最大 16,000 文字）
+
+```
+Takes over the small, repeated browser chores of your workday. There are three tools so far.
+None of them does anything by default — each one reacts only to the setup you give it.
+
+■ Jira domain redirect
+
+When you open an Atlassian (atlassian.net) domain that a migration or consolidation has retired,
+it switches you to the new domain automatically.
+
+  https://a.atlassian.net/browse/XAPP-134
+    ↓
+  https://b.atlassian.net/browse/XAPP-134
+
+・Only the host name is replaced. The path, query string and hash carry over as they are, so old
+  bookmarks and links left in tickets or Slack still open
+・The switch happens in the browser before the request is sent, so the retired domain is never
+  actually reached
+・You can register as many source/destination pairs as you like, and turn each row on or off
+
+■ Google Meet auto join
+
+Keep a meeting's waiting screen open and the Join button is pressed the moment the next start
+time comes around.
+
+  Open the waiting screen at 10:07 → join automatically at 10:15
+
+・Off by default. Joining a meeting on your behalf is a big surprise, so it only runs when you
+  turn it on
+・The start interval can be 5 / 10 / 15 / 30 / 60 minutes (default 15 minutes = :00 :15 :30 :45)
+・The bottom-left of the waiting screen shows "Joining automatically at 10:15" with a countdown,
+  and you can call it off right there with Cancel
+・To shift only the timing, the "+1 min" and "-1 min" buttons move the join time one minute later
+  or earlier
+・When Meet asks "You haven't left the call yet — do you want to keep waiting?", the extension
+  presses Keep waiting for you. Left unanswered, the dialog drops you out of the lobby
+・The camera and microphone state you set on the waiting screen is used as it is. The extension
+  does not change it
+
+■ Page auto reload
+
+Keeps reloading a page you leave open waiting for updates, at the interval and for the duration
+you set.
+
+  Every 5 minutes for 1 hour → stops automatically after 1 hour
+
+・Open the extension from the toolbar icon and the tab you were looking at becomes the target
+・The reload interval can be 5 / 10 / 30 minutes, and the duration 1 to 8 hours
+・It stops on its own once the duration is up — no leaving it reloading for hours by mistake
+・The timer keeps running after you close the settings screen. Open it again to see the time left
+  and press Stop from there. Closing the tab also stops it
+
+■ Carrying your settings
+
+Settings sync through your Chrome account, so they reach every device you sign in to with the
+same account. You can also export them to a JSON file and read them back, picking which features
+to write and which to read. An import replaces only the features you choose, so you can hand just
+one feature's settings to another device.
+
+■ What is not collected
+
+Browsing history, what you type, meeting audio or video, and personally identifiable information
+are neither collected nor sent. Settings are only stored in Chrome's synced storage; nothing goes
+to an external server. There are no ads and no analytics.
+
+■ Permissions
+
+・declarativeNetRequest — used to redirect the domains you register
+・storage — used to save your settings
+・alarms — used to know when the next auto reload is due
+・activeTab — used so auto reload only ever touches the tab you pressed the toolbar icon on
+・*://*.atlassian.net/* — used to limit redirects to atlassian.net domains
+・meet.google.com — used to show the countdown on the waiting screen and to click the Join button
+  and the Keep waiting button in the dialog that asks whether to keep waiting
+
+The source code is on GitHub.
+https://github.com/wilf312/browser-tool
+```
+
+## スペイン語（es）の掲載情報
+
+`public/_locales/es/messages.json` を追加したので、ダッシュボードの言語「スペイン語」にも
+同じ内容を登録します。カテゴリと「プライバシーへの取り組み」タブは全言語共通です。
+
+### 名前（最大 75 文字）
+
+```
+Nanatsudougu
+```
+
+### 概要 / 短い説明（最大 132 文字）
+
+```
+Redirige los dominios Jira retirados conservando la ruta y entra automáticamente en Google Meet justo a la hora de inicio.
+```
+
+### 詳細説明（最大 16,000 文字）
+
+```
+Se encarga de las pequeñas tareas repetitivas del navegador en tu jornada. De momento hay tres
+herramientas. Ninguna hace nada por defecto: cada una reacciona solo a lo que configures.
+
+■ Redirección de dominios Jira
+
+Cuando abres un dominio de Atlassian (atlassian.net) que una migración o consolidación ha
+retirado, te cambia automáticamente al dominio nuevo.
+
+  https://a.atlassian.net/browse/XAPP-134
+    ↓
+  https://b.atlassian.net/browse/XAPP-134
+
+・Solo se sustituye el nombre del host. La ruta, la cadena de consulta y el hash se conservan tal
+  cual, así que los marcadores antiguos y los enlaces que quedaron en tickets o Slack siguen
+  abriéndose
+・El cambio ocurre en el navegador antes de enviar la petición, así que nunca se llega a acceder
+  al dominio retirado
+・Puedes registrar tantos pares origen/destino como quieras y activar o desactivar cada fila
+
+■ Entrada automática en Google Meet
+
+Si dejas abierta la pantalla de espera de una reunión, se pulsa el botón «Unirse» en cuanto llega
+la próxima hora de inicio.
+
+  Abrir la pantalla de espera a las 10:07 → entrar automáticamente a las 10:15
+
+・Desactivado por defecto. Entrar en una reunión por ti es una sorpresa grande, así que solo
+  funciona cuando lo activas
+・El intervalo de inicio puede ser 5 / 10 / 15 / 30 / 60 minutos (por defecto 15 minutos =
+  :00 :15 :30 :45)
+・En la esquina inferior izquierda de la pantalla de espera se muestra «Te unirás automáticamente
+  a las 10:15» con una cuenta atrás, y puedes cancelarlo ahí mismo con Cancelar
+・Para cambiar solo el momento, los botones «+1 min» y «-1 min» mueven la hora de entrada un
+  minuto después o antes
+・Cuando Meet pregunta «Aún no has salido de la llamada, ¿quieres seguir esperando?», la extensión
+  pulsa Seguir esperando por ti. Si se deja sin responder, el diálogo te saca de la sala de espera
+・El estado de cámara y micrófono que hayas puesto en la pantalla de espera se usa tal cual. La
+  extensión no lo cambia
+
+■ Recarga automática de páginas
+
+Sigue recargando una página que dejas abierta esperando novedades, con el intervalo y durante el
+tiempo que definas.
+
+  Cada 5 minutos durante 1 hora → se detiene automáticamente al cabo de 1 hora
+
+・Abre la extensión desde el icono de la barra de herramientas y la pestaña que estabas viendo pasa
+  a ser el objetivo
+・El intervalo de recarga puede ser 5 / 10 / 30 minutos, y la duración de 1 a 8 horas
+・Se detiene solo cuando se cumple la duración: no se queda recargando durante horas por olvido
+・El temporizador sigue activo al cerrar la pantalla de ajustes. Vuelve a abrirla para ver el tiempo
+  restante y pulsar Detener. Cerrar la pestaña también lo detiene
+
+■ Llevar tus ajustes
+
+Los ajustes se sincronizan con tu cuenta de Chrome, así que llegan a todos los dispositivos en los
+que inicies sesión con la misma cuenta. También puedes exportarlos a un archivo JSON y volver a
+cargarlos, eligiendo qué funciones escribir y cuáles leer. La importación solo sustituye las
+funciones que elijas, así que puedes pasar los ajustes de una sola función a otro dispositivo.
+
+■ Lo que no se recoge
+
+El historial de navegación, lo que escribes, el audio o vídeo de las reuniones y la información
+que permita identificarte no se recogen ni se envían. Los ajustes solo se guardan en el
+almacenamiento sincronizado de Chrome; nada va a un servidor externo. No hay anuncios ni
+herramientas de análisis.
+
+■ Permisos
+
+・declarativeNetRequest: se usa para redirigir los dominios que registras
+・storage: se usa para guardar tus ajustes
+・alarms: se usa para saber cuándo toca la siguiente recarga automática
+・activeTab: se usa para que la recarga automática solo afecte a la pestaña en la que pulsaste el
+  icono de la barra de herramientas
+・*://*.atlassian.net/*: se usa para limitar las redirecciones a dominios atlassian.net
+・meet.google.com: se usa para mostrar la cuenta atrás en la pantalla de espera y para pulsar el
+  botón «Unirse» y el botón «Seguir esperando» del diálogo que pregunta si quieres seguir esperando
+
+El código fuente está publicado en GitHub.
+https://github.com/wilf312/browser-tool
+```
+
+## 中国語（zh_CN）の掲載情報
+
+`public/_locales/zh_CN/messages.json` を追加したので、ダッシュボードの言語「中国語（簡体字）」にも
+同じ内容を登録します。カテゴリと「プライバシーへの取り組み」タブは全言語共通です。
+
+### 名前（最大 75 文字）
+
+```
+Nanatsudougu
+```
+
+### 概要 / 短い説明（最大 132 文字）
+
+```
+在保留路径的情况下重定向已停用的 Jira 域名，并在开始时间自动进入 Google Meet。
+```
+
+### 詳細説明（最大 16,000 文字）
+
+```
+替你处理日常工作中在浏览器里反复出现的细小手工作业。目前有三件工具，默认都不会做任何事，
+只对你设置的内容作出反应。
+
+■ Jira 域名重定向
+
+当你打开一个因迁移或整合而停用的 Atlassian（atlassian.net）域名时，自动切换到新域名。
+
+  https://a.atlassian.net/browse/XAPP-134
+    ↓
+  https://b.atlassian.net/browse/XAPP-134
+
+・只替换主机名。路径、查询字符串和片段原样保留，所以旧的收藏夹、工单或 Slack 里留下的链接
+  都能直接打开
+・在请求发送之前就在浏览器端完成切换，因此不会真正访问已停用的域名
+・可以登记任意多组来源与去向，并逐行启用或停用
+
+■ Google Meet 自动入会
+
+保持会议等待页面打开，到了下一个开始时间就会按下「加入」按钮。
+
+  10:07 打开等待页面 → 10:15 自动入会
+
+・默认关闭。擅自进入会议的影响很大，所以只有明确启用时才会工作
+・开始时间间隔可选 5 / 10 / 15 / 30 / 60 分钟（默认 15 分钟 = :00 :15 :30 :45）
+・等待页面左下角会显示「将在 10:15 自动加入」和倒计时，可以当场用取消按钮中止
+・只想调整时间时，可用「+1 分钟」「-1 分钟」按钮把入会时间前后移动 1 分钟
+・当 Meet 询问「你还没有退出通话，是否继续等待？」时，扩展会自动按下「继续等待」。如果放着
+  不管，就会被移出等待队列
+・摄像头和麦克风沿用你在等待页面设置的状态，扩展不会更改
+
+■ 页面自动重新加载
+
+对一直开着等待更新的页面，按设定的间隔持续重新加载设定的时长。
+
+  每 5 分钟一次，持续 1 小时 → 满 1 小时后自动停止
+
+・从工具栏图标打开扩展，当时正在查看的标签页会成为目标
+・重新加载间隔可选 5 / 10 / 30 分钟，持续时间可选 1 到 8 小时
+・到设定时长会自行停止，不会忘记停止而连续重新加载好几个小时
+・关闭设置页面后计时器仍会继续运行。重新打开即可看到剩余时间，并从那里按「停止」。关闭标签页
+  也会停止
+
+■ 设置的携带
+
+设置会通过 Chrome 账号同步，因此用同一账号登录的设备会自动生效。也可以导出为 JSON 文件并
+重新导入，导出和导入都能按功能选择。导入只替换所选的功能，因此可以把某一项功能的设置单独
+带到另一台设备。
+
+■ 不收集的内容
+
+浏览记录、输入内容、会议的音视频以及可识别个人身份的信息，都不收集也不发送。设置只保存在
+Chrome 的同步存储中，不会发送到任何外部服务器。没有广告，也没有分析工具。
+
+■ 所需权限
+
+・declarativeNetRequest — 用于重定向你登记的域名
+・storage — 用于保存设置
+・alarms — 用于得知下一次自动重新加载的时间
+・activeTab — 用于让自动重新加载只作用于你按下工具栏图标的那个标签页
+・*://*.atlassian.net/* — 用于把重定向对象限定为 atlassian.net 域名
+・meet.google.com — 用于在等待页面显示倒计时，以及点击「加入」按钮和询问是否继续等待的
+  对话框中的「继续等待」按钮
+
+源代码在 GitHub 上公开。
+https://github.com/wilf312/browser-tool
+```
+
 ## 「プライバシーへの取り組み」タブ
 
 ここが埋まっていないと、掲載情報を書いても公開できません。ダッシュボードが出す
