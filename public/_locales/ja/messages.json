@@ -1,0 +1,341 @@
+{
+  "app_name": {
+    "message": "Nanatsudougu",
+    "description": "Extension name shown in the browser."
+  },
+  "app_description": {
+    "message": "廃止された atlassian.net のドメインをパスを保ったままリダイレクトし、Google Meet の開始時刻に自動で入室し、開いているタブを決めた時間だけリロードし続けます。",
+    "description": "Extension description shown in the browser and the Web Store."
+  },
+
+  "saved": {
+    "message": "保存しました",
+    "description": "Status after a setting was written."
+  },
+  "save_failed": {
+    "message": "保存に失敗しました",
+    "description": "Status when a setting could not be written."
+  },
+  "cancel": {
+    "message": "キャンセル",
+    "description": "Button that drops what is on screen without applying it."
+  },
+  "delete": {
+    "message": "削除",
+    "description": "Button that removes a row."
+  },
+  "enabled": {
+    "message": "有効",
+    "description": "Table column and checkbox that turns a single rule on."
+  },
+  "add": {
+    "message": "＋ 追加",
+    "description": "Button that adds a new row."
+  },
+  "unit_seconds": {
+    "message": "$1 秒",
+    "description": "A number of seconds, as shown in a dropdown."
+  },
+  "unit_minutes": {
+    "message": "$1 分",
+    "description": "A number of minutes, as shown in a dropdown."
+  },
+  "unit_hours": {
+    "message": "$1 時間",
+    "description": "A number of whole hours, as shown in a dropdown."
+  },
+  "unit_hours_minutes": {
+    "message": "$1 時間 $2 分",
+    "description": "Hours and minutes, as shown in a dropdown."
+  },
+
+  "feature_redirect_rules": {
+    "message": "Jira ドメインリダイレクト",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "feature_meet_auto_join": {
+    "message": "Meet 自動入室",
+    "description": "Feature name, used as its section heading, panel title and export label."
+  },
+  "feature_reload_timer": {
+    "message": "ページ自動リロード",
+    "description": "Feature name, used as its section heading and export label."
+  },
+
+  "redirect_lead": {
+    "message": "廃止されたドメインへのアクセスを、パス以降をそのままにして移行先へリダイレクトします。",
+    "description": "Intro of the Jira redirect section."
+  },
+  "redirect_example_prefix": {
+    "message": "例) ",
+    "description": "Text before the first URL in the redirect example."
+  },
+  "redirect_example_arrow": {
+    "message": " → ",
+    "description": "Arrow between the two URLs in the redirect example."
+  },
+  "redirect_note_prefix": {
+    "message": "変更は自動で保存されます。ホスト名のみを入力してください（",
+    "description": "Start of the note under the rules table, before the https:// code span."
+  },
+  "redirect_note_between": {
+    "message": " やパスは省略できます）。対象は ",
+    "description": "Middle of the note under the rules table, between the two code spans."
+  },
+  "redirect_note_suffix": {
+    "message": " のドメインです。",
+    "description": "End of the note under the rules table, after the domain code span."
+  },
+  "rules_empty": {
+    "message": "ルールがありません。「追加」から登録してください。",
+    "description": "Placeholder row shown while there are no redirect rules."
+  },
+  "delete_row": {
+    "message": "この行を削除",
+    "description": "Tooltip of the delete button on a rules table row."
+  },
+
+  "meet_lead": {
+    "message": "Google Meet の待機画面を開いておくと、次の開始時刻になったときに「参加」ボタンを自動でクリックします。",
+    "description": "Intro of the Meet auto join section."
+  },
+  "meet_example_prefix": {
+    "message": "例) 10:07 に待機画面を開く → ",
+    "description": "Text before the join time in the auto join example."
+  },
+  "meet_example_suffix": {
+    "message": " に入室",
+    "description": "Text after the join time in the auto join example."
+  },
+  "meet_enable": {
+    "message": "自動入室を有効にする",
+    "description": "Checkbox that turns the Meet auto join on."
+  },
+  "meet_interval": {
+    "message": "開始時刻の間隔",
+    "description": "Label of the dropdown that picks the join interval."
+  },
+  "meet_note": {
+    "message": "待機画面の左下に入室予定時刻とカウントダウンが表示され、そこからキャンセルできます。 カメラとマイクの状態は待機画面の設定がそのまま使われます。 「このまま待機を続けますか？」と聞かれたときは、自動で「待機」を押して待ち続けます。",
+    "description": "Note under the Meet auto join controls."
+  },
+
+  "reload_lead": {
+    "message": "今開いているタブを、決めた間隔で決めた時間だけリロードし続けます。",
+    "description": "Intro of the reload timer section."
+  },
+  "reload_example_prefix": {
+    "message": "例) ",
+    "description": "Text before the interval in the reload example."
+  },
+  "reload_example_between": {
+    "message": " ごとに ",
+    "description": "Text between the interval and the duration in the reload example."
+  },
+  "reload_example_mid": {
+    "message": " 間 → ",
+    "description": "Text between the duration and the closing sentence in the reload example."
+  },
+  "reload_example_suffix": {
+    "message": "たったら自動で止まります",
+    "description": "Text after the repeated duration in the reload example."
+  },
+  "reload_checking_tab": {
+    "message": "対象のタブを確認しています…",
+    "description": "Status while the active tab is being looked up."
+  },
+  "reload_no_tab_note": {
+    "message": "対象のタブが見つかりません。リロードしたいページを開いた状態で、ツールバーの Nanatsudougu アイコンからこの画面を開いてください。",
+    "description": "Shown when the popup has no tab to act on."
+  },
+  "reload_target_label": {
+    "message": "対象: ",
+    "description": "Label before the tab the timer will reload."
+  },
+  "reload_tab_fallback": {
+    "message": "このタブ",
+    "description": "How the target tab is named when it has no URL or title."
+  },
+  "reload_progress_lead": {
+    "message": "$1 ごとにリロードしています（終了まで $2",
+    "description": "Running timer status; $1 is the interval, $2 the remaining time."
+  },
+  "reload_progress_next": {
+    "message": " ／ 次まで $1",
+    "description": "Appended to the running timer status; $1 is the time to the next reload."
+  },
+  "reload_progress_tail": {
+    "message": "）",
+    "description": "Closing bracket of the running timer status."
+  },
+  "reload_interval_label": {
+    "message": "リロード間隔",
+    "description": "Label of the reload interval dropdown."
+  },
+  "reload_duration_label": {
+    "message": "続ける時間",
+    "description": "Label of the reload duration dropdown."
+  },
+  "reload_start": {
+    "message": "開始",
+    "description": "Button that starts the timer."
+  },
+  "reload_stop": {
+    "message": "停止",
+    "description": "Button that stops the timer."
+  },
+  "reload_started": {
+    "message": "開始しました",
+    "description": "Status after the timer started."
+  },
+  "reload_start_failed": {
+    "message": "開始できませんでした",
+    "description": "Status when the timer could not be started."
+  },
+  "reload_stopped": {
+    "message": "停止しました",
+    "description": "Status after the timer stopped."
+  },
+  "reload_stop_failed": {
+    "message": "停止できませんでした",
+    "description": "Status when the timer could not be stopped."
+  },
+  "reload_footer_note": {
+    "message": "タイマーはタブごとに動きます。この画面を閉じても続き、決めた時間がたつか、タブを閉じるか、「停止」を押すと終わります。対象はタブなので、そのタブで別のページへ移動したときは移動先がリロードされます。",
+    "description": "Note at the bottom of the reload timer section."
+  },
+
+  "transfer_section_title": {
+    "message": "設定のインポート / エクスポート",
+    "description": "Heading of the settings transfer section."
+  },
+  "transfer_lead": {
+    "message": "設定を JSON ファイルに書き出して、別の端末や再インストールしたあとに読み込めます。書き出す機能も、取り込む機能も選べます。",
+    "description": "Intro of the settings transfer section."
+  },
+  "export_heading": {
+    "message": "エクスポート",
+    "description": "Sub-heading of the export half."
+  },
+  "export_features_legend": {
+    "message": "書き出す機能",
+    "description": "Legend of the picker for the features to write to the file."
+  },
+  "export_button": {
+    "message": "エクスポート",
+    "description": "Button that downloads the settings file."
+  },
+  "export_done": {
+    "message": "エクスポートしました",
+    "description": "Status after the settings file was written."
+  },
+  "export_failed": {
+    "message": "エクスポートに失敗しました",
+    "description": "Status when the settings file could not be written."
+  },
+  "import_heading": {
+    "message": "インポート",
+    "description": "Sub-heading of the import half."
+  },
+  "import_file_label": {
+    "message": "設定ファイル",
+    "description": "Label of the file picker for the settings to read."
+  },
+  "import_features_legend": {
+    "message": "取り込む機能",
+    "description": "Legend of the picker for the features to read out of the file."
+  },
+  "import_apply": {
+    "message": "選択した設定を適用",
+    "description": "Button that applies the picked features from the file."
+  },
+  "import_done": {
+    "message": "インポートしました",
+    "description": "Status after the settings were applied."
+  },
+  "import_failed": {
+    "message": "インポートに失敗しました",
+    "description": "Status when the settings could not be applied."
+  },
+  "import_exported_at_note": {
+    "message": "$1 に書き出されたファイルです。",
+    "description": "Says when the file being imported was written; $1 is the timestamp."
+  },
+  "transfer_footer_note": {
+    "message": "適用すると、選んだ機能の設定は今の内容を置き換えます。選ばなかった機能はそのままです。",
+    "description": "Note at the bottom of the settings transfer section."
+  },
+  "transfer_error_json": {
+    "message": "JSON として読み取れませんでした",
+    "description": "Import error when the file is not valid JSON."
+  },
+  "transfer_error_not_ours": {
+    "message": "Nanatsudougu の設定ファイルではありません",
+    "description": "Import error when the JSON is not a settings bundle."
+  },
+  "transfer_error_newer": {
+    "message": "新しい形式の設定ファイルです（version $1）。拡張機能を更新してください",
+    "description": "Import error when the file comes from a newer format; $1 is its version."
+  },
+  "transfer_error_empty": {
+    "message": "取り込める設定が入っていません",
+    "description": "Import error when the bundle carries no known feature."
+  },
+  "describe_no_rules": {
+    "message": "ルールなし",
+    "description": "Says a redirect rules feature holds no rule."
+  },
+  "describe_rules": {
+    "message": "ルール $1 件（有効 $2 件）",
+    "description": "Says how many redirect rules a feature holds; $1 total, $2 enabled."
+  },
+  "describe_meet": {
+    "message": "自動入室 $1 / $2 分間隔",
+    "description": "Says the Meet settings; $1 is ON/OFF, $2 the interval in minutes."
+  },
+  "describe_reload": {
+    "message": "$1ごと / $2",
+    "description": "Says the reload settings; $1 is the interval, $2 the duration."
+  },
+
+  "panel_joined": {
+    "message": "参加しました",
+    "description": "Panel message after the join button was clicked."
+  },
+  "panel_cancelled": {
+    "message": "自動入室をキャンセルしました",
+    "description": "Panel message after the user cancelled the join."
+  },
+  "panel_missed": {
+    "message": "参加ボタンが見つかりませんでした",
+    "description": "Panel message when the join button never showed up."
+  },
+  "panel_waiting": {
+    "message": "$1 に自動で参加します",
+    "description": "Panel message while waiting; $1 is the join time."
+  },
+  "panel_remaining": {
+    "message": "残り $1",
+    "description": "Countdown on the panel; $1 is the time left."
+  },
+  "panel_close_hint": {
+    "message": "クリックで閉じる",
+    "description": "Hint that the settled panel closes when clicked."
+  },
+  "panel_hasten": {
+    "message": "-1分",
+    "description": "Button that moves the join one minute earlier."
+  },
+  "panel_hasten_title": {
+    "message": "参加を1分早める",
+    "description": "Tooltip of the hasten button."
+  },
+  "panel_postpone": {
+    "message": "+1分",
+    "description": "Button that moves the join one minute later."
+  },
+  "panel_postpone_title": {
+    "message": "参加を1分先に延ばす",
+    "description": "Tooltip of the postpone button."
+  }
+}

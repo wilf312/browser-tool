@@ -183,6 +183,27 @@ https://b.atlassian.net/browse/XAPP-134
 改名前の `browser-tool` で書き出したファイル（`"format": "browser-tool-settings"`）も、
 そのまま読み込めます。書き出すときは常に新しい `nanatsudougu-settings` になります。
 
+## 多言語化（i18n）
+
+画面の文言は Chrome の i18n 機構（`chrome.i18n`）で切り替えます。文言は
+`public/_locales/<locale>/messages.json` にあり、`public/manifest.json` の
+`name` / `description` も `__MSG_app_name__` / `__MSG_app_description__` として
+このファイルから引きます。既定ロケール（`default_locale`）は `ja` です。
+
+- 対応ロケールは `public/_locales/` のディレクトリで決まります。今は `ja` だけです
+- 文言を足す・変えるときは `public/_locales/ja/messages.json` を正とし、他のロケールにも
+  同じキーを足します。キーが無いロケールでは既定ロケール（`ja`）にフォールバックします
+- コードからは `src/lib/i18n.ts` の `t(key, substitutions?)` で引きます。キーは
+  `messages.json` から型付けされているので、存在しないキーは型エラーになります
+- 画面に出る文字列をコンポーネントに直接書かないでください。`_locales` を経由させます
+  （例外的に、Google Meet のページ上のボタンを探す `JOIN_LABELS` /
+  `KEEP_WAITING_LABELS` は相手側の UI 文言なので対象外です）
+- ストアの掲載文は言語ごとに別途入力します。文面は
+  [`docs/store-listing.md`](docs/store-listing.md) にまとめています
+
+`chrome.i18n` が無い環境（ユニットテストなど）では `ja` の文言にフォールバックするので、
+テストは日本語のまま検証できます。
+
 ## 公開用のビルド
 
 Chrome Web Store には ZIP をアップロードします。`npm run package` が公開用のビルドと

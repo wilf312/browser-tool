@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createRule, loadRules, onRulesChanged, saveRules } from '../lib/storage';
 import { debounce } from '../lib/debounce';
+import { t } from '../lib/i18n';
 import type { RedirectRule } from '../lib/types';
 import { RulesTable } from './RulesTable';
 import { useStatus } from './useStatus';
@@ -21,10 +22,10 @@ export function RedirectRulesSection() {
       debounce(async (next: RedirectRule[]) => {
         try {
           await saveRules(next);
-          showStatus('保存しました');
+          showStatus(t('saved'));
         } catch (error) {
           console.error('[nanatsudougu] failed to save rules', error);
-          showStatus('保存に失敗しました');
+          showStatus(t('save_failed'));
         }
       }, SAVE_DEBOUNCE_MS),
     [showStatus],
@@ -79,11 +80,13 @@ export function RedirectRulesSection() {
 
   return (
     <section>
-      <h2>Jira ドメインリダイレクト</h2>
+      <h2>{t('feature_redirect_rules')}</h2>
       <p className="lead">
-        廃止されたドメインへのアクセスを、パス以降をそのままにして移行先へリダイレクトします。
+        {t('redirect_lead')}
         <br />
-        例) <code>https://a.atlassian.net/browse/XAPP-134</code> →{' '}
+        {t('redirect_example_prefix')}
+        <code>https://a.atlassian.net/browse/XAPP-134</code>
+        {t('redirect_example_arrow')}
         <code>https://b.atlassian.net/browse/XAPP-134</code>
       </p>
 
@@ -98,8 +101,11 @@ export function RedirectRulesSection() {
       />
 
       <p className="note">
-        変更は自動で保存されます。ホスト名のみを入力してください（<code>https://</code>{' '}
-        やパスは省略できます）。対象は <code>*.atlassian.net</code> のドメインです。
+        {t('redirect_note_prefix')}
+        <code>https://</code>
+        {t('redirect_note_between')}
+        <code>*.atlassian.net</code>
+        {t('redirect_note_suffix')}
       </p>
     </section>
   );
