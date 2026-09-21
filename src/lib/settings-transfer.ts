@@ -6,6 +6,7 @@
  * bundle is shaped, how to read one back, and how to describe it to the user.
  */
 
+import { t } from './i18n';
 import { sanitizeMeetSettings } from './meet-settings';
 import { sanitizeReloadSettings } from './reload-settings';
 import { formatDurationLabel, formatIntervalLabel } from './reload-timer';
@@ -25,9 +26,9 @@ export const FEATURE_IDS = ['redirectRules', 'meetAutoJoin', 'reloadTimer'] as c
 export type FeatureId = (typeof FEATURE_IDS)[number];
 
 export const FEATURE_LABELS: Readonly<Record<FeatureId, string>> = Object.freeze({
-  redirectRules: 'Jira ドメインリダイレクト',
-  meetAutoJoin: 'Meet 自動入室',
-  reloadTimer: 'ページ自動リロード',
+  redirectRules: t('feature_redirect_rules'),
+  meetAutoJoin: t('feature_meet_auto_join'),
+  reloadTimer: t('feature_reload_timer'),
 });
 
 /** The settings of each feature. A bundle carries only the ones that were picked. */
@@ -115,11 +116,11 @@ export function parseBundle(text: string): ParseResult {
   try {
     raw = JSON.parse(text);
   } catch {
-    return { ok: false, error: 'JSON として読み取れませんでした' };
+    return { ok: false, error: t('transfer_error_json') };
   }
 
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
-    return { ok: false, error: 'Nanatsudougu の設定ファイルではありません' };
+    return { ok: false, error: t('transfer_error_not_ours') };
   }
 
   const candidate = raw as Partial<SettingsBundle>;
@@ -128,18 +129,18 @@ export function parseBundle(text: string): ParseResult {
   const known =
     typeof format === 'string' && (format === EXPORT_FORMAT || LEGACY_EXPORT_FORMATS.has(format));
   if (!known || typeof version !== 'number' || !(version >= 1)) {
-    return { ok: false, error: 'Nanatsudougu の設定ファイルではありません' };
+    return { ok: false, error: t('transfer_error_not_ours') };
   }
   if (version > EXPORT_VERSION) {
     return {
       ok: false,
-      error: `新しい形式の設定ファイルです（version ${version}）。拡張機能を更新してください`,
+      error: t('transfer_error_newer', [String(version)]),
     };
   }
 
   const features = sanitizeFeatures(candidate.features);
   if (featuresInBundle(features).length === 0) {
-    return { ok: false, error: '取り込める設定が入っていません' };
+    return { ok: false, error: t('transfer_error_empty') };
   }
 
   return {
@@ -158,18 +159,21 @@ export function describeFeature(features: SettingsFeatures, id: FeatureId): stri
   if (id === 'redirectRules') {
     const rules = features.redirectRules;
     if (rules === undefined) return '';
-    if (rules.length === 0) return 'ルールなし';
+    if (rules.length === 0) return t('describe_no_rules');
     const enabled = rules.filter((rule) => rule.enabled).length;
-    return `ルール ${rules.length} 件（有効 ${enabled} 件）`;
+    return t('describe_rules', [String(rules.length), String(enabled)]);
   }
   if (id === 'meetAutoJoin') {
     const settings = features.meetAutoJoin;
     if (settings === undefined) return '';
-    return `自動入室 ${settings.enabled ? 'ON' : 'OFF'} / ${settings.intervalMinutes} 分間隔`;
+    return t('describe_meet', [settings.enabled ? 'ON' : 'OFF', String(settings.intervalMinutes)]);
   }
   const timer = features.reloadTimer;
   if (timer === undefined) return '';
-  return `${formatIntervalLabel(timer.intervalSeconds)}ごと / ${formatDurationLabel(timer.durationMinutes)}`;
+  return t('describe_reload', [
+    formatIntervalLabel(timer.intervalSeconds),
+    formatDurationLabel(timer.durationMinutes),
+  ]);
 }
 
 function pad(value: number): string {

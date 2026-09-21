@@ -14,7 +14,9 @@ function readJson(path: string): unknown {
 interface Manifest {
   manifest_version: number;
   name: string;
+  description: string;
   version: string;
+  default_locale?: string;
   permissions: string[];
   host_permissions: string[];
   background: { service_worker: string; type: string };
@@ -94,5 +96,27 @@ describe('manifest.json', () => {
 
   it('opens the same settings page from the toolbar and from the options entry', () => {
     expect(manifest.action.default_popup).toBe(manifest.options_page);
+  });
+
+  it('localizes the name and the description from default_locale', () => {
+    expect(manifest.default_locale).toBe('ja');
+    expect(manifest.name).toBe('__MSG_app_name__');
+    expect(manifest.description).toBe('__MSG_app_description__');
+  });
+
+  it('has a message for every __MSG_ token the manifest uses', () => {
+    const locale = manifest.default_locale ?? '';
+    const messages = readJson(`public/_locales/${locale}/messages.json`) as Record<
+      string,
+      { message: string }
+    >;
+    const tokens = [...JSON.stringify(manifest).matchAll(/__MSG_([A-Za-z0-9_@]+)__/g)].map(
+      (match) => match[1],
+    );
+
+    expect(tokens.length).toBeGreaterThan(0);
+    for (const token of tokens) {
+      expect(messages[token]?.message, `${token} is defined in _locales/${locale}`).toBeTruthy();
+    }
   });
 });

@@ -8,6 +8,7 @@
  * why this module has neither timers nor storage in it.
  */
 
+import { t } from './i18n';
 import type { ReloadJob, ReloadProgress } from './types';
 
 /** Chrome does not run an alarm more often than every 30 seconds. */
@@ -125,13 +126,17 @@ export function reloadProgress(job: ReloadJob, now: Date): ReloadProgress {
 
 /** `30 秒` / `1 分` / `30 分` — an interval as shown in the dropdown. */
 export function formatIntervalLabel(seconds: number): string {
-  return seconds < 60 ? `${seconds} 秒` : `${Math.round(seconds / 60)} 分`;
+  return seconds < 60
+    ? t('unit_seconds', [String(seconds)])
+    : t('unit_minutes', [String(Math.round(seconds / 60))]);
 }
 
 /** `30 分` / `1 時間` / `1 時間 30 分` — a duration as shown in the dropdown. */
 export function formatDurationLabel(minutes: number): string {
-  if (minutes < 60) return `${minutes} 分`;
+  if (minutes < 60) return t('unit_minutes', [String(minutes)]);
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
-  return rest === 0 ? `${hours} 時間` : `${hours} 時間 ${rest} 分`;
+  return rest === 0
+    ? t('unit_hours', [String(hours)])
+    : t('unit_hours_minutes', [String(hours), String(rest)]);
 }

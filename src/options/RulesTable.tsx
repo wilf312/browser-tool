@@ -6,6 +6,7 @@
  */
 
 import type { Ref } from 'react';
+import { t } from '../lib/i18n';
 import type { RedirectRule } from '../lib/types';
 
 const COLUMN_COUNT = 4;
@@ -37,12 +38,12 @@ export function RulesTable({
         <thead>
           <tr>
             <th scope="col" className="col-enabled">
-              有効
+              {t('enabled')}
             </th>
             <th scope="col">from</th>
             <th scope="col">to</th>
             <th scope="col" className="col-delete">
-              削除
+              {t('delete')}
             </th>
           </tr>
         </thead>
@@ -50,7 +51,7 @@ export function RulesTable({
           {rules.length === 0 ? (
             <tr>
               <td className="empty" colSpan={COLUMN_COUNT}>
-                ルールがありません。「追加」から登録してください。
+                {t('rules_empty')}
               </td>
             </tr>
           ) : (
@@ -60,7 +61,7 @@ export function RulesTable({
                   <input
                     type="checkbox"
                     className="rule-enabled"
-                    aria-label="有効"
+                    aria-label={t('enabled')}
                     checked={rule.enabled}
                     onChange={(event) => onChange(rule.id, { enabled: event.target.checked })}
                   />
@@ -92,10 +93,10 @@ export function RulesTable({
                   <button
                     type="button"
                     className="rule-delete"
-                    title="この行を削除"
+                    title={t('delete_row')}
                     onClick={() => onDelete(rule.id)}
                   >
-                    削除
+                    {t('delete')}
                   </button>
                 </td>
               </tr>
@@ -106,7 +107,7 @@ export function RulesTable({
 
       <div className="actions">
         <button type="button" id="add" onClick={onAdd}>
-          ＋ 追加
+          {t('add')}
         </button>
         <span id="status" className="status" role="status" aria-live="polite">
           {status}

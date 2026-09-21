@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getActiveTab, type ActiveTab } from '../lib/active-tab';
 import { formatCountdown } from '../lib/format-time';
+import { t } from '../lib/i18n';
 import { loadReloadJob, startReloadJob, stopReloadJob } from '../lib/reload-jobs';
 import {
   DEFAULT_RELOAD_SETTINGS,
@@ -42,7 +43,7 @@ function choicesWith(choices: readonly number[], current: number): number[] {
 
 /** How the tab under the timer is named. Its URL, unless there is none to show. */
 function describeTab(tab: ActiveTab): string {
-  return tab.url || tab.title || 'このタブ';
+  return tab.url || tab.title || t('reload_tab_fallback');
 }
 
 export function ReloadTimerSection() {
@@ -87,10 +88,10 @@ export function ReloadTimerSection() {
       try {
         setNowMs(Date.now());
         setJob(await startReloadJob({ tabId: target.id, ...settings }));
-        showStatus('開始しました');
+        showStatus(t('reload_started'));
       } catch (error) {
         console.error('[nanatsudougu] failed to start the reload timer', error);
-        showStatus('開始できませんでした');
+        showStatus(t('reload_start_failed'));
       }
     },
     [settings, showStatus],
@@ -101,10 +102,10 @@ export function ReloadTimerSection() {
       try {
         await stopReloadJob(target.id);
         setJob(null);
-        showStatus('停止しました');
+        showStatus(t('reload_stopped'));
       } catch (error) {
         console.error('[nanatsudougu] failed to stop the reload timer', error);
-        showStatus('停止できませんでした');
+        showStatus(t('reload_stop_failed'));
       }
     },
     [showStatus],
@@ -115,38 +116,44 @@ export function ReloadTimerSection() {
 
   return (
     <section>
-      <h2>ページ自動リロード</h2>
+      <h2>{t('feature_reload_timer')}</h2>
       <p className="lead">
-        今開いているタブを、決めた間隔で決めた時間だけリロードし続けます。
+        {t('reload_lead')}
         <br />
-        例) <code>1 分</code> ごとに <code>30 分</code> 間 → 30 分たったら自動で止まります
+        {t('reload_example_prefix')}
+        <code>{t('unit_minutes', ['1'])}</code>
+        {t('reload_example_between')}
+        <code>{t('unit_minutes', ['30'])}</code>
+        {t('reload_example_mid')}
+        {t('unit_minutes', ['30'])}
+        {t('reload_example_suffix')}
       </p>
 
-      {tab === undefined && <p className="status">対象のタブを確認しています…</p>}
+      {tab === undefined && <p className="status">{t('reload_checking_tab')}</p>}
 
-      {tab === null && (
-        <p className="note">
-          対象のタブが見つかりません。リロードしたいページを開いた状態で、ツールバーの Nanatsudougu
-          アイコンからこの画面を開いてください。
-        </p>
-      )}
+      {tab === null && <p className="note">{t('reload_no_tab_note')}</p>}
 
       {tab && (
         <>
           <p className="target">
-            対象: <code>{describeTab(tab)}</code>
+            {t('reload_target_label')}
+            <code>{describeTab(tab)}</code>
           </p>
 
           {running ? (
             <>
               <p id="reload-progress" className="field" role="status" aria-live="polite">
-                {formatIntervalLabel(job.intervalSeconds)} ごとにリロードしています（終了まで{' '}
-                {formatCountdown(progress.remainingMs)}
-                {progress.nextInMs !== null && ` ／ 次まで ${formatCountdown(progress.nextInMs)}`}）
+                {t('reload_progress_lead', [
+                  formatIntervalLabel(job.intervalSeconds),
+                  formatCountdown(progress.remainingMs),
+                ])}
+                {progress.nextInMs !== null &&
+                  t('reload_progress_next', [formatCountdown(progress.nextInMs)])}
+                {t('reload_progress_tail')}
               </p>
               <div className="actions">
                 <button type="button" id="reload-stop" onClick={() => void handleStop(tab)}>
-                  停止
+                  {t('reload_stop')}
                 </button>
                 <span className="status" role="status" aria-live="polite">
                   {status}
@@ -155,7 +162,7 @@ export function ReloadTimerSection() {
             </>
           ) : (
             <div className="field">
-              <label htmlFor="reload-interval">リロード間隔</label>
+              <label htmlFor="reload-interval">{t('reload_interval_label')}</label>
               <select
                 id="reload-interval"
                 value={String(settings.intervalSeconds)}
@@ -170,7 +177,7 @@ export function ReloadTimerSection() {
                 ))}
               </select>
 
-              <label htmlFor="reload-duration">続ける時間</label>
+              <label htmlFor="reload-duration">{t('reload_duration_label')}</label>
               <select
                 id="reload-duration"
                 value={String(settings.durationMinutes)}
@@ -186,7 +193,7 @@ export function ReloadTimerSection() {
               </select>
 
               <button type="button" id="reload-start" onClick={() => void handleStart(tab)}>
-                開始
+                {t('reload_start')}
               </button>
               <span className="status" role="status" aria-live="polite">
                 {status}
@@ -196,11 +203,7 @@ export function ReloadTimerSection() {
         </>
       )}
 
-      <p className="note">
-        タイマーはタブごとに動きます。この画面を閉じても続き、決めた時間がたつか、タブを閉じるか、
-        「停止」を押すと終わります。対象はタブなので、そのタブで別のページへ移動したときは移動先が
-        リロードされます。
-      </p>
+      <p className="note">{t('reload_footer_note')}</p>
     </section>
   );
 }

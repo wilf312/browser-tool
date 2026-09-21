@@ -14,6 +14,7 @@ import {
   saveReloadSettings,
 } from '../lib/reload-settings';
 import { loadRules, onRulesChanged, saveRules } from '../lib/storage';
+import { t } from '../lib/i18n';
 import {
   buildBundle,
   describeFeature,
@@ -82,10 +83,10 @@ export function SettingsTransferSection() {
     try {
       const features = await readFeatures(exportIds);
       downloadText(exportFilename(), serializeBundle(buildBundle(features, exportIds)));
-      showExportStatus('エクスポートしました');
+      showExportStatus(t('export_done'));
     } catch (failure) {
       console.error('[nanatsudougu] failed to export the settings', failure);
-      showExportStatus('エクスポートに失敗しました');
+      showExportStatus(t('export_failed'));
     }
   }, [exportIds, showExportStatus]);
 
@@ -111,10 +112,10 @@ export function SettingsTransferSection() {
       try {
         await writeFeatures(pickFeatures(bundle.features, importIds));
         setPending(null);
-        showImportStatus('インポートしました');
+        showImportStatus(t('import_done'));
       } catch (failure) {
         console.error('[nanatsudougu] failed to import the settings', failure);
-        showImportStatus('インポートに失敗しました');
+        showImportStatus(t('import_failed'));
       }
     },
     [importIds, showImportStatus],
@@ -127,15 +128,12 @@ export function SettingsTransferSection() {
 
   return (
     <section>
-      <h2>設定のインポート / エクスポート</h2>
-      <p className="lead">
-        設定を JSON
-        ファイルに書き出して、別の端末や再インストールしたあとに読み込めます。書き出す機能も、取り込む機能も選べます。
-      </p>
+      <h2>{t('transfer_section_title')}</h2>
+      <p className="lead">{t('transfer_lead')}</p>
 
-      <h3>エクスポート</h3>
+      <h3>{t('export_heading')}</h3>
       <fieldset className="feature-picker">
-        <legend>書き出す機能</legend>
+        <legend>{t('export_features_legend')}</legend>
         {FEATURE_IDS.map((id) => (
           <label key={id} className="feature">
             <input
@@ -157,16 +155,16 @@ export function SettingsTransferSection() {
           disabled={exportIds.length === 0}
           onClick={() => void handleExport()}
         >
-          エクスポート
+          {t('export_button')}
         </button>
         <span className="status" role="status" aria-live="polite">
           {exportStatus}
         </span>
       </div>
 
-      <h3>インポート</h3>
+      <h3>{t('import_heading')}</h3>
       <div className="field">
-        <label htmlFor="import-file">設定ファイル</label>
+        <label htmlFor="import-file">{t('import_file_label')}</label>
         <input
           type="file"
           id="import-file"
@@ -187,7 +185,7 @@ export function SettingsTransferSection() {
       {pending !== null && (
         <>
           <fieldset className="feature-picker">
-            <legend>取り込む機能</legend>
+            <legend>{t('import_features_legend')}</legend>
             {featuresInBundle(pending.features).map((id) => (
               <label key={id} className="feature">
                 <input
@@ -209,24 +207,22 @@ export function SettingsTransferSection() {
               disabled={importIds.length === 0}
               onClick={() => void handleApply(pending)}
             >
-              選択した設定を適用
+              {t('import_apply')}
             </button>
             <button type="button" id="import-cancel" onClick={handleCancel}>
-              キャンセル
+              {t('cancel')}
             </button>
           </div>
 
           {formatExportedAt(pending.exportedAt) !== '' && (
             <p className="note">
-              {formatExportedAt(pending.exportedAt)} に書き出されたファイルです。
+              {t('import_exported_at_note', [formatExportedAt(pending.exportedAt)])}
             </p>
           )}
         </>
       )}
 
-      <p className="note">
-        適用すると、選んだ機能の設定は今の内容を置き換えます。選ばなかった機能はそのままです。
-      </p>
+      <p className="note">{t('transfer_footer_note')}</p>
     </section>
   );
 }

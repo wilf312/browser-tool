@@ -75,6 +75,23 @@ if (sourcemaps.length > 0) {
   );
 }
 
+const locales = new Set(
+  files
+    .map((path) => /^_locales\/([^/]+)\/messages\.json$/.exec(path)?.[1])
+    .filter((locale) => locale !== undefined),
+);
+if (locales.size === 0) {
+  fail(
+    'dist/_locales がありません。多言語化のメッセージがビルド結果に含まれているか確認してください',
+  );
+}
+if (manifest.default_locale !== undefined && !locales.has(manifest.default_locale)) {
+  fail(
+    `manifest.json の default_locale "${manifest.default_locale}" に対応する ` +
+      `_locales/${manifest.default_locale}/messages.json がありません`,
+  );
+}
+
 mkdirSync(releaseDir, { recursive: true });
 const zipPath = join(releaseDir, `${pkg.name}-${manifest.version}.zip`);
 rmSync(zipPath, { force: true });

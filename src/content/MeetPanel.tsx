@@ -14,6 +14,7 @@
 
 import type { KeyboardEvent } from 'react';
 import { formatClock, formatCountdown } from '../lib/format-time';
+import { t } from '../lib/i18n';
 import type { AutoJoinSnapshot } from '../lib/types';
 
 export const PANEL_STYLE = `
@@ -71,13 +72,13 @@ export const PANEL_STYLE = `
 export function describe({ state, joinAt }: AutoJoinSnapshot): string {
   switch (state) {
     case 'joined':
-      return '参加しました';
+      return t('panel_joined');
     case 'cancelled':
-      return '自動入室をキャンセルしました';
+      return t('panel_cancelled');
     case 'missed':
-      return '参加ボタンが見つかりませんでした';
+      return t('panel_missed');
     default:
-      return `${formatClock(joinAt)} に自動で参加します`;
+      return t('panel_waiting', [formatClock(joinAt)]);
   }
 }
 
@@ -111,16 +112,18 @@ export function MeetPanel({ snapshot, onCancel, onPostpone, onHasten, onDismiss 
         className={dismissible ? 'panel dismissible' : 'panel'}
         role={dismissible ? 'button' : undefined}
         tabIndex={dismissible ? 0 : undefined}
-        title={dismissible ? 'クリックで閉じる' : undefined}
+        title={dismissible ? t('panel_close_hint') : undefined}
         onClick={dismissible ? () => onDismiss() : undefined}
         onKeyDown={dismissible ? handleKeyDown : undefined}
       >
-        <div className="title">Meet 自動入室</div>
+        <div className="title">{t('feature_meet_auto_join')}</div>
         <div className="message">{describe(snapshot)}</div>
         {waiting ? (
-          <div className="countdown">残り {formatCountdown(snapshot.remainingMs)}</div>
+          <div className="countdown">
+            {t('panel_remaining', [formatCountdown(snapshot.remainingMs)])}
+          </div>
         ) : (
-          <div className="hint">クリックで閉じる</div>
+          <div className="hint">{t('panel_close_hint')}</div>
         )}
         <div className="actions" hidden={!waiting}>
           <button
@@ -128,22 +131,22 @@ export function MeetPanel({ snapshot, onCancel, onPostpone, onHasten, onDismiss 
             className="hasten"
             hidden={!waiting}
             disabled={!canHasten}
-            title="参加を1分早める"
+            title={t('panel_hasten_title')}
             onClick={onHasten}
           >
-            -1分
+            {t('panel_hasten')}
           </button>
           <button
             type="button"
             className="postpone"
             hidden={!waiting}
-            title="参加を1分先に延ばす"
+            title={t('panel_postpone_title')}
             onClick={onPostpone}
           >
-            +1分
+            {t('panel_postpone')}
           </button>
           <button type="button" className="cancel" hidden={!waiting} onClick={onCancel}>
-            キャンセル
+            {t('cancel')}
           </button>
         </div>
       </div>
