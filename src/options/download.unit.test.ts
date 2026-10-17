@@ -14,11 +14,11 @@ beforeEach(() => {
   Object.assign(URL, { createObjectURL, revokeObjectURL });
 
   clicked = [];
-  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
-    function (this: HTMLAnchorElement) {
-      clicked.push(this);
-    },
-  );
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+    this: HTMLAnchorElement,
+  ) {
+    clicked.push(this);
+  });
 });
 
 afterEach(() => {
