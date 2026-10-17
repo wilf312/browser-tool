@@ -362,11 +362,11 @@ describe('settings import / export', () => {
       }),
       revokeObjectURL: vi.fn(),
     });
-    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
-      function (this: HTMLAnchorElement) {
-        downloads.push({ filename: this.download, blob: pendingBlob as unknown as Blob });
-      },
-    );
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      downloads.push({ filename: this.download, blob: pendingBlob as unknown as Blob });
+    });
   });
 
   afterEach(() => {
