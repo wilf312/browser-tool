@@ -397,15 +397,33 @@ describe('meet content script', () => {
     expect(dialog.answers()).toBe(0);
   });
 
-  it('takes the joined panel down as soon as the call starts', async () => {
+  it('keeps 参加しました up for its usual time once the call starts', async () => {
     await run();
     await tick(at(10, 15));
     expect(panelText('.message')).toBe('参加しました');
 
     inCall = true;
     await tick();
+    expect(panelText('.message')).toBe('参加しました');
+    // Only the URL poll and the dismiss timer are left.
+    expect(vi.getTimerCount()).toBe(2);
+
+    await vi.advanceTimersByTimeAsync(4999);
+    expect(panel()).toBeTruthy();
+
+    await vi.advanceTimersByTimeAsync(1);
     expect(panel()).toBeNull();
-    // The dismiss timer went with the panel instead of firing later.
+    expect(vi.getTimerCount()).toBe(1);
+  });
+
+  it('still lets 参加しました be clicked away in the call', async () => {
+    await run();
+    await tick(at(10, 15));
+    inCall = true;
+    await tick();
+
+    panel()?.shadowRoot?.querySelector<HTMLElement>('.panel')?.click();
+    expect(panel()).toBeNull();
     expect(vi.getTimerCount()).toBe(1);
   });
 

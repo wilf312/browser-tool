@@ -12,8 +12,9 @@
  * for.
  *
  * Once we are in the call — joined by us or by hand — there is nothing left to
- * count down to or to wait for, so the panel and the watch both go, timers and
- * all, until another meeting is opened.
+ * count down to or to wait for, so the countdown and the watch both go, timers
+ * and all, until another meeting is opened. An outcome already on screen
+ * (参加しました) still gets its few seconds before its dismiss timer takes it.
  */
 
 import { createAutoJoin, type AutoJoinController } from '../lib/meet-auto-join';
@@ -145,6 +146,11 @@ export function start({
     watchTimer = null;
   }
 
+  /** In the call only a running countdown has to go; a settled outcome is there to be read. */
+  function outlivesCall(current: Session) {
+    return inCall && current.controller.getSnapshot().state !== 'waiting';
+  }
+
   function sync() {
     const onMeeting = Boolean(settings?.enabled) && isMeetingUrl(getUrl());
     // Already in the call when we get here (the feature switched on mid-call,
@@ -152,7 +158,7 @@ export function start({
     if (onMeeting && !inCall) inCall = isInCall();
     const wanted = onMeeting && !inCall;
     if (wanted && !session) startSession();
-    if (!wanted && session) stopSession();
+    if (!wanted && session && !outlivesCall(session)) stopSession();
     // Not tied to the session: the dialog turns up long after the panel is gone.
     if (wanted) startWatch();
     else stopWatch();
