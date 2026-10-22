@@ -194,7 +194,7 @@ https://b.atlassian.net/browse/XAPP-134
 このファイルから引きます。既定ロケール（`default_locale`）は `ja` です。
 
 - 対応ロケールは `public/_locales/` のディレクトリで決まります。今は `ja` / `en` / `es` /
-  `zh_CN`（簡体字）です
+  `zh_CN`（簡体字）/ `de` です
 - 文言を足す・変えるときは `public/_locales/ja/messages.json` を正とし、他のロケールにも
   同じキーを足します。キーが無いロケールでは既定ロケール（`ja`）にフォールバックします
 - コードからは `src/lib/i18n.ts` の `t(key, substitutions?)` で引きます。キーは

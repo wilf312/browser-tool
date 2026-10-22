@@ -408,6 +408,111 @@ Chrome 的同步存储中，不会发送到任何外部服务器。没有广告�
 https://github.com/wilf312/browser-tool
 ```
 
+## ドイツ語（de）の掲載情報
+
+`public/_locales/de/messages.json` を追加したので、ダッシュボードの言語「ドイツ語」にも
+同じ内容を登録します。カテゴリと「プライバシーへの取り組み」タブは全言語共通です。
+
+### 名前（最大 75 文字）
+
+```
+Nanatsudougu
+```
+
+### 概要 / 短い説明（最大 132 文字）
+
+```
+Leitet stillgelegte Jira-Domains mit unverändertem Pfad um und tritt Google Meet pünktlich zur Startzeit automatisch bei.
+```
+
+### 詳細説明（最大 16,000 文字）
+
+```
+Übernimmt die kleinen, sich wiederholenden Handgriffe im Browser während Ihres Arbeitstags. Bisher
+gibt es drei Werkzeuge. Keines davon tut standardmäßig etwas – jedes reagiert nur auf das, was Sie
+einrichten.
+
+■ Jira-Domain-Weiterleitung
+
+Wenn Sie eine Atlassian-Domain (atlassian.net) öffnen, die durch eine Migration oder
+Zusammenlegung stillgelegt wurde, werden Sie automatisch zur neuen Domain weitergeleitet.
+
+  https://a.atlassian.net/browse/XAPP-134
+    ↓
+  https://b.atlassian.net/browse/XAPP-134
+
+・Ersetzt wird nur der Hostname. Pfad, Query-String und Hash bleiben unverändert, sodass alte
+  Lesezeichen und Links in Tickets oder Slack weiterhin funktionieren
+・Die Umleitung geschieht im Browser, bevor die Anfrage gesendet wird – die stillgelegte Domain
+  wird also nie tatsächlich aufgerufen
+・Sie können beliebig viele Paare aus Quelle und Ziel anlegen und jede Zeile einzeln ein- oder
+  ausschalten
+
+■ Automatischer Google-Meet-Beitritt
+
+Lassen Sie den Wartebildschirm einer Besprechung geöffnet, und sobald die nächste Startzeit
+erreicht ist, wird auf „Teilnehmen“ geklickt.
+
+  Wartebildschirm um 10:07 öffnen → um 10:15 automatisch beitreten
+
+・Standardmäßig aus. Ohne Ihr Zutun einer Besprechung beizutreten ist eine große Überraschung,
+  daher läuft es nur, wenn Sie es einschalten
+・Das Startintervall kann 5 / 10 / 15 / 30 / 60 Minuten betragen (Standard: 15 Minuten =
+  :00 :15 :30 :45)
+・Unten links auf dem Wartebildschirm erscheint „Automatischer Beitritt um 10:15“ mit einem
+  Countdown, und Sie können direkt dort mit „Abbrechen“ abbrechen
+・Um nur den Zeitpunkt zu verschieben, verlegen die Schaltflächen „+1 Min.“ und „-1 Min.“ den
+  Beitritt um eine Minute nach hinten bzw. vorne
+・Fragt Meet „Sie haben den Anruf noch nicht verlassen – möchten Sie weiter warten?“, klickt die
+  Erweiterung für Sie auf „Weiter warten“. Bleibt der Dialog unbeantwortet, fliegen Sie aus dem
+  Wartebereich
+・Der Kamera- und Mikrofonstatus, den Sie auf dem Wartebildschirm eingestellt haben, wird
+  unverändert übernommen. Die Erweiterung ändert daran nichts
+
+■ Automatisches Neuladen von Seiten
+
+Lädt eine Seite, die Sie geöffnet lassen, um auf Neuigkeiten zu warten, im festgelegten Intervall
+und für die festgelegte Dauer immer wieder neu.
+
+  Alle 5 Minuten für 1 Stunde → nach 1 Stunde stoppt es automatisch
+
+・Öffnen Sie die Erweiterung über das Symbol in der Symbolleiste, wird der gerade angezeigte Tab
+  zum Ziel
+・Das Neuladeintervall kann 5 / 10 / 30 Minuten betragen, die Dauer 1 bis 8 Stunden
+・Ist die Dauer abgelaufen, stoppt es von selbst – kein versehentliches stundenlanges Neuladen
+・Der Timer läuft weiter, wenn Sie den Einstellungsbildschirm schließen. Öffnen Sie ihn erneut,
+  sehen Sie die verbleibende Zeit und können dort auf „Stoppen“ klicken. Auch das Schließen des
+  Tabs beendet ihn
+
+■ Einstellungen mitnehmen
+
+Die Einstellungen werden über Ihr Chrome-Konto synchronisiert und stehen so auf jedem Gerät
+bereit, auf dem Sie mit demselben Konto angemeldet sind. Sie können sie außerdem in eine
+JSON-Datei exportieren und wieder einlesen und dabei wählen, welche Funktionen geschrieben und
+welche gelesen werden. Ein Import ersetzt nur die ausgewählten Funktionen, sodass Sie auch nur die
+Einstellungen einer einzelnen Funktion auf ein anderes Gerät übertragen können.
+
+■ Was nicht erfasst wird
+
+Browserverlauf, Ihre Eingaben, Ton oder Bild von Besprechungen und personenbezogene Daten werden
+weder erfasst noch gesendet. Die Einstellungen werden nur im synchronisierten Speicher von Chrome
+abgelegt; nichts geht an einen externen Server. Es gibt weder Werbung noch Analysetools.
+
+■ Berechtigungen
+
+・declarativeNetRequest – zum Weiterleiten der von Ihnen eingetragenen Domains
+・storage – zum Speichern Ihrer Einstellungen
+・alarms – um zu wissen, wann das nächste automatische Neuladen fällig ist
+・activeTab – damit das automatische Neuladen nur den Tab betrifft, auf dem Sie das Symbol in der
+  Symbolleiste angeklickt haben
+・*://*.atlassian.net/* – um Weiterleitungen auf atlassian.net-Domains zu beschränken
+・meet.google.com – um den Countdown auf dem Wartebildschirm anzuzeigen und auf „Teilnehmen“
+  sowie im Dialog, der fragt, ob Sie weiter warten möchten, auf „Weiter warten“ zu klicken
+
+Der Quellcode ist auf GitHub veröffentlicht.
+https://github.com/wilf312/browser-tool
+```
+
 ## 「プライバシーへの取り組み」タブ
 
 ここが埋まっていないと、掲載情報を書いても公開できません。ダッシュボードが出す

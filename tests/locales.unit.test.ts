@@ -39,7 +39,7 @@ describe('_locales', () => {
   });
 
   it('ships the locales the store listing documents', () => {
-    expect(new Set(locales)).toEqual(new Set(['en', 'es', 'ja', 'zh_CN']));
+    expect(new Set(locales)).toEqual(new Set(['de', 'en', 'es', 'ja', 'zh_CN']));
   });
 
   it.each(locales)('%s defines exactly the same keys as the default locale', (locale) => {
