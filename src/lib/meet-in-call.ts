@@ -14,7 +14,13 @@
 import { clickableButtons, exactLabelsOf } from './page-buttons';
 
 /** Matched against the whole label, case insensitively. */
-export const LEAVE_CALL_LABELS = ['通話から退出', 'Leave call'];
+export const LEAVE_CALL_LABELS = [
+  '通話から退出',
+  'Leave call',
+  'Anruf verlassen',
+  'Salir de la llamada',
+  '退出通话',
+];
 
 const DIALOG_SELECTOR = 'dialog, [role="dialog"], [role="alertdialog"]';
 

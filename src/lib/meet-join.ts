@@ -8,8 +8,26 @@
 
 import { clickableButtons, exactLabelsOf, labelOf } from './page-buttons';
 
-/** Matched as a substring, most specific first. */
-export const JOIN_LABELS = ['今すぐ参加', 'Join now', '参加をリクエスト', 'Ask to join'];
+/**
+ * Matched as a substring, most specific first: joining outright in every
+ * language before requesting to join in any of them. Japanese and English, then
+ * the other locales the extension ships (de / es / zh_CN). Spanish Meet words
+ * the same button in more than one way, so it gets every wording seen.
+ */
+export const JOIN_LABELS = [
+  '今すぐ参加',
+  'Join now',
+  'Jetzt teilnehmen',
+  'Unirse ahora',
+  'Unirme ahora',
+  '立即加入',
+  '参加をリクエスト',
+  'Ask to join',
+  'Teilnahme erbitten',
+  'Solicitar unirte',
+  'Pedir para unirte',
+  '申请加入',
+];
 
 /**
  * Matched only against the whole label: a substring match on `参加` would also
