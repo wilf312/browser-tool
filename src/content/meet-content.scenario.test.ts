@@ -12,6 +12,7 @@ function at(hours: number, minutes: number, seconds = 0): Date {
 let time: Date;
 let url: string;
 let joinButton: { click: Mock<() => void> } | null;
+let inCall: boolean;
 let settingsListener: ((settings: MeetSettings) => void) | undefined;
 let running: Running | null;
 
@@ -69,10 +70,11 @@ async function run(settings: MeetSettings = { enabled: true, intervalMinutes: 15
       settingsListener = cb;
     },
     findButton: () => joinButton,
+    isInCall: () => inCall,
     now: () => time,
     tickMs: 1000,
     urlPollMs: 1000,
-    keepWaitingPollMs: 1000,
+    watchPollMs: 1000,
     dismissMs: 6000,
   });
   await running.ready;
@@ -90,6 +92,7 @@ beforeEach(() => {
   time = at(10, 7);
   url = MEETING_URL;
   joinButton = { click: vi.fn<() => void>() };
+  inCall = false;
   settingsListener = undefined;
   running = null;
 });
@@ -366,6 +369,102 @@ describe('meet content script', () => {
     const dialog = showKeepWaitingDialog();
     await tick();
     expect(dialog.answers()).toBe(0);
+  });
+
+  it('takes the countdown down once the user joins by hand', async () => {
+    await run();
+    const timersWhileWaiting = vi.getTimerCount();
+
+    inCall = true;
+    await tick(at(10, 10));
+    expect(panel()).toBeNull();
+    // The countdown tick and the page watch are gone; only the URL poll is left.
+    expect(vi.getTimerCount()).toBe(timersWhileWaiting - 2);
+
+    joinButton = { click: vi.fn<() => void>() };
+    await tick(at(10, 15));
+    expect(joinButton.click).not.toHaveBeenCalled();
+    expect(panel()).toBeNull();
+  });
+
+  it('stops answering the dialog once in the call', async () => {
+    await run();
+    inCall = true;
+    await tick();
+
+    const dialog = showKeepWaitingDialog();
+    await tick();
+    expect(dialog.answers()).toBe(0);
+  });
+
+  it('keeps 参加しました up for its usual time once the call starts', async () => {
+    await run();
+    await tick(at(10, 15));
+    expect(panelText('.message')).toBe('参加しました');
+
+    inCall = true;
+    await tick();
+    expect(panelText('.message')).toBe('参加しました');
+    // Only the URL poll and the dismiss timer are left.
+    expect(vi.getTimerCount()).toBe(2);
+
+    await vi.advanceTimersByTimeAsync(4999);
+    expect(panel()).toBeTruthy();
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(panel()).toBeNull();
+    expect(vi.getTimerCount()).toBe(1);
+  });
+
+  it('still lets 参加しました be clicked away in the call', async () => {
+    await run();
+    await tick(at(10, 15));
+    inCall = true;
+    await tick();
+
+    panel()?.shadowRoot?.querySelector<HTMLElement>('.panel')?.click();
+    expect(panel()).toBeNull();
+    expect(vi.getTimerCount()).toBe(1);
+  });
+
+  it('shows no countdown when the page is already in the call', async () => {
+    inCall = true;
+    await run();
+
+    expect(panel()).toBeNull();
+    expect(vi.getTimerCount()).toBe(1);
+  });
+
+  it('shows no countdown when the feature is switched on mid-call', async () => {
+    await run({ enabled: false, intervalMinutes: 15 });
+    inCall = true;
+
+    settingsListener?.({ enabled: true, intervalMinutes: 15 });
+    expect(panel()).toBeNull();
+  });
+
+  it('does not start over on the same meeting after leaving the call', async () => {
+    await run();
+    inCall = true;
+    await tick();
+    expect(panel()).toBeNull();
+
+    inCall = false;
+    settingsListener?.({ enabled: true, intervalMinutes: 30 });
+    await tick();
+    expect(panel()).toBeNull();
+  });
+
+  it('counts down again when another meeting is opened after the call', async () => {
+    await run();
+    inCall = true;
+    await tick();
+    expect(panel()).toBeNull();
+
+    inCall = false;
+    url = 'https://meet.google.com/klm-nopq-rst';
+    await tick();
+    expect(panelText('.message')).toBe('10:15 に自動で参加します');
   });
 
   it('stops cleanly', async () => {

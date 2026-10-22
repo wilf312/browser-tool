@@ -70,6 +70,20 @@ describe('start with its own defaults', () => {
     expect(panelText('.message')).toBe('参加しました');
   });
 
+  it('takes the panel down once the real hang-up button shows up', async () => {
+    running = start({ getUrl: () => MEETING_URL });
+    await running.ready;
+    expect(panel()).toBeTruthy();
+
+    const hangUp = document.createElement('button');
+    hangUp.setAttribute('aria-label', '通話から退出');
+    document.body.append(hangUp);
+    await vi.advanceTimersByTimeAsync(1000);
+
+    expect(panel()).toBeNull();
+    expect(running.getSession()).toBeNull();
+  });
+
   it('follows the settings written by the options page', async () => {
     running = start({ getUrl: () => MEETING_URL });
     await running.ready;

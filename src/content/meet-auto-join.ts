@@ -10,9 +10,15 @@
  * drops you out of the lobby when nobody answers it. That watch outlives the
  * countdown panel: the dialog only shows up minutes after the join was asked
  * for.
+ *
+ * Once we are in the call — joined by us or by hand — there is nothing left to
+ * count down to or to wait for, so the countdown and the watch both go, timers
+ * and all, until another meeting is opened. An outcome already on screen
+ * (参加しました) still gets its few seconds before its dismiss timer takes it.
  */
 
 import { createAutoJoin, type AutoJoinController } from '../lib/meet-auto-join';
+import { isInCall as isInCallOnPage } from '../lib/meet-in-call';
 import { findJoinButton } from '../lib/meet-join';
 import { findKeepWaitingButton } from '../lib/meet-keep-waiting';
 import { isMeetingUrl } from '../lib/meet-page';
@@ -22,8 +28,8 @@ import { createPanel, type Panel } from './meet-panel';
 
 const TICK_MS = 1000;
 const URL_POLL_MS = 1000;
-/** How often the page is checked for the 「待機を続けますか？」 dialog. */
-const KEEP_WAITING_POLL_MS = 1000;
+/** How often the page is checked for the 「待機を続けますか？」 dialog and for being in the call. */
+const WATCH_POLL_MS = 1000;
 /** How long the outcome stays on screen if the user does not click it away. */
 const DISMISS_MS = 6000;
 
@@ -34,10 +40,11 @@ export interface StartOptions {
   onSettingsChanged?: (callback: (settings: MeetSettings) => void) => void;
   findButton?: () => { click: () => void } | null | undefined;
   findKeepWaiting?: () => { click: () => void } | null | undefined;
+  isInCall?: () => boolean;
   now?: () => Date;
   tickMs?: number;
   urlPollMs?: number;
-  keepWaitingPollMs?: number;
+  watchPollMs?: number;
   dismissMs?: number;
 }
 
@@ -62,16 +69,19 @@ export function start({
   onSettingsChanged = onMeetSettingsChanged,
   findButton = () => findJoinButton(document),
   findKeepWaiting = () => findKeepWaitingButton(document),
+  isInCall = () => isInCallOnPage(document),
   now = () => new Date(),
   tickMs = TICK_MS,
   urlPollMs = URL_POLL_MS,
-  keepWaitingPollMs = KEEP_WAITING_POLL_MS,
+  watchPollMs = WATCH_POLL_MS,
   dismissMs = DISMISS_MS,
 }: StartOptions = {}): Running {
   let settings: MeetSettings | null = null;
   let session: Session | null = null;
-  let keepWaitingTimer: ReturnType<typeof setInterval> | null = null;
+  let watchTimer: ReturnType<typeof setInterval> | null = null;
   let url = getUrl();
+  /** We made it into the call on this URL; nothing runs here until it changes. */
+  let inCall = false;
 
   function stopSession() {
     if (!session) return;
@@ -117,30 +127,48 @@ export function start({
     panel.update(controller.getSnapshot());
   }
 
-  function startKeepWaiting() {
-    if (keepWaitingTimer !== null) return;
-    keepWaitingTimer = setInterval(() => findKeepWaiting()?.click(), keepWaitingPollMs);
+  function startWatch() {
+    if (watchTimer !== null) return;
+    watchTimer = setInterval(() => {
+      // Joined, by us or by hand: the countdown and this watch are done.
+      if (isInCall()) {
+        inCall = true;
+        sync();
+        return;
+      }
+      findKeepWaiting()?.click();
+    }, watchPollMs);
   }
 
-  function stopKeepWaiting() {
-    if (keepWaitingTimer === null) return;
-    clearInterval(keepWaitingTimer);
-    keepWaitingTimer = null;
+  function stopWatch() {
+    if (watchTimer === null) return;
+    clearInterval(watchTimer);
+    watchTimer = null;
+  }
+
+  /** In the call only a running countdown has to go; a settled outcome is there to be read. */
+  function outlivesCall(current: Session) {
+    return inCall && current.controller.getSnapshot().state !== 'waiting';
   }
 
   function sync() {
-    const wanted = Boolean(settings?.enabled) && isMeetingUrl(getUrl());
+    const onMeeting = Boolean(settings?.enabled) && isMeetingUrl(getUrl());
+    // Already in the call when we get here (the feature switched on mid-call,
+    // say): no countdown to show in the first place.
+    if (onMeeting && !inCall) inCall = isInCall();
+    const wanted = onMeeting && !inCall;
     if (wanted && !session) startSession();
-    if (!wanted && session) stopSession();
+    if (!wanted && session && !outlivesCall(session)) stopSession();
     // Not tied to the session: the dialog turns up long after the panel is gone.
-    if (wanted) startKeepWaiting();
-    else stopKeepWaiting();
+    if (wanted) startWatch();
+    else stopWatch();
   }
 
   const urlTimer = setInterval(() => {
     const current = getUrl();
     if (current === url) return;
     url = current;
+    inCall = false;
     stopSession(); // a different meeting deserves its own countdown
     sync();
   }, urlPollMs);
@@ -161,7 +189,7 @@ export function start({
     ready,
     stop() {
       clearInterval(urlTimer);
-      stopKeepWaiting();
+      stopWatch();
       stopSession();
     },
     getSession: () => session,
