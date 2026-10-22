@@ -16,6 +16,32 @@ describe('findJoinButton', () => {
     expect(findJoinButton(document)?.textContent).toBe('Join now');
   });
 
+  it.each([
+    ['German', 'Jetzt teilnehmen'],
+    ['Spanish', 'Unirse ahora'],
+    ['Spanish (alternate wording)', 'Unirme ahora'],
+    ['Chinese', '立即加入'],
+  ])('finds the button by its %s label', (_language, label) => {
+    document.body.innerHTML = `<button>${label}</button>`;
+    expect(findJoinButton(document)?.textContent).toBe(label);
+  });
+
+  it.each([
+    ['German', 'Teilnahme erbitten'],
+    ['Spanish', 'Solicitar unirte'],
+    ['Spanish (alternate wording)', 'Pedir para unirte'],
+    ['Chinese', '申请加入'],
+  ])('finds the %s request-to-join button', (_language, label) => {
+    document.body.innerHTML = `<button>${label}</button>`;
+    expect(findJoinButton(document)?.textContent).toBe(label);
+  });
+
+  it('prefers joining outright over requesting to join in another language too', () => {
+    document.body.innerHTML =
+      '<button>Teilnahme erbitten</button><button>Jetzt teilnehmen</button>';
+    expect(findJoinButton(document)?.textContent).toBe('Jetzt teilnehmen');
+  });
+
   it('finds a role=button element', () => {
     document.body.innerHTML = '<div role="button" aria-label="今すぐ参加"></div>';
     expect(findJoinButton(document)?.getAttribute('aria-label')).toBe('今すぐ参加');

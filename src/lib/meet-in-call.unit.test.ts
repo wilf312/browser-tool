@@ -16,6 +16,15 @@ describe('isInCall', () => {
     expect(isInCall(document)).toBe(true);
   });
 
+  it.each([
+    ['German', 'Anruf verlassen'],
+    ['Spanish', 'Salir de la llamada'],
+    ['Chinese', '退出通话'],
+  ])('sees the %s hang-up button', (_language, label) => {
+    document.body.innerHTML = `<button aria-label="${label}"><i>call_end</i></button>`;
+    expect(isInCall(document)).toBe(true);
+  });
+
   it('matches the label whatever its case and surrounding whitespace', () => {
     document.body.innerHTML = '<div role="button">  LEAVE CALL  </div>';
     expect(isInCall(document)).toBe(true);
