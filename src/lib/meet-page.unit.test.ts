@@ -8,11 +8,20 @@ describe('isMeetingUrl', () => {
     expect(isMeetingUrl('https://meet.google.com/abc-defg-hij#hash')).toBe(true);
   });
 
+  it('accepts a meeting code under the meet/ prefix', () => {
+    expect(isMeetingUrl('https://meet.google.com/meet/abc-defg-hij')).toBe(true);
+    expect(isMeetingUrl('https://meet.google.com/meet/abc-defg-hij?authuser=1')).toBe(true);
+  });
+
   it('rejects the pages without a join button', () => {
     expect(isMeetingUrl('https://meet.google.com/')).toBe(false);
     expect(isMeetingUrl('https://meet.google.com/new')).toBe(false);
     expect(isMeetingUrl('https://meet.google.com/landing')).toBe(false);
     expect(isMeetingUrl('https://meet.google.com/lookup/abcdefghij')).toBe(false);
+    expect(isMeetingUrl('https://meet.google.com/meet')).toBe(false);
+    expect(isMeetingUrl('https://meet.google.com/meet/new')).toBe(false);
+    expect(isMeetingUrl('https://meet.google.com/lookup/abc-defg-hij')).toBe(false);
+    expect(isMeetingUrl('https://meet.google.com/meet/meet/abc-defg-hij')).toBe(false);
   });
 
   it('rejects other hosts', () => {
