@@ -61,7 +61,7 @@ https://b.atlassian.net/browse/XAPP-134
 
 ## Meet 自動入室
 
-会議の待機画面（`https://meet.google.com/abc-defg-hij`）を開いておくと、**次の開始時刻**になった時点で「参加」ボタンをクリックします。
+会議の待機画面（`https://meet.google.com/abc-defg-hij` または `https://meet.google.com/meet/abc-defg-hij`）を開いておくと、**次の開始時刻**になった時点で「参加」ボタンをクリックします。
 
 ```
 10:07 に待機画面を開く → 10:15 に自動で入室
@@ -80,7 +80,7 @@ https://b.atlassian.net/browse/XAPP-134
 
 ### しくみ
 
-- 対象は会議コードの URL（`https://meet.google.com/abc-defg-hij`）だけです。トップページや `/new` では何もしません
+- 対象は会議コードの URL（`https://meet.google.com/abc-defg-hij`、および `meet/` が付いた `https://meet.google.com/meet/abc-defg-hij`）だけです。トップページや `/new` では何もしません
 - 現在時刻から見て次の区切り（既定は 15 分刻み）を入室時刻とします。ちょうど区切りの時刻に開いた場合は、その次の区切りが対象になります
 - 「参加」ボタンは待機画面の準備ができてから現れるため、入室時刻になっても見つからない場合は最大 2 分間探し続けます。それでも見つからなければ諦めます（`参加ボタンが見つかりませんでした`）
 - ボタンは表示ラベルで探します（`今すぐ参加` / `Join now` / `参加をリクエスト` / `Ask to join`）。`参加者` のような別のボタンを誤って押さないよう、`参加` だけは完全一致のときのみ対象にします
