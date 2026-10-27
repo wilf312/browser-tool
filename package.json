@@ -1,6 +1,6 @@
 {
   "name": "nanatsudougu",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "Chrome extension that redirects retired Atlassian (Jira) domains keeping the pathname, and joins a Google Meet call at the next scheduled start time",
   "keywords": [],
