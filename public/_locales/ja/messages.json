@@ -337,5 +337,14 @@
   "panel_postpone_title": {
     "message": "参加を1分先に延ばす",
     "description": "Tooltip of the postpone button."
+  },
+
+  "menu_copy_page_title": {
+    "message": "ページのタイトルをコピー",
+    "description": "Context menu item that copies the title of the page."
+  },
+  "menu_copy_page_url": {
+    "message": "ページの URL をコピー",
+    "description": "Context menu item that copies the URL of the page."
   }
 }

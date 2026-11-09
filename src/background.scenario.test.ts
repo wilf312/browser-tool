@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { STORAGE_KEY } from './lib/storage';
 import { RELOAD_JOBS_KEY, reloadAlarmName } from './lib/reload-jobs';
+import { COPY_TITLE_MENU_ID, COPY_URL_MENU_ID } from './lib/page-copy';
 import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from '../tests/fake-chrome';
 
 const RULES = [{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }];
@@ -23,6 +24,18 @@ async function boot(): Promise<void> {
   vi.resetModules();
   await import('./background');
   await vi.waitFor(() => expect(chrome.dnr.updateDynamicRules).toHaveBeenCalled());
+}
+
+/** Boot the worker next to the offscreen document, and record what reaches the clipboard. */
+async function bootWithOffscreen(): Promise<string[]> {
+  await boot();
+  await import('./offscreen/main');
+  const copied: string[] = [];
+  document.execCommand = vi.fn(() => {
+    copied.push(document.querySelector('textarea')?.value ?? '');
+    return true;
+  });
+  return copied;
 }
 
 function addedHosts(call: number): unknown[] {
@@ -53,8 +66,9 @@ describe('background service worker', () => {
   it('registers for the install and the startup events', async () => {
     await boot();
 
-    expect(chrome.runtime.installed).toHaveLength(1);
-    expect(chrome.runtime.startup).toHaveLength(1);
+    // One for the redirect rules, one for the page copy menu.
+    expect(chrome.runtime.installed).toHaveLength(2);
+    expect(chrome.runtime.startup).toHaveLength(2);
   });
 
   it('re-syncs when the browser installs the extension', async () => {
@@ -180,5 +194,100 @@ describe('reload timers', () => {
 
     await vi.waitFor(() => expect(logged).toHaveBeenCalled());
     expect(logged.mock.calls[0]).toContain(error);
+  });
+});
+
+describe('page copy menu', () => {
+  const TAB = { id: 7, title: 'XAPP-134 - Jira', url: 'https://b.atlassian.net/browse/XAPP-134' };
+
+  afterEach(() => {
+    Reflect.deleteProperty(document, 'execCommand');
+  });
+
+  it('adds the two items to every context menu when the extension is installed', async () => {
+    await boot();
+
+    chrome.emitRuntime('installed');
+
+    await vi.waitFor(() => expect(chrome.contextMenus.create).toHaveBeenCalledTimes(2));
+    expect(chrome.contextMenus.removeAll).toHaveBeenCalledBefore(chrome.contextMenus.create);
+    expect(chrome.contextMenus.create).toHaveBeenCalledWith({
+      id: COPY_TITLE_MENU_ID,
+      title: 'ページのタイトルをコピー',
+      contexts: ['all'],
+    });
+    expect(chrome.contextMenus.create).toHaveBeenCalledWith({
+      id: COPY_URL_MENU_ID,
+      title: 'ページの URL をコピー',
+      contexts: ['all'],
+    });
+  });
+
+  it('builds the items again when the browser starts up', async () => {
+    await boot();
+
+    chrome.emitRuntime('startup');
+
+    await vi.waitFor(() => expect(chrome.contextMenus.create).toHaveBeenCalledTimes(2));
+    expect(chrome.contextMenus.removeAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs instead of throwing when the items cannot be set up', async () => {
+    await boot();
+    const error = new Error('menus are unavailable');
+    chrome.contextMenus.removeAll.mockRejectedValue(error);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    chrome.emitRuntime('installed');
+
+    await vi.waitFor(() => expect(logged).toHaveBeenCalled());
+    expect(logged.mock.calls[0]).toContain(error);
+    expect(chrome.contextMenus.create).not.toHaveBeenCalled();
+  });
+
+  it('copies the title of the tab', async () => {
+    const copied = await bootWithOffscreen();
+
+    chrome.emitMenuClick({ menuItemId: COPY_TITLE_MENU_ID, pageUrl: TAB.url }, TAB);
+
+    await vi.waitFor(() => expect(copied).toEqual(['XAPP-134 - Jira']));
+    await vi.waitFor(() => expect(chrome.offscreenOpen).toBe(false));
+    expect(document.querySelector('textarea')).toBeNull();
+  });
+
+  it('copies the URL of the tab', async () => {
+    const copied = await bootWithOffscreen();
+
+    chrome.emitMenuClick({ menuItemId: COPY_URL_MENU_ID, pageUrl: TAB.url }, TAB);
+
+    await vi.waitFor(() => expect(copied).toEqual([TAB.url]));
+  });
+
+  it('falls back to the URL of the page when the tab does not tell it', async () => {
+    const copied = await bootWithOffscreen();
+
+    chrome.emitMenuClick({ menuItemId: COPY_URL_MENU_ID, pageUrl: TAB.url }, { id: 7 });
+
+    await vi.waitFor(() => expect(copied).toEqual([TAB.url]));
+  });
+
+  it('leaves the clipboard alone when the page has no title', async () => {
+    await bootWithOffscreen();
+
+    chrome.emitMenuClick({ menuItemId: COPY_TITLE_MENU_ID, pageUrl: TAB.url }, { id: 7 });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(chrome.offscreen.createDocument).not.toHaveBeenCalled();
+  });
+
+  it('logs instead of throwing when the copy fails', async () => {
+    await bootWithOffscreen();
+    document.execCommand = vi.fn(() => false);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    chrome.emitMenuClick({ menuItemId: COPY_URL_MENU_ID, pageUrl: TAB.url }, TAB);
+
+    await vi.waitFor(() => expect(logged).toHaveBeenCalled());
+    expect(String(logged.mock.calls[0][1])).toContain('could not copy');
   });
 });

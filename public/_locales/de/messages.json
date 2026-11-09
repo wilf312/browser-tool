@@ -337,5 +337,14 @@
   "panel_postpone_title": {
     "message": "1 Minute später beitreten",
     "description": "Tooltip of the postpone button."
+  },
+
+  "menu_copy_page_title": {
+    "message": "Seitentitel kopieren",
+    "description": "Context menu item that copies the title of the page."
+  },
+  "menu_copy_page_url": {
+    "message": "Seiten-URL kopieren",
+    "description": "Context menu item that copies the URL of the page."
   }
 }

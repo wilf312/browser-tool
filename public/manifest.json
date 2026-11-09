@@ -4,7 +4,15 @@
   "version": "2.1.0",
   "description": "__MSG_app_description__",
   "default_locale": "ja",
-  "permissions": ["declarativeNetRequest", "storage", "alarms", "activeTab"],
+  "permissions": [
+    "declarativeNetRequest",
+    "storage",
+    "alarms",
+    "activeTab",
+    "contextMenus",
+    "offscreen",
+    "clipboardWrite"
+  ],
   "host_permissions": ["*://*.atlassian.net/*"],
   "background": {
     "service_worker": "background.js",

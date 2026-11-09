@@ -1,6 +1,6 @@
 /**
- * The two entry points are import-time side effects, so each test re-imports
- * the module under a fresh mock.
+ * The entry points are import-time side effects, so each test re-imports the
+ * module under a fresh mock.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -59,5 +59,47 @@ describe('settings page entry point', () => {
       await expect(import('./options/main')).resolves.toBeDefined();
     });
     expect(document.body.innerHTML).toBe('');
+  });
+});
+
+describe('offscreen document entry point', () => {
+  afterEach(() => {
+    Reflect.deleteProperty(document, 'execCommand');
+  });
+
+  it('copies the text the service worker sends, and cleans up after itself', async () => {
+    const chrome = installFakeChrome();
+    const copied: string[] = [];
+    document.execCommand = vi.fn((command: string) => {
+      copied.push(`${command}:${document.querySelector('textarea')?.value ?? ''}`);
+      return true;
+    });
+    await import('./offscreen/main');
+
+    const response = await chrome.sendMessage({ type: 'copy-to-clipboard', text: 'hello' });
+
+    expect(response).toEqual({ ok: true });
+    expect(copied).toEqual(['copy:hello']);
+    expect(document.body.innerHTML).toBe('');
+  });
+
+  it('reports a copy the browser refused', async () => {
+    const chrome = installFakeChrome();
+    document.execCommand = vi.fn(() => false);
+    await import('./offscreen/main');
+
+    const response = await chrome.sendMessage({ type: 'copy-to-clipboard', text: 'hello' });
+
+    expect(response).toEqual({ ok: false });
+  });
+
+  it('leaves messages that are not copies unanswered', async () => {
+    const chrome = installFakeChrome();
+    document.execCommand = vi.fn(() => true);
+    await import('./offscreen/main');
+
+    expect(await chrome.sendMessage({ type: 'something-else' })).toBeUndefined();
+    expect(await chrome.sendMessage({ type: 'copy-to-clipboard' })).toBeUndefined();
+    expect(document.execCommand).not.toHaveBeenCalled();
   });
 });

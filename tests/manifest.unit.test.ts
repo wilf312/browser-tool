@@ -65,6 +65,15 @@ describe('manifest.json', () => {
     expect(manifest.permissions).toContain('activeTab');
   });
 
+  it('requests the permissions the page copy menu needs', () => {
+    // The service worker has no document, so an offscreen one does the copy;
+    // picking a menu item grants activeTab, which is how the tab's title is read.
+    expect(manifest.permissions).toContain('contextMenus');
+    expect(manifest.permissions).toContain('offscreen');
+    expect(manifest.permissions).toContain('clipboardWrite');
+    expect(manifest.permissions).not.toContain('tabs');
+  });
+
   it('runs the background script as a module', () => {
     expect(manifest.background.type).toBe('module');
   });

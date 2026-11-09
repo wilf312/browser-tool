@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react';
 
 /**
  * Build for everything that Chrome loads as a page or as a module:
- * the settings page (options / popup) and the background service worker.
+ * the settings page (options / popup), the offscreen document that copies to
+ * the clipboard, and the background service worker.
  *
  * The content script cannot be an ES module, so it is built separately —
  * see `vite.content.config.ts`.
@@ -26,6 +27,7 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       input: {
         options: resolve(import.meta.dirname, 'options.html'),
+        offscreen: resolve(import.meta.dirname, 'offscreen.html'),
         background: resolve(import.meta.dirname, 'src/background.ts'),
       },
       output: {
