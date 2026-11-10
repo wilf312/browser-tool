@@ -41,6 +41,18 @@ export type RuntimeListener = () => unknown;
 export type AlarmListener = (alarm: { name: string }) => unknown;
 export type TabRemovedListener = (tabId: number) => unknown;
 
+export interface FakeMenuClick {
+  menuItemId: string | number;
+  pageUrl?: string;
+}
+
+export type MenuClickListener = (info: FakeMenuClick, tab?: FakeTab) => unknown;
+export type MessageListener = (
+  message: unknown,
+  sender: object,
+  sendResponse: (response: unknown) => void,
+) => unknown;
+
 export interface FakeChrome {
   store: Record<string, unknown>;
   sessionStore: Record<string, unknown>;
@@ -70,15 +82,33 @@ export interface FakeChrome {
     getCurrent: Mock<() => Promise<FakeTab | undefined>>;
     reload: Mock<(tabId: number) => Promise<void>>;
   };
+  contextMenus: {
+    create: Mock<(properties: chrome.contextMenus.CreateProperties) => string | number>;
+    removeAll: Mock<() => Promise<void>>;
+  };
+  /** Whether the offscreen document is open, as `hasDocument` reports it. */
+  offscreenOpen: boolean;
+  offscreen: {
+    createDocument: Mock<(parameters: chrome.offscreen.CreateParameters) => Promise<void>>;
+    closeDocument: Mock<() => Promise<void>>;
+    hasDocument: Mock<() => Promise<boolean>>;
+  };
+  /**
+   * Delivers a message to the `onMessage` listeners, the way it reaches the
+   * other contexts of the extension, and resolves with the first response.
+   */
+  sendMessage: Mock<(message: unknown) => Promise<unknown>>;
   /** What the service worker registered for the browser lifecycle events. */
   runtime: {
     installed: RuntimeListener[];
     startup: RuntimeListener[];
   };
-  /** What the service worker registered for the alarm and tab events. */
+  /** What the service worker registered for the alarm, tab, menu and message events. */
   events: {
     alarm: AlarmListener[];
     tabRemoved: TabRemovedListener[];
+    menuClicked: MenuClickListener[];
+    message: MessageListener[];
   };
   /** Pretend another context (another tab, the popup, another device) wrote a key. */
   emitChange(key: string, newValue: unknown, areaName?: string): void;
@@ -88,6 +118,8 @@ export interface FakeChrome {
   emitAlarm(name: string): void;
   /** Pretend the user closed a tab. */
   emitTabRemoved(tabId: number): void;
+  /** Pretend the user picked one of the extension's context menu items. */
+  emitMenuClick(info: FakeMenuClick, tab?: FakeTab): void;
 }
 
 /** One storage area, backed by a plain object the test can read afterwards. */
@@ -112,7 +144,12 @@ export function installFakeChrome({
   const listeners: ChangeListener[] = [];
   const alarmStore = new Map<string, FakeAlarm>();
   const runtime = { installed: [] as RuntimeListener[], startup: [] as RuntimeListener[] };
-  const events = { alarm: [] as AlarmListener[], tabRemoved: [] as TabRemovedListener[] };
+  const events = {
+    alarm: [] as AlarmListener[],
+    tabRemoved: [] as TabRemovedListener[],
+    menuClicked: [] as MenuClickListener[],
+    message: [] as MessageListener[],
+  };
 
   const fake: FakeChrome = {
     store,
@@ -138,6 +175,34 @@ export function installFakeChrome({
       getCurrent: vi.fn(async () => currentTab ?? undefined),
       reload: vi.fn(async () => {}),
     },
+    contextMenus: {
+      create: vi.fn((properties: chrome.contextMenus.CreateProperties) => properties.id ?? 0),
+      removeAll: vi.fn(async () => {}),
+    },
+    offscreenOpen: false,
+    offscreen: {
+      createDocument: vi.fn(async () => {
+        if (fake.offscreenOpen) throw new Error('Only a single offscreen document may be created.');
+        fake.offscreenOpen = true;
+      }),
+      closeDocument: vi.fn(async () => {
+        if (!fake.offscreenOpen) throw new Error('No current offscreen document.');
+        fake.offscreenOpen = false;
+      }),
+      hasDocument: vi.fn(async () => fake.offscreenOpen),
+    },
+    sendMessage: vi.fn(async (message: unknown) => {
+      let response: unknown;
+      let answered = false;
+      for (const listener of events.message) {
+        listener(message, {}, (value) => {
+          if (answered) return;
+          answered = true;
+          response = value;
+        });
+      }
+      return response;
+    }),
     emitChange(key, newValue, areaName = 'sync') {
       for (const listener of listeners) listener({ [key]: { newValue } }, areaName);
     },
@@ -149,6 +214,9 @@ export function installFakeChrome({
     },
     emitTabRemoved(tabId) {
       for (const listener of events.tabRemoved) listener(tabId);
+    },
+    emitMenuClick(info, tab) {
+      for (const listener of events.menuClicked) listener(info, tab);
     },
   };
 
@@ -172,9 +240,22 @@ export function installFakeChrome({
         addListener: (listener: TabRemovedListener) => events.tabRemoved.push(listener),
       },
     },
+    contextMenus: {
+      create: fake.contextMenus.create,
+      removeAll: fake.contextMenus.removeAll,
+      onClicked: {
+        addListener: (listener: MenuClickListener) => events.menuClicked.push(listener),
+      },
+    },
+    offscreen: {
+      ...fake.offscreen,
+      Reason: { CLIPBOARD: 'CLIPBOARD' },
+    },
     runtime: {
       onInstalled: { addListener: (listener: RuntimeListener) => runtime.installed.push(listener) },
       onStartup: { addListener: (listener: RuntimeListener) => runtime.startup.push(listener) },
+      onMessage: { addListener: (listener: MessageListener) => events.message.push(listener) },
+      sendMessage: fake.sendMessage,
     },
   } as unknown as typeof chrome;
 

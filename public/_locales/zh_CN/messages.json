@@ -337,5 +337,14 @@
   "panel_postpone_title": {
     "message": "推迟 1 分钟加入",
     "description": "Tooltip of the postpone button."
+  },
+
+  "menu_copy_page_title": {
+    "message": "复制页面标题",
+    "description": "Context menu item that copies the title of the page."
+  },
+  "menu_copy_page_url": {
+    "message": "复制页面 URL",
+    "description": "Context menu item that copies the URL of the page."
   }
 }

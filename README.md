@@ -3,11 +3,12 @@
 <img width="1280" height="800" alt="sc" src="https://github.com/user-attachments/assets/2a90c2e7-cbec-4275-846c-bc96439534a0" />
 
 日々のブラウザ作業を少し楽にする Chrome 拡張です。仕事に必要な小さい道具をまとめた「七つ道具」で、
-今のところ 3 つの機能があります。
+今のところ 4 つの機能があります。
 
 1. **Jira ドメインリダイレクト** — 廃止された Jira (atlassian.net) のドメインへのアクセスを、パス以降をそのまま残したまま移行先のドメインへリダイレクトします
 2. **Meet 自動入室** — Google Meet の待機画面で、次の開始時刻になったら「参加」ボタンを自動でクリックします
 3. **ページ自動リロード** — 開いているタブを、決めた間隔で決めた時間だけリロードし続けます
+4. **ページのタイトル / URL のコピー** — 右クリックメニューから、開いているページのタイトルか URL をクリップボードにコピーします
 
 どの設定も JSON ファイルに書き出して、別の端末で読み込めます（[設定のインポート / エクスポート](#設定のインポート--エクスポート)）。
 
@@ -128,6 +129,39 @@ https://b.atlassian.net/browse/XAPP-134
   押したそのタブに対してだけ許可される権限なので、閲覧履歴を読む権限（`tabs`）は必要ありません。
   `chrome://extensions` から設定画面をタブとして開いた場合は対象のタブがないので、その旨を表示します
 
+## ページのタイトル / URL のコピー
+
+ページを右クリックすると、拡張機能のメニューにコピーの項目が出ます。
+
+```
+右クリック → Nanatsudougu ▸ ページのタイトルをコピー
+                            ページの URL をコピー
+```
+
+- **ページのタイトルをコピー**: タブに表示されているタイトル（`<title>` の内容）をコピーします
+- **ページの URL をコピー**: 開いているページの URL をコピーします
+- ページのどこを右クリックしても出ます。リンクや画像の上で右クリックしたときも、コピーされるのは
+  リンク先ではなく開いているページです（リンク先の URL は Chrome 標準の「リンクのアドレスをコピー」で取れます）
+- ツールバーのアイコンを右クリックしたときのメニューにも同じ項目が出ます
+- 設定はありません。インストールすれば使えます
+
+### しくみ
+
+- メニューは拡張機能のインストール・更新時とブラウザの起動時に作ります（`src/background.ts`）。
+  起動時にも作り直すのは、ブラウザの言語を変えたときにメニューの文言を追従させるためです
+- タイトルと URL は、メニューを選んだタブから読みます。メニューの選択でも
+  [`activeTab`](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab) が付与されるので、閲覧履歴を読む権限（`tabs`）は必要ありません
+- service worker には DOM が無く、クリップボードへ直接書き込めません。そこで
+  [offscreen document](https://developer.chrome.com/docs/extensions/reference/api/offscreen)（`offscreen.html`）という見えない拡張機能のページを
+  コピーの間だけ開き、`document.execCommand('copy')` で書き込んでからすぐ閉じます
+  （`src/lib/clipboard.ts` / `src/offscreen/main.ts`）
+- ページの中ではなく拡張機能のページで書き込むので、`http://` のページや iframe の中にフォーカスが
+  あるとき、拡張機能がスクリプトを入れられないページでも同じように動きます
+- タイトルが空のページでは何もしません。クリップボードの中身を空で上書きしないためです
+- クリップボードへの書き込みには `clipboardWrite` 権限が要ります。この権限はインストール時に
+  「コピーして貼り付けるデータの変更」のような警告が出るものです。書き込むのは選んだ 1 件だけで、
+  クリップボードを読むことはありません
+
 ## 設定のインポート / エクスポート
 
 設定画面のいちばん下から、設定を JSON ファイルに書き出したり、書き出したファイルを読み込んだり
@@ -247,7 +281,7 @@ source map の有無だけです。どちらも同じ `dist/` に、同じ内容
 
 - `manifest.json` が ZIP の直下にある（Chrome Web Store はこの形しか受け付けません）
 - `manifest.json` が参照しているファイル（`background.js` / `content/main.js` /
-  `options.html`）がビルド結果に揃っている
+  `options.html`）と、service worker が名前で開く `offscreen.html` がビルド結果に揃っている
 - `manifest.json` と `package.json` のバージョンが一致している
 - `.map` が残っていない（= 公開用ビルドで作られた `dist/` である）
 
@@ -326,13 +360,14 @@ TDD で実装しています。テストは [Vitest](https://vitest.dev/)（DOM 
 ```
 public/manifest.json       そのまま dist/ にコピーされる
 options.html               設定画面の HTML エントリ
+offscreen.html             クリップボードへ書き込む offscreen document の HTML エントリ
 vite.config.ts             設定画面 + service worker のビルド
 vite.content.config.ts     content script のビルド（IIFE）
 scripts/package.mjs        dist/ を公開用の ZIP にまとめる
 src/                       実装と、その隣に置いたテスト
-  background.ts            service worker: ルール → declarativeNetRequest 同期、リロードのアラーム
+  background.ts            service worker: ルール → declarativeNetRequest 同期、リロードのアラーム、コピーのメニュー
   background.scenario.test.ts
-  entry-points.scenario.test.tsx  2 つのエントリが読み込めることの確認
+  entry-points.scenario.test.tsx  各エントリが読み込めることの確認
   lib/
     types.ts               ルール・設定・スナップショットの型
     redirect.ts            リダイレクト解決 / DNR ルール生成（純粋関数）
@@ -352,6 +387,8 @@ src/                       実装と、その隣に置いたテスト
     meet-page.ts           対象となる Meet の URL 判定
     meet-settings.ts       Meet 自動入室の設定の読み書き
     settings-transfer.ts   設定ファイルの組み立てと読み取り（純粋関数）
+    page-copy.ts           コピーのメニュー項目と、コピーする文字列の決定（純粋関数）
+    clipboard.ts           offscreen document を開いてクリップボードへ書き込む
     *.unit.test.ts         上の各モジュールのユニットテスト
   content/
     main.ts                content script のエントリ
@@ -361,6 +398,8 @@ src/                       実装と、その隣に置いたテスト
     meet-panel.unit.test.tsx
     meet-content.scenario.test.ts          自動入室の一連の流れ
     meet-content-defaults.scenario.test.ts 設定が空のときの既定動作
+  offscreen/
+    main.ts                offscreen document のエントリ: 受け取った文字列をコピーする
   options/
     main.tsx               設定画面のエントリ
     App.tsx                3 つのセクションを並べるだけ
@@ -384,7 +423,7 @@ tests/                     隣に置けないテストと共通のヘルパ
 
 ### ビルドの構成
 
-- **設定画面と service worker** (`vite.config.ts`): ES モジュールとして `dist/` に出力します。`manifest.json` が service worker のパスを名指しするため、`background.js` だけファイル名を固定しています
+- **設定画面・offscreen document・service worker** (`vite.config.ts`): ES モジュールとして `dist/` に出力します。`manifest.json` が service worker のパスを名指しするため、`background.js` だけファイル名を固定しています
 - **content script** (`vite.content.config.ts`): manifest v3 の content script は ES モジュールとして注入できないため、単一の IIFE として別に出力します。動的 `import()` も `web_accessible_resources` も不要になりました
 - React は content script にも同梱されるので、Meet のページには 60 KB ほど（gzip）が追加で読み込まれます。パネルの UI をこれ以上増やさないなら、`MeetPanel.tsx` だけ素の DOM に戻す選択肢もあります
 - `manifest.json` は `public/` にあり、Vite がそのまま `dist/` にコピーします。参照しているパスとビルド成果物の対応は `tests/manifest.unit.test.ts` で確認しています

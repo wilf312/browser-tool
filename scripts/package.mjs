@@ -67,6 +67,11 @@ if (missing.length > 0) {
   fail(`manifest.json が参照しているファイルがビルド結果にありません: ${missing.join(', ')}`);
 }
 
+// The service worker opens this page by name, so the manifest never mentions it.
+if (!files.includes('offscreen.html')) {
+  fail('dist/offscreen.html がありません。右クリックメニューからのコピーが動かなくなります');
+}
+
 const sourcemaps = files.filter((path) => path.endsWith('.map'));
 if (sourcemaps.length > 0) {
   fail(

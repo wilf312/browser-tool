@@ -28,3 +28,13 @@ describe.each(configs)('%s', (_name, config) => {
     expect(forMode(config, 'release').build?.outDir).toBe('dist');
   });
 });
+
+describe('vite.config.ts inputs', () => {
+  it('builds the offscreen document the service worker opens by name', () => {
+    const input = forMode(mainConfig, 'release').build?.rollupOptions?.input as Record<
+      string,
+      string
+    >;
+    expect(input.offscreen).toMatch(/[/\\]offscreen\.html$/);
+  });
+});

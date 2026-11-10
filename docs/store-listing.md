@@ -45,7 +45,7 @@ Jira ドメインの自動リダイレクトと Google Meet の自動入室。�
 
 ```
 仕事中のブラウザで何度も繰り返している小さな手作業を、拡張機能に肩代わりさせます。
-道具は今のところ 3 つ。どれも既定では何もせず、あなたが設定した内容にだけ反応します。
+道具は今のところ 4 つ。どれも既定では何もせず、あなたが設定した内容にだけ反応します。
 
 ■ Jira ドメインリダイレクト
 
@@ -90,6 +90,17 @@ Jira ドメインの自動リダイレクトと Google Meet の自動入室。�
 ・設定画面を閉じてもタイマーは動き続けます。開き直せば残り時間が表示され、そこから
   「停止」で止められます。タブを閉じたときも止まります
 
+■ ページのタイトル / URL のコピー
+
+ページを右クリックして「Nanatsudougu」のメニューから選ぶと、そのページのタイトルか URL を
+クリップボードにコピーします。
+
+  右クリック → Nanatsudougu → ページのタイトルをコピー / ページの URL をコピー
+
+・リンクや画像の上で右クリックしても、コピーされるのはリンク先ではなく開いているページです
+・ツールバーのアイコンを右クリックしたときのメニューからも使えます
+・書き込むのは選んだそのときの 1 件だけで、クリップボードの中身を読むことはありません
+
 ■ 設定の持ち運び
 
 設定は Chrome アカウントで同期されるので、同じアカウントでログインした端末には自動で反映されます。
@@ -108,7 +119,11 @@ JSON ファイルへの書き出しと読み込みもでき、書き出す機能
 ・storage — 設定の保存に使います
 ・alarms — ページ自動リロードの次のリロード時刻を知らせるためのものです
 ・activeTab — ページ自動リロードの対象として、ツールバーのアイコンを押したタブだけを
-  扱うためのものです
+  扱うためと、右クリックしたタブのタイトルをコピーするためのものです
+・contextMenus — 右クリックメニューにタイトル / URL のコピーを追加するためのものです
+・offscreen — バックグラウンドの処理はクリップボードに直接書き込めないため、表示されない
+  拡張機能のページから書き込むためのものです
+・clipboardWrite — 選んだタイトルや URL をクリップボードに書き込むためのものです
 ・*://*.atlassian.net/* — リダイレクトの対象を atlassian.net に限定するためのものです
 ・meet.google.com — 待機画面へカウントダウンを表示し、「参加」ボタンと、待機を続けるか尋ねる
   ダイアログの「待機」ボタンをクリックするためのものです
@@ -142,7 +157,7 @@ Redirects retired Jira domains with their paths intact and joins Google Meet aut
 ### 詳細説明（最大 16,000 文字）
 
 ```
-Takes over the small, repeated browser chores of your workday. There are three tools so far.
+Takes over the small, repeated browser chores of your workday. There are four tools so far.
 None of them does anything by default — each one reacts only to the setup you give it.
 
 ■ Jira domain redirect
@@ -192,6 +207,17 @@ you set.
 ・The timer keeps running after you close the settings screen. Open it again to see the time left
   and press Stop from there. Closing the tab also stops it
 
+■ Copy page title / URL
+
+Right-click a page and pick from the Nanatsudougu menu to copy that page's title or URL to the
+clipboard.
+
+  Right-click → Nanatsudougu → Copy page title / Copy page URL
+
+・Right-clicking on a link or an image still copies the page you are on, not the link target
+・The same items are in the menu you get by right-clicking the toolbar icon
+・It only writes what you picked, when you pick it. It never reads the clipboard
+
 ■ Carrying your settings
 
 Settings sync through your Chrome account, so they reach every device you sign in to with the
@@ -210,7 +236,12 @@ to an external server. There are no ads and no analytics.
 ・declarativeNetRequest — used to redirect the domains you register
 ・storage — used to save your settings
 ・alarms — used to know when the next auto reload is due
-・activeTab — used so auto reload only ever touches the tab you pressed the toolbar icon on
+・activeTab — used so auto reload only ever touches the tab you pressed the toolbar icon on, and
+  so the copy menu can read the title of the tab you right-clicked
+・contextMenus — used to add the items that copy the page title and URL to the right-click menu
+・offscreen — used to write to the clipboard from a hidden extension page, since the background
+  script cannot do it itself
+・clipboardWrite — used to put the title or URL you picked on the clipboard
 ・*://*.atlassian.net/* — used to limit redirects to atlassian.net domains
 ・meet.google.com — used to show the countdown on the waiting screen and to click the Join button
   and the Keep waiting button in the dialog that asks whether to keep waiting
@@ -239,7 +270,7 @@ Redirige los dominios Jira retirados conservando la ruta y entra automáticament
 ### 詳細説明（最大 16,000 文字）
 
 ```
-Se encarga de las pequeñas tareas repetitivas del navegador en tu jornada. De momento hay tres
+Se encarga de las pequeñas tareas repetitivas del navegador en tu jornada. De momento hay cuatro
 herramientas. Ninguna hace nada por defecto: cada una reacciona solo a lo que configures.
 
 ■ Redirección de dominios Jira
@@ -292,6 +323,19 @@ tiempo que definas.
 ・El temporizador sigue activo al cerrar la pantalla de ajustes. Vuelve a abrirla para ver el tiempo
   restante y pulsar Detener. Cerrar la pestaña también lo detiene
 
+■ Copiar el título o la URL de la página
+
+Haz clic derecho en una página y elige en el menú de Nanatsudougu para copiar al portapapeles el
+título o la URL de esa página.
+
+  Clic derecho → Nanatsudougu → Copiar el título de la página / Copiar la URL de la página
+
+・Aunque hagas clic derecho sobre un enlace o una imagen, se copia la página en la que estás, no el
+  destino del enlace
+・Las mismas opciones aparecen en el menú que se abre al hacer clic derecho en el icono de la barra
+  de herramientas
+・Solo escribe lo que eliges, en el momento en que lo eliges. Nunca lee el portapapeles
+
 ■ Llevar tus ajustes
 
 Los ajustes se sincronizan con tu cuenta de Chrome, así que llegan a todos los dispositivos en los
@@ -312,7 +356,13 @@ herramientas de análisis.
 ・storage: se usa para guardar tus ajustes
 ・alarms: se usa para saber cuándo toca la siguiente recarga automática
 ・activeTab: se usa para que la recarga automática solo afecte a la pestaña en la que pulsaste el
-  icono de la barra de herramientas
+  icono de la barra de herramientas, y para que el menú de copia pueda leer el título de la
+  pestaña en la que hiciste clic derecho
+・contextMenus: se usa para añadir al menú contextual las opciones que copian el título y la URL
+  de la página
+・offscreen: se usa para escribir en el portapapeles desde una página oculta de la extensión, ya
+  que el script en segundo plano no puede hacerlo por sí mismo
+・clipboardWrite: se usa para poner en el portapapeles el título o la URL que elegiste
 ・*://*.atlassian.net/*: se usa para limitar las redirecciones a dominios atlassian.net
 ・meet.google.com: se usa para mostrar la cuenta atrás en la pantalla de espera y para pulsar el
   botón «Unirse» y el botón «Seguir esperando» del diálogo que pregunta si quieres seguir esperando
@@ -341,7 +391,7 @@ Nanatsudougu
 ### 詳細説明（最大 16,000 文字）
 
 ```
-替你处理日常工作中在浏览器里反复出现的细小手工作业。目前有三件工具，默认都不会做任何事，
+替你处理日常工作中在浏览器里反复出现的细小手工作业。目前有四件工具，默认都不会做任何事，
 只对你设置的内容作出反应。
 
 ■ Jira 域名重定向
@@ -383,6 +433,16 @@ Nanatsudougu
 ・关闭设置页面后计时器仍会继续运行。重新打开即可看到剩余时间，并从那里按「停止」。关闭标签页
   也会停止
 
+■ 复制页面标题 / URL
+
+在页面上点击右键，从「Nanatsudougu」菜单中选择，即可把该页面的标题或 URL 复制到剪贴板。
+
+  右键 → Nanatsudougu → 复制页面标题 / 复制页面 URL
+
+・即使在链接或图片上点击右键，复制的也是当前打开的页面，而不是链接目标
+・右键点击工具栏图标时出现的菜单中也有同样的选项
+・只在你选择时写入你选择的内容，不会读取剪贴板
+
 ■ 设置的携带
 
 设置会通过 Chrome 账号同步，因此用同一账号登录的设备会自动生效。也可以导出为 JSON 文件并
@@ -399,7 +459,11 @@ Chrome 的同步存储中，不会发送到任何外部服务器。没有广告�
 ・declarativeNetRequest — 用于重定向你登记的域名
 ・storage — 用于保存设置
 ・alarms — 用于得知下一次自动重新加载的时间
-・activeTab — 用于让自动重新加载只作用于你按下工具栏图标的那个标签页
+・activeTab — 用于让自动重新加载只作用于你按下工具栏图标的那个标签页，以及让复制菜单读取你
+  点击右键的那个标签页的标题
+・contextMenus — 用于在右键菜单中添加复制页面标题和 URL 的选项
+・offscreen — 后台脚本无法直接写入剪贴板，因此用于从隐藏的扩展页面写入剪贴板
+・clipboardWrite — 用于把你选择的标题或 URL 放到剪贴板
 ・*://*.atlassian.net/* — 用于把重定向对象限定为 atlassian.net 域名
 ・meet.google.com — 用于在等待页面显示倒计时，以及点击「加入」按钮和询问是否继续等待的
   对话框中的「继续等待」按钮
@@ -429,7 +493,7 @@ Leitet stillgelegte Jira-Domains mit unverändertem Pfad um und tritt Google Mee
 
 ```
 Übernimmt die kleinen, sich wiederholenden Handgriffe im Browser während Ihres Arbeitstags. Bisher
-gibt es drei Werkzeuge. Keines davon tut standardmäßig etwas – jedes reagiert nur auf das, was Sie
+gibt es vier Werkzeuge. Keines davon tut standardmäßig etwas – jedes reagiert nur auf das, was Sie
 einrichten.
 
 ■ Jira-Domain-Weiterleitung
@@ -484,6 +548,18 @@ und für die festgelegte Dauer immer wieder neu.
   sehen Sie die verbleibende Zeit und können dort auf „Stoppen“ klicken. Auch das Schließen des
   Tabs beendet ihn
 
+■ Seitentitel / URL kopieren
+
+Klicken Sie mit der rechten Maustaste auf eine Seite und wählen Sie im Menü „Nanatsudougu“, um
+den Titel oder die URL dieser Seite in die Zwischenablage zu kopieren.
+
+  Rechtsklick → Nanatsudougu → Seitentitel kopieren / Seiten-URL kopieren
+
+・Auch ein Rechtsklick auf einen Link oder ein Bild kopiert die geöffnete Seite, nicht das Linkziel
+・Dieselben Einträge stehen im Menü, das ein Rechtsklick auf das Symbol in der Symbolleiste öffnet
+・Geschrieben wird nur, was Sie auswählen, und nur in dem Moment. Die Zwischenablage wird nie
+  gelesen
+
 ■ Einstellungen mitnehmen
 
 Die Einstellungen werden über Ihr Chrome-Konto synchronisiert und stehen so auf jedem Gerät
@@ -504,7 +580,12 @@ abgelegt; nichts geht an einen externen Server. Es gibt weder Werbung noch Analy
 ・storage – zum Speichern Ihrer Einstellungen
 ・alarms – um zu wissen, wann das nächste automatische Neuladen fällig ist
 ・activeTab – damit das automatische Neuladen nur den Tab betrifft, auf dem Sie das Symbol in der
-  Symbolleiste angeklickt haben
+  Symbolleiste angeklickt haben, und damit das Kopiermenü den Titel des Tabs lesen kann, auf dem
+  Sie mit der rechten Maustaste geklickt haben
+・contextMenus – um dem Kontextmenü die Einträge zum Kopieren von Seitentitel und URL hinzuzufügen
+・offscreen – um aus einer unsichtbaren Seite der Erweiterung in die Zwischenablage zu schreiben,
+  da das Hintergrundskript das nicht selbst kann
+・clipboardWrite – um den ausgewählten Titel oder die URL in die Zwischenablage zu legen
 ・*://*.atlassian.net/* – um Weiterleitungen auf atlassian.net-Domains zu beschränken
 ・meet.google.com – um den Countdown auf dem Wartebildschirm anzuzeigen und auf „Teilnehmen“
   sowie im Dialog, der fragt, ob Sie weiter warten möchten, auf „Weiter warten“ zu klicken
@@ -527,8 +608,8 @@ Chrome Web Store は「拡張機能の目的は 1 つに絞られていること
 ```
 業務で使う Web ツールを開くときの定型操作を自動化し、手作業を減らすことが目的です。
 廃止されたドメインへのアクセスを現行のドメインへ転送すること、会議の待機画面で開始時刻に
-参加ボタンを押すこと、更新を待つページを一定時間リロードし続けることは、いずれもユーザーが
-手で行っている同じ操作の置き換えです。
+参加ボタンを押すこと、更新を待つページを一定時間リロードし続けること、開いているページの
+タイトルや URL をコピーすることは、いずれもユーザーが手で行っている同じ操作の置き換えです。
 ```
 
 差し戻された場合の逃げ道は、Meet 自動入室を別アイテムとして分けて出すことです。コードは
@@ -537,7 +618,7 @@ Chrome Web Store は「拡張機能の目的は 1 つに絞られていること
 
 ### 権限の正当性
 
-権限ごとに欄が分かれています。`manifest.json` が要求しているのは次の 6 つで、それ以外の欄は出ません。
+権限ごとに欄が分かれています。`manifest.json` が要求しているのは次の 9 つで、それ以外の欄は出ません。
 
 **`declarativeNetRequest` の理由**
 
@@ -560,7 +641,25 @@ Chrome Web Store は「拡張機能の目的は 1 つに絞られていること
 **`activeTab` の理由**
 
 ```
-ページ自動リロードの対象タブを設定画面に表示するために使用します。ユーザーがツールバーのアイコンを押した時点のタブに限って URL とタイトルを読み取り、「このタブをリロードします」と示すためだけのものです。読み取った URL は画面に表示するだけで、保存も送信もしません。すべてのサイトを読み取る権限（tabs）は要求していません。
+ページ自動リロードの対象タブを設定画面に表示するためと、右クリックメニューからページのタイトルをコピーするために使用します。ユーザーがツールバーのアイコンを押した時点、または右クリックメニューの項目を選んだ時点のタブに限って URL とタイトルを読み取ります。読み取った URL とタイトルは、画面への表示と、ユーザーが選んだクリップボードへのコピーにだけ使い、保存も送信もしません。すべてのサイトを読み取る権限（tabs）は要求していません。
+```
+
+**`contextMenus` の理由**
+
+```
+右クリックメニューに「ページのタイトルをコピー」「ページの URL をコピー」の 2 項目を追加するために使用します。項目はユーザーが選んだときにだけ動作し、開いているタブのタイトルまたは URL をクリップボードにコピーします。
+```
+
+**`offscreen` の理由**
+
+```
+右クリックメニューで選ばれたタイトルや URL をクリップボードに書き込むために使用します。Manifest V3 の service worker には DOM が無くクリップボードへ書き込めないため、表示されない拡張機能内のページ（offscreen document）を書き込みの間だけ開き、終わったらすぐに閉じます。このページは拡張機能に同梱したもので、外部のコンテンツは読み込みません。
+```
+
+**`clipboardWrite` の理由**
+
+```
+ユーザーが右クリックメニューで選んだページのタイトルまたは URL を、クリップボードに書き込むために使用します。書き込むのはユーザーが選んだその 1 件だけで、クリップボードの内容を読み取ることはありません。コピーした内容は保存も送信もしません。
 ```
 
 **ホスト権限（`*://*.atlassian.net/*`）の理由**
