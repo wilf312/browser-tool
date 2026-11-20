@@ -19,6 +19,7 @@ interface Manifest {
   default_locale?: string;
   permissions: string[];
   host_permissions: string[];
+  optional_host_permissions?: string[];
   background: { service_worker: string; type: string };
   content_scripts: Array<{ matches: string[]; js: string[]; run_at: string }>;
   web_accessible_resources?: unknown;
@@ -72,6 +73,15 @@ describe('manifest.json', () => {
     expect(manifest.permissions).toContain('offscreen');
     expect(manifest.permissions).toContain('clipboardWrite');
     expect(manifest.permissions).not.toContain('tabs');
+  });
+
+  it('asks for the sites of the path replace rules only when a rule names them', () => {
+    // A rule's site is granted from the settings page; the worker then injects
+    // the replace into those pages, and sees no other tab's URL.
+    expect(manifest.permissions).toContain('scripting');
+    expect(manifest.optional_host_permissions).toEqual(['*://*/*']);
+    expect(manifest.host_permissions).not.toContain('*://*/*');
+    expect(manifest.host_permissions).not.toContain('<all_urls>');
   });
 
   it('runs the background script as a module', () => {

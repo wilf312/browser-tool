@@ -1,7 +1,8 @@
 /**
  * Service worker: mirrors the stored rules into declarativeNetRequest so the
  * redirect happens before the retired domain is ever requested, runs the
- * reload timers whose alarms wake it back up, and answers the context menu
+ * reload timers whose alarms wake it back up, replaces the path of the pages
+ * a path replace rule matches, and answers the context menu
  * items that copy the page's title and URL.
  */
 
@@ -11,6 +12,7 @@ import { runReloadAlarm, stopReloadJob } from './lib/reload-jobs';
 import { COPY_TITLE_MENU_ID, COPY_URL_MENU_ID, textToCopy } from './lib/page-copy';
 import { writeToClipboard } from './lib/clipboard';
 import { t } from './lib/i18n';
+import { forgetTab, handleTabUpdated } from './lib/path-replace-tabs';
 
 async function refresh(): Promise<void> {
   try {
@@ -39,8 +41,17 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 // A closed tab cannot be reloaded; its timer goes with it.
 chrome.tabs.onRemoved.addListener((tabId) => {
+  forgetTab(tabId);
   stopReloadJob(tabId).catch((error: unknown) => {
     console.error('[nanatsudougu] failed to stop the reload timer', error);
+  });
+});
+
+// The path replace rules: the worker only hears the URL of the hosts the user
+// granted, so nothing else is ever looked at.
+chrome.tabs.onUpdated.addListener((tabId, change, tab) => {
+  handleTabUpdated(tabId, change, tab).catch((error: unknown) => {
+    console.error('[nanatsudougu] failed to replace the path', error);
   });
 });
 

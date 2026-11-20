@@ -346,5 +346,74 @@
   "menu_copy_page_url": {
     "message": "复制页面 URL",
     "description": "Context menu item that copies the URL of the page."
+  },
+
+  "feature_path_replace": {
+    "message": "路径替换",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "path_replace_lead": {
+    "message": "打开指定主机和路径的页面时，跳转到替换了路径文字的页面。",
+    "description": "Intro of the path replace section."
+  },
+  "path_replace_note": {
+    "message": "更改会自动保存。目标可以使用 *（例如 *.example.com/docs/*）。省略路径则适用于该主机的所有页面。只替换路径，查询参数和哈希保持不变。每条规则需要先点击“允许”才能在对应网站上运行。",
+    "description": "Note under the path replace table."
+  },
+  "path_replace_col_pattern": {
+    "message": "目标",
+    "description": "Path replace table column: the host and path a rule applies to."
+  },
+  "path_replace_col_from": {
+    "message": "替换前",
+    "description": "Path replace table column: the text to replace."
+  },
+  "path_replace_col_to": {
+    "message": "替换后",
+    "description": "Path replace table column: the replacement text."
+  },
+  "path_replace_col_mode": {
+    "message": "动作",
+    "description": "Path replace table column and select: what a rule does."
+  },
+  "path_replace_col_permission": {
+    "message": "权限",
+    "description": "Path replace table column: whether the extension may run on the rule's site."
+  },
+  "path_replace_mode_always": {
+    "message": "总是",
+    "description": "Mode option: replace right away, without asking."
+  },
+  "path_replace_mode_confirm": {
+    "message": "确认",
+    "description": "Mode option: ask before replacing. The default."
+  },
+  "path_replace_mode_disabled": {
+    "message": "停用",
+    "description": "Mode option: the rule does nothing."
+  },
+  "path_replace_allow": {
+    "message": "允许",
+    "description": "Button that asks Chrome for access to the rule's site."
+  },
+  "path_replace_allow_title": {
+    "message": "允许此扩展程序在 $1 上运行",
+    "description": "Tooltip of the allow button; $1 is the site match pattern."
+  },
+  "path_replace_allowed": {
+    "message": "已允许",
+    "description": "Shown once access to the rule's site is granted."
+  },
+  "path_replace_problem_loops": {
+    "message": "替换后的文字包含替换前的文字，此规则不会生效",
+    "description": "Warning on a rule whose replacement contains the text it replaces."
+  },
+  "path_replace_confirm": {
+    "message": "要替换路径并跳转到以下页面吗？\n$1",
+    "description": "Dialog shown on the page before moving; $1 is the new URL."
+  },
+  "describe_path_replace": {
+    "message": "规则 $1 条（总是 $2 条，确认 $3 条）",
+    "description": "Says what the path replace rules hold; $1 all rules, $2 replaced right away, $3 asked first."
   }
 }

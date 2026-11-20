@@ -33,6 +33,17 @@ function storedRules(): RedirectRule[] {
   return chrome.store[STORAGE_KEY] as RedirectRule[];
 }
 
+/** Queries scoped to the section under the heading `title`. */
+function section(title: string) {
+  const element = screen.getByRole('heading', { name: title }).closest('section');
+  if (!element) throw new Error(`no section for ${title}`);
+  return within(element);
+}
+
+const REDIRECT = 'Jira ドメインリダイレクト';
+const MEET = 'Meet 自動入室';
+const TRANSFER = '設定のインポート / エクスポート';
+
 function rows(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('tr[data-id]'));
 }
@@ -86,7 +97,9 @@ describe('redirect rules', () => {
 
   it('shows the empty state when nothing is stored', async () => {
     await mount([]);
-    expect(screen.getByText('ルールがありません。「追加」から登録してください。')).toBeTruthy();
+    expect(
+      section(REDIRECT).getByText('ルールがありません。「追加」から登録してください。'),
+    ).toBeTruthy();
   });
 
   it('persists a toggle after the debounce', async () => {
@@ -146,7 +159,7 @@ describe('redirect rules', () => {
   it('adds a rule and persists it', async () => {
     await mount([]);
 
-    fireEvent.click(screen.getByRole('button', { name: '＋ 追加' }));
+    fireEvent.click(section(REDIRECT).getByRole('button', { name: '＋ 追加' }));
     await settleSave();
 
     expect(rows()).toHaveLength(1);
@@ -157,7 +170,7 @@ describe('redirect rules', () => {
   it('focuses the from input of a freshly added rule', async () => {
     await mount([]);
 
-    fireEvent.click(screen.getByRole('button', { name: '＋ 追加' }));
+    fireEvent.click(section(REDIRECT).getByRole('button', { name: '＋ 追加' }));
 
     expect(document.activeElement).toBe(within(rows()[0]).getByLabelText('from'));
   });
@@ -181,7 +194,7 @@ describe('redirect rules', () => {
     fireEvent.click(screen.getByLabelText('有効'));
     await settleSave();
 
-    expect(screen.getAllByRole('status')[0].textContent).toBe('保存しました');
+    expect(section(REDIRECT).getByRole('status').textContent).toBe('保存しました');
   });
 
   it('reports a failed save instead of pretending it worked', async () => {
@@ -193,7 +206,7 @@ describe('redirect rules', () => {
     fireEvent.click(screen.getByLabelText('有効'));
     await settleSave();
 
-    expect(screen.getAllByRole('status')[0].textContent).toBe('保存に失敗しました');
+    expect(section(REDIRECT).getByRole('status').textContent).toBe('保存に失敗しました');
     expect(logged.mock.calls[0]).toContain(error);
   });
 
@@ -272,7 +285,7 @@ describe('meet auto join settings', () => {
     });
 
     expect(chrome.store[MEET_SETTINGS_KEY]).toEqual({ enabled: true, intervalMinutes: 15 });
-    expect(screen.getAllByRole('status')[1].textContent).toBe('保存しました');
+    expect(section(MEET).getByRole('status').textContent).toBe('保存しました');
   });
 
   it('writes the interval straight away', async () => {
@@ -295,7 +308,7 @@ describe('meet auto join settings', () => {
       fireEvent.click(screen.getByLabelText('自動入室を有効にする'));
     });
 
-    expect(screen.getAllByRole('status')[1].textContent).toBe('保存に失敗しました');
+    expect(section(MEET).getByRole('status').textContent).toBe('保存に失敗しました');
     expect(logged.mock.calls[0]).toContain(error);
     // The checkbox still shows what the user asked for, not what got stored.
     expect(screen.getByLabelText<HTMLInputElement>('自動入室を有効にする').checked).toBe(true);
@@ -307,12 +320,12 @@ describe('meet auto join settings', () => {
     await act(async () => {
       fireEvent.click(screen.getByLabelText('自動入室を有効にする'));
     });
-    expect(screen.getAllByRole('status')[1].textContent).toBe('保存しました');
+    expect(section(MEET).getByRole('status').textContent).toBe('保存しました');
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(1500);
     });
-    expect(screen.getAllByRole('status')[1].textContent).toBe('');
+    expect(section(MEET).getByRole('status').textContent).toBe('');
   });
 
   it('picks up settings changed in another context', async () => {
@@ -405,6 +418,7 @@ describe('settings import / export', () => {
     await mount([storedRule], storedMeet);
 
     fireEvent.click(featureCheckbox('書き出す機能', 'Jira ドメインリダイレクト'));
+    fireEvent.click(featureCheckbox('書き出す機能', 'パスの置き換え'));
     fireEvent.click(featureCheckbox('書き出す機能', 'ページ自動リロード'));
     await clickExport();
 
@@ -423,6 +437,7 @@ describe('settings import / export', () => {
 
     fireEvent.click(featureCheckbox('書き出す機能', 'Jira ドメインリダイレクト'));
     fireEvent.click(featureCheckbox('書き出す機能', 'Meet 自動入室'));
+    fireEvent.click(featureCheckbox('書き出す機能', 'パスの置き換え'));
     fireEvent.click(featureCheckbox('書き出す機能', 'ページ自動リロード'));
 
     expect(screen.getByRole('button', { name: 'エクスポート' })).toHaveProperty('disabled', true);
@@ -437,7 +452,9 @@ describe('settings import / export', () => {
     await clickExport();
 
     expect(downloads).toHaveLength(0);
-    expect(screen.getAllByRole('status')[2].textContent).toBe('エクスポートに失敗しました');
+    expect(section(TRANSFER).getAllByRole('status')[0].textContent).toBe(
+      'エクスポートに失敗しました',
+    );
     expect(logged.mock.calls[0]).toContain(error);
   });
 
@@ -469,7 +486,7 @@ describe('settings import / export', () => {
 
     expect(chrome.store[STORAGE_KEY]).toEqual([storedRule]);
     expect(chrome.store[MEET_SETTINGS_KEY]).toBeUndefined();
-    expect(screen.getAllByRole('status')[3].textContent).toBe('インポートしました');
+    expect(section(TRANSFER).getAllByRole('status')[1].textContent).toBe('インポートしました');
     expect(screen.queryByRole('group', { name: '取り込む機能' })).toBeNull();
   });
 
@@ -558,7 +575,9 @@ describe('settings import / export', () => {
       fireEvent.click(screen.getByRole('button', { name: '選択した設定を適用' }));
     });
 
-    expect(screen.getAllByRole('status')[3].textContent).toBe('インポートに失敗しました');
+    expect(section(TRANSFER).getAllByRole('status')[1].textContent).toBe(
+      'インポートに失敗しました',
+    );
     expect(screen.getByRole('group', { name: '取り込む機能' })).toBeTruthy();
     expect(logged.mock.calls[0]).toContain(error);
   });

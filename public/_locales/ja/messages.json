@@ -346,5 +346,74 @@
   "menu_copy_page_url": {
     "message": "ページの URL をコピー",
     "description": "Context menu item that copies the URL of the page."
+  },
+
+  "feature_path_replace": {
+    "message": "パスの置き換え",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "path_replace_lead": {
+    "message": "指定したホスト・パスのページを開いたら、パスの文字を置き換えたページに移動します。",
+    "description": "Intro of the path replace section."
+  },
+  "path_replace_note": {
+    "message": "変更は自動で保存されます。対象には * が使えます（例: *.example.com/docs/*）。パスを省略するとホストのすべてのページが対象です。置き換えるのはパスだけで、クエリとハッシュはそのまま残ります。各ルールのサイトで動くには「許可する」が必要です。",
+    "description": "Note under the path replace table."
+  },
+  "path_replace_col_pattern": {
+    "message": "対象",
+    "description": "Path replace table column: the host and path a rule applies to."
+  },
+  "path_replace_col_from": {
+    "message": "置換前",
+    "description": "Path replace table column: the text to replace."
+  },
+  "path_replace_col_to": {
+    "message": "置換後",
+    "description": "Path replace table column: the replacement text."
+  },
+  "path_replace_col_mode": {
+    "message": "動作",
+    "description": "Path replace table column and select: what a rule does."
+  },
+  "path_replace_col_permission": {
+    "message": "権限",
+    "description": "Path replace table column: whether the extension may run on the rule's site."
+  },
+  "path_replace_mode_always": {
+    "message": "随時",
+    "description": "Mode option: replace right away, without asking."
+  },
+  "path_replace_mode_confirm": {
+    "message": "確認",
+    "description": "Mode option: ask before replacing. The default."
+  },
+  "path_replace_mode_disabled": {
+    "message": "無効",
+    "description": "Mode option: the rule does nothing."
+  },
+  "path_replace_allow": {
+    "message": "許可する",
+    "description": "Button that asks Chrome for access to the rule's site."
+  },
+  "path_replace_allow_title": {
+    "message": "$1 でこの拡張機能が動くのを許可します",
+    "description": "Tooltip of the allow button; $1 is the site match pattern."
+  },
+  "path_replace_allowed": {
+    "message": "許可済み",
+    "description": "Shown once access to the rule's site is granted."
+  },
+  "path_replace_problem_loops": {
+    "message": "置換後に置換前の文字が含まれているため、このルールは動きません",
+    "description": "Warning on a rule whose replacement contains the text it replaces."
+  },
+  "path_replace_confirm": {
+    "message": "パスを置き換えて次のページに移動しますか？\n$1",
+    "description": "Dialog shown on the page before moving; $1 is the new URL."
+  },
+  "describe_path_replace": {
+    "message": "ルール $1 件（随時 $2 件・確認 $3 件）",
+    "description": "Says what the path replace rules hold; $1 all rules, $2 replaced right away, $3 asked first."
   }
 }

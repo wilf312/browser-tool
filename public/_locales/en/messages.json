@@ -346,5 +346,74 @@
   "menu_copy_page_url": {
     "message": "Copy page URL",
     "description": "Context menu item that copies the URL of the page."
+  },
+
+  "feature_path_replace": {
+    "message": "Path replace",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "path_replace_lead": {
+    "message": "When a page on the given host and path opens, moves to the page whose path has the text replaced.",
+    "description": "Intro of the path replace section."
+  },
+  "path_replace_note": {
+    "message": "Changes are saved automatically. Targets may use * (e.g. *.example.com/docs/*). Leave the path out to cover every page of the host. Only the path is replaced; the query and the hash stay as they are. Each rule needs “Allow” before it runs on its site.",
+    "description": "Note under the path replace table."
+  },
+  "path_replace_col_pattern": {
+    "message": "Target",
+    "description": "Path replace table column: the host and path a rule applies to."
+  },
+  "path_replace_col_from": {
+    "message": "Replace",
+    "description": "Path replace table column: the text to replace."
+  },
+  "path_replace_col_to": {
+    "message": "With",
+    "description": "Path replace table column: the replacement text."
+  },
+  "path_replace_col_mode": {
+    "message": "Mode",
+    "description": "Path replace table column and select: what a rule does."
+  },
+  "path_replace_col_permission": {
+    "message": "Access",
+    "description": "Path replace table column: whether the extension may run on the rule's site."
+  },
+  "path_replace_mode_always": {
+    "message": "Always",
+    "description": "Mode option: replace right away, without asking."
+  },
+  "path_replace_mode_confirm": {
+    "message": "Ask",
+    "description": "Mode option: ask before replacing. The default."
+  },
+  "path_replace_mode_disabled": {
+    "message": "Off",
+    "description": "Mode option: the rule does nothing."
+  },
+  "path_replace_allow": {
+    "message": "Allow",
+    "description": "Button that asks Chrome for access to the rule's site."
+  },
+  "path_replace_allow_title": {
+    "message": "Let the extension run on $1",
+    "description": "Tooltip of the allow button; $1 is the site match pattern."
+  },
+  "path_replace_allowed": {
+    "message": "Allowed",
+    "description": "Shown once access to the rule's site is granted."
+  },
+  "path_replace_problem_loops": {
+    "message": "This rule does nothing: the replacement contains the text it replaces",
+    "description": "Warning on a rule whose replacement contains the text it replaces."
+  },
+  "path_replace_confirm": {
+    "message": "Replace the path and go to this page?\n$1",
+    "description": "Dialog shown on the page before moving; $1 is the new URL."
+  },
+  "describe_path_replace": {
+    "message": "$1 rules ($2 always, $3 ask)",
+    "description": "Says what the path replace rules hold; $1 all rules, $2 replaced right away, $3 asked first."
   }
 }

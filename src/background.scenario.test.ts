@@ -7,6 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { STORAGE_KEY } from './lib/storage';
 import { RELOAD_JOBS_KEY, reloadAlarmName } from './lib/reload-jobs';
 import { COPY_TITLE_MENU_ID, COPY_URL_MENU_ID } from './lib/page-copy';
+import { PATH_REPLACE_STORAGE_KEY } from './lib/path-replace-storage';
 import { installFakeChrome, uninstallFakeChrome, type FakeChrome } from '../tests/fake-chrome';
 
 const RULES = [{ id: '1', from: 'a.atlassian.net', to: 'b.atlassian.net', enabled: true }];
@@ -289,5 +290,48 @@ describe('page copy menu', () => {
 
     await vi.waitFor(() => expect(logged).toHaveBeenCalled());
     expect(String(logged.mock.calls[0][1])).toContain('could not copy');
+  });
+});
+
+describe('path replace', () => {
+  const pathRule = {
+    id: 'p',
+    pattern: '*.example.com/docs/*',
+    from: 'old',
+    to: 'new',
+    mode: 'always',
+  };
+
+  beforeEach(() => {
+    chrome = installFakeChrome({
+      storage: { [STORAGE_KEY]: RULES, [PATH_REPLACE_STORAGE_KEY]: [pathRule] },
+    });
+  });
+
+  it('replaces the path of a tab that opens a matching page', async () => {
+    await boot();
+
+    chrome.emitTabUpdated(5, { status: 'loading', url: 'https://a.example.com/docs/old' });
+
+    await vi.waitFor(() => expect(chrome.scripting.executeScript).toHaveBeenCalled());
+    const [injection] = chrome.scripting.executeScript.mock.calls[0];
+    expect(injection.target).toEqual({ tabId: 5 });
+    expect(injection.args).toEqual([
+      'https://a.example.com/docs/old',
+      'https://a.example.com/docs/new',
+      null,
+    ]);
+  });
+
+  it('logs instead of throwing when the page cannot be scripted', async () => {
+    await boot();
+    const error = new Error('Cannot access contents of the page');
+    chrome.scripting.executeScript.mockRejectedValue(error);
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    chrome.emitTabUpdated(6, { url: 'https://a.example.com/docs/old' });
+
+    await vi.waitFor(() => expect(logged).toHaveBeenCalled());
+    expect(logged.mock.calls[0]).toContain(error);
   });
 });
