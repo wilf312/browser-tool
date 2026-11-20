@@ -35,11 +35,26 @@ export interface FakeChromeOptions {
    * popup has none, which is the default.
    */
   currentTab?: FakeTab | null;
+  /** The optional host permissions already granted, as match patterns. */
+  granted?: string[];
+}
+
+/** What a test sees of one `chrome.scripting.executeScript` call. */
+export interface FakeInjection {
+  target: { tabId: number };
+  func: (...args: never[]) => unknown;
+  args?: unknown[];
 }
 
 export type RuntimeListener = () => unknown;
 export type AlarmListener = (alarm: { name: string }) => unknown;
 export type TabRemovedListener = (tabId: number) => unknown;
+export type TabUpdatedListener = (
+  tabId: number,
+  change: { url?: string; status?: string },
+  tab: { url?: string },
+) => unknown;
+export type PermissionsListener = () => unknown;
 
 export interface FakeMenuClick {
   menuItemId: string | number;
@@ -82,6 +97,18 @@ export interface FakeChrome {
     getCurrent: Mock<() => Promise<FakeTab | undefined>>;
     reload: Mock<(tabId: number) => Promise<void>>;
   };
+  scripting: {
+    executeScript: Mock<(injection: FakeInjection) => Promise<unknown[]>>;
+  };
+  /** The optional host permissions granted so far, as match patterns. */
+  grantedOrigins: Set<string>;
+  permissions: {
+    contains: Mock<(permissions: { origins?: string[] }) => Promise<boolean>>;
+    /** Grants unless `denyPermissionRequests` is set, like the user clicking Allow. */
+    request: Mock<(permissions: { origins?: string[] }) => Promise<boolean>>;
+  };
+  /** Makes the next permission requests answer as if the user declined. */
+  denyPermissionRequests: boolean;
   contextMenus: {
     create: Mock<(properties: chrome.contextMenus.CreateProperties) => string | number>;
     removeAll: Mock<() => Promise<void>>;
@@ -107,6 +134,8 @@ export interface FakeChrome {
   events: {
     alarm: AlarmListener[];
     tabRemoved: TabRemovedListener[];
+    tabUpdated: TabUpdatedListener[];
+    permissionsChanged: PermissionsListener[];
     menuClicked: MenuClickListener[];
     message: MessageListener[];
   };
@@ -118,8 +147,25 @@ export interface FakeChrome {
   emitAlarm(name: string): void;
   /** Pretend the user closed a tab. */
   emitTabRemoved(tabId: number): void;
+  /** Pretend a tab navigated or started loading. */
+  emitTabUpdated(
+    tabId: number,
+    change: { url?: string; status?: string },
+    tab?: { url?: string },
+  ): void;
   /** Pretend the user picked one of the extension's context menu items. */
   emitMenuClick(info: FakeMenuClick, tab?: FakeTab): void;
+}
+
+/** A `chrome.permissions` event, both of which land in the same list. */
+function permissionEvent(target: PermissionsListener[]) {
+  return {
+    addListener: (listener: PermissionsListener) => target.push(listener),
+    removeListener: (listener: PermissionsListener) => {
+      const index = target.indexOf(listener);
+      if (index !== -1) target.splice(index, 1);
+    },
+  };
 }
 
 /** One storage area, backed by a plain object the test can read afterwards. */
@@ -138,8 +184,10 @@ export function installFakeChrome({
   dynamicRules = [],
   activeTab = null,
   currentTab = null,
+  granted = [],
 }: FakeChromeOptions = {}): FakeChrome {
   const store: Record<string, unknown> = { ...storage };
+  const grantedOrigins = new Set<string>(granted);
   const sessionStore: Record<string, unknown> = { ...session };
   const listeners: ChangeListener[] = [];
   const alarmStore = new Map<string, FakeAlarm>();
@@ -147,6 +195,8 @@ export function installFakeChrome({
   const events = {
     alarm: [] as AlarmListener[],
     tabRemoved: [] as TabRemovedListener[],
+    tabUpdated: [] as TabUpdatedListener[],
+    permissionsChanged: [] as PermissionsListener[],
     menuClicked: [] as MenuClickListener[],
     message: [] as MessageListener[],
   };
@@ -175,6 +225,22 @@ export function installFakeChrome({
       getCurrent: vi.fn(async () => currentTab ?? undefined),
       reload: vi.fn(async () => {}),
     },
+    scripting: {
+      executeScript: vi.fn(async () => []),
+    },
+    grantedOrigins,
+    permissions: {
+      contains: vi.fn(async ({ origins = [] }) =>
+        origins.every((origin) => grantedOrigins.has(origin)),
+      ),
+      request: vi.fn(async ({ origins = [] }) => {
+        if (fake.denyPermissionRequests) return false;
+        for (const origin of origins) grantedOrigins.add(origin);
+        for (const listener of events.permissionsChanged) listener();
+        return true;
+      }),
+    },
+    denyPermissionRequests: false,
     contextMenus: {
       create: vi.fn((properties: chrome.contextMenus.CreateProperties) => properties.id ?? 0),
       removeAll: vi.fn(async () => {}),
@@ -215,6 +281,9 @@ export function installFakeChrome({
     emitTabRemoved(tabId) {
       for (const listener of events.tabRemoved) listener(tabId);
     },
+    emitTabUpdated(tabId, change, tab = {}) {
+      for (const listener of events.tabUpdated) listener(tabId, change, tab);
+    },
     emitMenuClick(info, tab) {
       for (const listener of events.menuClicked) listener(info, tab);
     },
@@ -239,6 +308,16 @@ export function installFakeChrome({
       onRemoved: {
         addListener: (listener: TabRemovedListener) => events.tabRemoved.push(listener),
       },
+      onUpdated: {
+        addListener: (listener: TabUpdatedListener) => events.tabUpdated.push(listener),
+      },
+    },
+    scripting: fake.scripting,
+    permissions: {
+      contains: fake.permissions.contains,
+      request: fake.permissions.request,
+      onAdded: permissionEvent(events.permissionsChanged),
+      onRemoved: permissionEvent(events.permissionsChanged),
     },
     contextMenus: {
       create: fake.contextMenus.create,

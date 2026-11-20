@@ -13,6 +13,11 @@ import {
   onReloadSettingsChanged,
   saveReloadSettings,
 } from '../lib/reload-settings';
+import {
+  loadPathReplaceRules,
+  onPathReplaceRulesChanged,
+  savePathReplaceRules,
+} from '../lib/path-replace-storage';
 import { loadRules, onRulesChanged, saveRules } from '../lib/storage';
 import { t } from '../lib/i18n';
 import {
@@ -37,6 +42,7 @@ import { useStatus } from './useStatus';
 async function readFeatures(ids: readonly FeatureId[]): Promise<SettingsFeatures> {
   const features: SettingsFeatures = {};
   if (ids.includes('redirectRules')) features.redirectRules = await loadRules();
+  if (ids.includes('pathReplaceRules')) features.pathReplaceRules = await loadPathReplaceRules();
   if (ids.includes('meetAutoJoin')) features.meetAutoJoin = await loadMeetSettings();
   if (ids.includes('reloadTimer')) features.reloadTimer = await loadReloadSettings();
   return features;
@@ -45,6 +51,9 @@ async function readFeatures(ids: readonly FeatureId[]): Promise<SettingsFeatures
 /** Write the picked features back. The other sections pick the change up through storage. */
 async function writeFeatures(features: SettingsFeatures): Promise<void> {
   if (features.redirectRules !== undefined) await saveRules(features.redirectRules);
+  if (features.pathReplaceRules !== undefined) {
+    await savePathReplaceRules(features.pathReplaceRules);
+  }
   if (features.meetAutoJoin !== undefined) await saveMeetSettings(features.meetAutoJoin);
   if (features.reloadTimer !== undefined) await saveReloadSettings(features.reloadTimer);
 }
@@ -67,12 +76,18 @@ export function SettingsTransferSection() {
 
   useEffect(() => {
     loadRules().then((rules) => setStored((current) => ({ ...current, redirectRules: rules })));
+    loadPathReplaceRules().then((rules) =>
+      setStored((current) => ({ ...current, pathReplaceRules: rules })),
+    );
     loadMeetSettings().then((meet) => setStored((current) => ({ ...current, meetAutoJoin: meet })));
     loadReloadSettings().then((timer) =>
       setStored((current) => ({ ...current, reloadTimer: timer })),
     );
 
     onRulesChanged((rules) => setStored((current) => ({ ...current, redirectRules: rules })));
+    onPathReplaceRulesChanged((rules) =>
+      setStored((current) => ({ ...current, pathReplaceRules: rules })),
+    );
     onMeetSettingsChanged((meet) => setStored((current) => ({ ...current, meetAutoJoin: meet })));
     onReloadSettingsChanged((timer) =>
       setStored((current) => ({ ...current, reloadTimer: timer })),

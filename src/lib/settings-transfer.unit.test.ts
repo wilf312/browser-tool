@@ -36,6 +36,7 @@ describe('the features that can be transferred', () => {
   it('has a label for every feature', () => {
     expect(FEATURE_IDS.map((id) => FEATURE_LABELS[id])).toEqual([
       'Jira ドメインリダイレクト',
+      'パスの置き換え',
       'Meet 自動入室',
       'ページ自動リロード',
     ]);

@@ -10,8 +10,9 @@ import { t } from './i18n';
 import { sanitizeMeetSettings } from './meet-settings';
 import { sanitizeReloadSettings } from './reload-settings';
 import { formatDurationLabel, formatIntervalLabel } from './reload-timer';
+import { sanitizePathReplaceRules } from './path-replace-storage';
 import { sanitizeRules } from './storage';
-import type { MeetSettings, RedirectRule, ReloadSettings } from './types';
+import type { MeetSettings, PathReplaceRule, RedirectRule, ReloadSettings } from './types';
 
 /** Stamped into the file so an unrelated JSON is rejected instead of half applied. */
 export const EXPORT_FORMAT = 'nanatsudougu-settings';
@@ -21,12 +22,18 @@ export const EXPORT_VERSION = 1;
 const LEGACY_EXPORT_FORMATS = new Set<string>(['browser-tool-settings']);
 
 /** The features that can be exported and imported on their own. */
-export const FEATURE_IDS = ['redirectRules', 'meetAutoJoin', 'reloadTimer'] as const;
+export const FEATURE_IDS = [
+  'redirectRules',
+  'pathReplaceRules',
+  'meetAutoJoin',
+  'reloadTimer',
+] as const;
 
 export type FeatureId = (typeof FEATURE_IDS)[number];
 
 export const FEATURE_LABELS: Readonly<Record<FeatureId, string>> = Object.freeze({
   redirectRules: t('feature_redirect_rules'),
+  pathReplaceRules: t('feature_path_replace'),
   meetAutoJoin: t('feature_meet_auto_join'),
   reloadTimer: t('feature_reload_timer'),
 });
@@ -34,6 +41,7 @@ export const FEATURE_LABELS: Readonly<Record<FeatureId, string>> = Object.freeze
 /** The settings of each feature. A bundle carries only the ones that were picked. */
 export interface SettingsFeatures {
   redirectRules?: RedirectRule[];
+  pathReplaceRules?: PathReplaceRule[];
   meetAutoJoin?: MeetSettings;
   /** The values a timer starts with. The running timers themselves are not carried. */
   reloadTimer?: ReloadSettings;
@@ -57,6 +65,9 @@ export function pickFeatures(
   const picked: SettingsFeatures = {};
   if (ids.includes('redirectRules') && features.redirectRules !== undefined) {
     picked.redirectRules = features.redirectRules;
+  }
+  if (ids.includes('pathReplaceRules') && features.pathReplaceRules !== undefined) {
+    picked.pathReplaceRules = features.pathReplaceRules;
   }
   if (ids.includes('meetAutoJoin') && features.meetAutoJoin !== undefined) {
     picked.meetAutoJoin = features.meetAutoJoin;
@@ -98,6 +109,9 @@ export function sanitizeFeatures(raw: unknown): SettingsFeatures {
   const result: SettingsFeatures = {};
   if (Array.isArray(features.redirectRules)) {
     result.redirectRules = sanitizeRules(features.redirectRules);
+  }
+  if (Array.isArray(features.pathReplaceRules)) {
+    result.pathReplaceRules = sanitizePathReplaceRules(features.pathReplaceRules);
   }
   const meet = features.meetAutoJoin;
   if (meet !== null && typeof meet === 'object' && !Array.isArray(meet)) {
@@ -162,6 +176,14 @@ export function describeFeature(features: SettingsFeatures, id: FeatureId): stri
     if (rules.length === 0) return t('describe_no_rules');
     const enabled = rules.filter((rule) => rule.enabled).length;
     return t('describe_rules', [String(rules.length), String(enabled)]);
+  }
+  if (id === 'pathReplaceRules') {
+    const rules = features.pathReplaceRules;
+    if (rules === undefined) return '';
+    if (rules.length === 0) return t('describe_no_rules');
+    const count = (mode: PathReplaceRule['mode']) =>
+      String(rules.filter((rule) => rule.mode === mode).length);
+    return t('describe_path_replace', [String(rules.length), count('always'), count('confirm')]);
   }
   if (id === 'meetAutoJoin') {
     const settings = features.meetAutoJoin;

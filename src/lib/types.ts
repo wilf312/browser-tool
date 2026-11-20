@@ -8,6 +8,25 @@ export interface RedirectRule {
   enabled: boolean;
 }
 
+/**
+ * What a path replace rule does when a page matches it:
+ * `always` replaces the URL right away, `confirm` asks first, `disabled` does nothing.
+ */
+export type PathReplaceMode = 'always' | 'confirm' | 'disabled';
+
+/**
+ * One path replace rule. `pattern` is a host plus an optional path such as
+ * `*.example.com/docs/*`, where `*` stands for any run of characters. On a
+ * matching page every `from` in the pathname becomes `to`.
+ */
+export interface PathReplaceRule {
+  id: string;
+  pattern: string;
+  from: string;
+  to: string;
+  mode: PathReplaceMode;
+}
+
 /** The Meet auto join settings. */
 export interface MeetSettings {
   enabled: boolean;

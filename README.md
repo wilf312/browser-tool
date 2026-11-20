@@ -3,12 +3,13 @@
 <img width="1280" height="800" alt="sc" src="https://github.com/user-attachments/assets/2a90c2e7-cbec-4275-846c-bc96439534a0" />
 
 日々のブラウザ作業を少し楽にする Chrome 拡張です。仕事に必要な小さい道具をまとめた「七つ道具」で、
-今のところ 4 つの機能があります。
+今のところ 5 つの機能があります。
 
 1. **Jira ドメインリダイレクト** — 廃止された Jira (atlassian.net) のドメインへのアクセスを、パス以降をそのまま残したまま移行先のドメインへリダイレクトします
-2. **Meet 自動入室** — Google Meet の待機画面で、次の開始時刻になったら「参加」ボタンを自動でクリックします
-3. **ページ自動リロード** — 開いているタブを、決めた間隔で決めた時間だけリロードし続けます
-4. **ページのタイトル / URL のコピー** — 右クリックメニューから、開いているページのタイトルか URL をクリップボードにコピーします
+2. **パスの置き換え** — 指定したホスト・パスのページを開いたら、パスの文字を置き換えたページへ `location.replace` で移動します
+3. **Meet 自動入室** — Google Meet の待機画面で、次の開始時刻になったら「参加」ボタンを自動でクリックします
+4. **ページ自動リロード** — 開いているタブを、決めた間隔で決めた時間だけリロードし続けます
+5. **ページのタイトル / URL のコピー** — 右クリックメニューから、開いているページのタイトルか URL をクリップボードにコピーします
 
 どの設定も JSON ファイルに書き出して、別の端末で読み込めます（[設定のインポート / エクスポート](#設定のインポート--エクスポート)）。
 
@@ -59,6 +60,46 @@ https://b.atlassian.net/browse/XAPP-134
 - 対象は `main_frame`（アドレスバーやリンクによるページ遷移）のみです
 
 権限は `*://*.atlassian.net/*` に限定しています。atlassian.net 以外のドメインをルールに登録したい場合は `manifest.json` の `host_permissions` を広げてください。
+
+## パスの置き換え
+
+```
+対象 example.com/docs/*   置換前 old   置換後 new
+
+https://example.com/docs/old/a?q=1
+                ↓
+https://example.com/docs/new/a?q=1
+```
+
+| 対象                   | 置換前 | 置換後 | 動作 | 権限     | 削除 |
+| ---------------------- | ------ | ------ | ---- | -------- | ---- |
+| `*.example.com/docs/*` | `old`  | `new`  | 確認 | 許可する | 削除 |
+
+- **対象**: ホストとパスを `*.example.com/docs/*` のように書きます。`*` は任意の文字列です。
+  パスを省略するとそのホストのすべてのページが対象です。ホストは大文字小文字を区別せず、パスは区別します
+- **置換前 / 置換後**: パスの中の「置換前」をすべて「置換後」に置き換えます。置き換えるのは**パスだけ**で、
+  ホスト・クエリ・ハッシュはそのまま残ります
+- **動作**: ルールごとに選びます。新しいルールは「確認」から始まります
+  - **随時**: 該当のページを開いたらすぐに移動します
+  - **確認**: 移動してよいかをページ上の確認ダイアログで聞きます。キャンセルするとそのページに留まります
+  - **無効**: 何もしません
+- **権限**: ルールのサイトで拡張機能が動くには、「許可する」を押して Chrome の確認に答える必要があります。
+  許可していないサイトでは、ルールがあっても何も起きません
+- 上の行が優先されます。置換後に置換前の文字が含まれるルール（`v1` → `v1/new` など）は、
+  移動先でもう一度一致してしまうため無視し、設定画面に警告を出します
+
+### しくみ
+
+- ルールは `chrome.storage.sync` に保存されます（`src/lib/path-replace-storage.ts`）
+- Service worker が `tabs.onUpdated` でページの読み込みと URL の変化（SPA の `pushState` も含む）を受け取り、
+  ルールに一致すれば [`scripting.executeScript`](https://developer.chrome.com/docs/extensions/reference/api/scripting)
+  で小さな関数をページに入れます。その関数が必要なら `confirm()` で聞いてから `location.replace` します
+  （`src/lib/path-replace-tabs.ts`）。`location.replace` なので、置き換え前のページは履歴に残りません
+- サイトの権限は `optional_host_permissions` で、ルールのホストごとに設定画面から求めます
+  （`*.example.com` なら `*://*.example.com/*`）。`dev-*.example.com` のように先頭以外に `*` があると
+  Chrome の match pattern で表せないため、すべてのサイト（`*://*/*`）を求めます
+- `tabs` 権限は使いません。許可していないサイトのタブの URL は service worker から見えないので、
+  ルールと関係ないページの URL を読むことはありません
 
 ## Meet 自動入室
 
@@ -177,6 +218,7 @@ https://b.atlassian.net/browse/XAPP-134
 
 [インポート]
   取り込む機能  ☑ Jira ドメインリダイレクト  ルール 2 件（有効 1 件）
+                ☑ パスの置き換え             ルール 3 件（随時 1 件・確認 1 件）
                 ☐ Meet 自動入室              自動入室 ON / 15 分間隔
                 ☑ ページ自動リロード         5 分ごと / 1 時間
                                                   ↓
@@ -189,7 +231,8 @@ https://b.atlassian.net/browse/XAPP-134
   確認して、取り込む機能にチェックを入れ、「選択した設定を適用」を押したときだけ保存されます。
   チェックを外した機能と、ファイルに入っていない機能は今の設定のままです
 - 適用は**置き換え**です。リダイレクトルールは今のルールに追加されるのではなく、ファイルの
-  ルールに入れ替わります
+  ルールに入れ替わります。パスの置き換えも同じです。サイトの権限はファイルに入らないので、
+  取り込んだあとに設定画面で「許可する」を押してください
 - 適用した内容は `chrome.storage.sync` に書かれるので、上のセクションの表示もその場で
   更新され、他の端末にも同期されます
 
@@ -204,6 +247,15 @@ https://b.atlassian.net/browse/XAPP-134
     "redirectRules": [
       { "id": "1", "from": "a.atlassian.net", "to": "b.atlassian.net", "enabled": true }
     ],
+    "pathReplaceRules": [
+      {
+        "id": "2",
+        "pattern": "*.example.com/docs/*",
+        "from": "old",
+        "to": "new",
+        "mode": "confirm"
+      }
+    ],
     "meetAutoJoin": { "enabled": true, "intervalMinutes": 15 },
     "reloadTimer": { "intervalSeconds": 300, "durationMinutes": 60 }
   }
@@ -215,7 +267,7 @@ https://b.atlassian.net/browse/XAPP-134
 
 `format` が違うファイル、壊れた JSON、この拡張より新しい `version` のファイルは、理由を表示して
 読み込みません。手で編集したファイルは、通常の保存と同じ正規化（`sanitizeRules` /
-`sanitizeMeetSettings` / `sanitizeReloadSettings`）を通してから適用されるので、欠けた項目は
+`sanitizePathReplaceRules` / `sanitizeMeetSettings` / `sanitizeReloadSettings`）を通してから適用されるので、欠けた項目は
 既定値で埋まります。
 
 改名前の `browser-tool` で書き出したファイル（`"format": "browser-tool-settings"`）も、

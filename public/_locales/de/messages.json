@@ -346,5 +346,74 @@
   "menu_copy_page_url": {
     "message": "Seiten-URL kopieren",
     "description": "Context menu item that copies the URL of the page."
+  },
+
+  "feature_path_replace": {
+    "message": "Pfad ersetzen",
+    "description": "Feature name, used as its section heading and export label."
+  },
+  "path_replace_lead": {
+    "message": "Öffnet sich eine Seite auf dem angegebenen Host und Pfad, wird zur Seite mit ersetztem Text im Pfad gewechselt.",
+    "description": "Intro of the path replace section."
+  },
+  "path_replace_note": {
+    "message": "Änderungen werden automatisch gespeichert. Ziele dürfen * enthalten (z. B. *.example.com/docs/*). Ohne Pfad gilt die Regel für alle Seiten des Hosts. Ersetzt wird nur der Pfad; Query und Hash bleiben erhalten. Jede Regel braucht „Erlauben“, bevor sie auf ihrer Website läuft.",
+    "description": "Note under the path replace table."
+  },
+  "path_replace_col_pattern": {
+    "message": "Ziel",
+    "description": "Path replace table column: the host and path a rule applies to."
+  },
+  "path_replace_col_from": {
+    "message": "Ersetzen",
+    "description": "Path replace table column: the text to replace."
+  },
+  "path_replace_col_to": {
+    "message": "Durch",
+    "description": "Path replace table column: the replacement text."
+  },
+  "path_replace_col_mode": {
+    "message": "Modus",
+    "description": "Path replace table column and select: what a rule does."
+  },
+  "path_replace_col_permission": {
+    "message": "Zugriff",
+    "description": "Path replace table column: whether the extension may run on the rule's site."
+  },
+  "path_replace_mode_always": {
+    "message": "Immer",
+    "description": "Mode option: replace right away, without asking."
+  },
+  "path_replace_mode_confirm": {
+    "message": "Nachfragen",
+    "description": "Mode option: ask before replacing. The default."
+  },
+  "path_replace_mode_disabled": {
+    "message": "Aus",
+    "description": "Mode option: the rule does nothing."
+  },
+  "path_replace_allow": {
+    "message": "Erlauben",
+    "description": "Button that asks Chrome for access to the rule's site."
+  },
+  "path_replace_allow_title": {
+    "message": "Die Erweiterung auf $1 laufen lassen",
+    "description": "Tooltip of the allow button; $1 is the site match pattern."
+  },
+  "path_replace_allowed": {
+    "message": "Erlaubt",
+    "description": "Shown once access to the rule's site is granted."
+  },
+  "path_replace_problem_loops": {
+    "message": "Diese Regel wirkt nicht: Der Ersatz enthält den zu ersetzenden Text",
+    "description": "Warning on a rule whose replacement contains the text it replaces."
+  },
+  "path_replace_confirm": {
+    "message": "Pfad ersetzen und zu dieser Seite wechseln?\n$1",
+    "description": "Dialog shown on the page before moving; $1 is the new URL."
+  },
+  "describe_path_replace": {
+    "message": "$1 Regeln ($2 immer, $3 nachfragen)",
+    "description": "Says what the path replace rules hold; $1 all rules, $2 replaced right away, $3 asked first."
   }
 }

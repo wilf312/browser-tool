@@ -11,9 +11,11 @@
     "activeTab",
     "contextMenus",
     "offscreen",
-    "clipboardWrite"
+    "clipboardWrite",
+    "scripting"
   ],
   "host_permissions": ["*://*.atlassian.net/*"],
+  "optional_host_permissions": ["*://*/*"],
   "background": {
     "service_worker": "background.js",
     "type": "module"
